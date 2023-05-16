@@ -2,9 +2,7 @@ package src;
 public class Tile {
     private int value;
 
-    public Tile(int tileX, int tileY, int value) {
-        this.tileX = tileX;
-        this.tileY = tileY;
+    public Tile(int value) {
         this.value = value;
     }
 
