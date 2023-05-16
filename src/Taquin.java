@@ -3,7 +3,7 @@ public class Taquin {
     private Level[] levels;
     private Level currentLevel;
     private Level[] unlockedLevels;
-    private Pile moves;
+    private Stack moves;
     private int moveCount;
 
     public void start(){}
