@@ -15,6 +15,7 @@ public class Level {
                 tempList.add(T[i].getValeur);
             }
         }
+
         Collections.shuffle(tempList);
         int p = 0 ;
         for (int i=0; i<= n-1; i++) {

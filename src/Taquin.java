@@ -14,6 +14,7 @@ public class Taquin {
     public void checkSolvable(){}
     public void checkVictory(){}
     public void saveScore(){}
+
     public void unlockNextLevel(){}
     public void displayLevelSolved(){}
     public void undoMove(){}
