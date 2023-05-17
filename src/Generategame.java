@@ -85,12 +85,11 @@ public class Generategame {
         for (int i = 0; i < format; i++) {
             for (int j = 0; j < format; j++) {
 
-            if(emptycase[i][j] == 0){
-                emptycase[i][j]=3;
+                if(emptycase[i][j] == 0){
+                    emptycase[i][j]=3;
+                }
+
             }
-
-        }
-
         }
 
 
@@ -114,8 +113,9 @@ public class Generategame {
                     default:
                         filledcase[i][j]="_";
 
-
-                }}}
+                }
+            }
+        }
 
 
 
@@ -131,9 +131,7 @@ public class Generategame {
                     }
 
                 }
-                }
-
-
+            }
         }
 
 

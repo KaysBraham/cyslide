@@ -36,18 +36,18 @@ public class Chronometer {
 
     // Starts the chronometer
     public void start(){
-        if(!isRunning()){
-            setStartTime(currentTimeSec());
-            setRunning(true);
-        }
+        if(isRunning()) return;
+
+        setStartTime(currentTimeSec());
+        setRunning(true);
     }
 
     // Stops the chronometer and calculates the elapsed time
     public void stop(){
-        if(isRunning()){
-            updateElapsedTime();
-            setRunning(false);
-        }
+        if(!isRunning()) return;
+
+        updateElapsedTime();
+        setRunning(false);
     }
 
     // Resets the chronometer to its initial state
