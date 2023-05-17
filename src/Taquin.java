@@ -1,4 +1,10 @@
 package src;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+
 public class Taquin {
     private Level[] levels;
     private Level currentLevel;
@@ -9,7 +15,7 @@ public class Taquin {
     public void start(){}
     public void loadLevels(){}
     public void selectLevel(int currentLevel){}
-    public void shuffleLevel(){}
+
     public void moveTile(){}
     public void checkSolvable(){}
     public void checkVictory(){}
