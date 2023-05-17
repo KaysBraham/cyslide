@@ -17,6 +17,10 @@ public class Chronometer {
     public void setElapsedTime(int elapsedTime) {
         this.elapsedTime = elapsedTime;
     }
+    // Updates the elapsed time
+    public void updateElapsedTime(){
+        setElapsedTime(getElapsedTime() + currentTimeSec() - getStartTime());
+    }
     
     public boolean isRunning() {
         return running;
@@ -41,7 +45,7 @@ public class Chronometer {
     // Stops the chronometer and calculates the elapsed time
     public void stop(){
         if(isRunning()){
-            setElapsedTime(getElapsedTime() + currentTimeSec() - getStartTime());
+            updateElapsedTime();
             setRunning(false);
         }
     }
