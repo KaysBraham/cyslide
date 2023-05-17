@@ -1,13 +1,54 @@
 package src;
 public class Chronometer {
-    private int startTime;
-    private int elapsedTime;
-    private boolean isRunning;
-    public void start(){}
-    public void stop(){}
-    public void reset(){}
+    private int startTime; // Holds the starting time in seconds
+    private int elapsedTime; // Holds the elapsed time in seconds
+    private boolean running = false; // Indicates whether the chronometer is running or not
+    
+    public int getStartTime() {
+        return startTime;
+    }
+    public void setStartTime(int startTime) {
+        this.startTime = startTime;
+    }
 
     public int getElapsedTime() {
         return elapsedTime;
+    }
+    public void setElapsedTime(int elapsedTime) {
+        this.elapsedTime = elapsedTime;
+    }
+    
+    public boolean isRunning() {
+        return running;
+    }
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+
+    // Returns the current time in seconds
+    public int currentTimeSec(){
+        return (int) ((System.currentTimeMillis()) / 1000); // Using the System method currentTimeMillis() and converting it to seconds
+    }
+
+    // Starts the chronometer
+    public void start(){
+        if(!isRunning()){
+            setStartTime(currentTimeSec());
+            setRunning(true);
+        }
+    }
+
+    // Stops the chronometer and calculates the elapsed time
+    public void stop(){
+        if(isRunning()){
+            setElapsedTime(getElapsedTime() + currentTimeSec() - getStartTime());
+            setRunning(false);
+        }
+    }
+
+    // Resets the chronometer to its initial state
+    public void reset(){
+        setElapsedTime(0);
+        setRunning(false);
     }
 }
