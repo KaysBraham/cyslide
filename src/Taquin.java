@@ -1,9 +1,12 @@
 package src;
+
+import java.util.Stack;
+
 public class Taquin {
     private Level[] levels;
     private Level currentLevel;
     private Level[] unlockedLevels;
-    private Stack moves;
+    private Stack<Move> moves;
     private int moveCount;
 
     public void start(){}
