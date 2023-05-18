@@ -23,7 +23,7 @@ import java.util.Scanner;
 
 public class EndScreen extends Application {
 
-
+    public MainMenu mainmenu=new MainMenu();
 
     private int point;
     private int level;
@@ -34,6 +34,7 @@ public class EndScreen extends Application {
 
 
     public int collectpoint() throws FileNotFoundException {
+
         File file = new File("pointlastgame.txt"); //to register pointlastgame
         Scanner pointlastgame = new Scanner(file); //collect the point
         String[] data = pointlastgame.next().split(";");
@@ -53,6 +54,8 @@ public class EndScreen extends Application {
         pointlastgame.close();
 
         return level;//return point
+
+
 
     }
     public void show(){
@@ -128,6 +131,15 @@ public class EndScreen extends Application {
             pauseTransition.setOnFinished(e -> home.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leoscar'"));//to remove the transparent
             pauseTransition.play();
         });
+        home.setOnAction(event -> { //to check if the user push the button
+            leave(endStage);
+
+            try {
+                home();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
 
 
         // ---------------------------------------Create "leave" button---------------------------------------------------
@@ -172,12 +184,12 @@ public class EndScreen extends Application {
     public void saveScore(int point) {
 
         try{ //to check the availability of score
-            FileWriter writer = new FileWriter("point.txt");
-            writer.write("Score: " + point); //to register the point on point.txt
-            writer.close();
+        FileWriter writer = new FileWriter("point.txt");
+        writer.write("Score: " + point); //to register the point on point.txt
+        writer.close();
         } catch (IOException e) {
-            System.out.println("Error  : " + e.getMessage());
-        }
+        System.out.println("Error  : " + e.getMessage());
+    }
 
     }
 
@@ -191,7 +203,10 @@ public class EndScreen extends Application {
         EndScreen end=new EndScreen();
         end.show();
 
-
+    }
+    public void home() throws FileNotFoundException {
+        Stage stage=new Stage();
+        mainmenu.start(stage);
     }
 }
 
@@ -200,5 +215,5 @@ public class EndScreen extends Application {
 /* public void tryAgain(self){}
     public void replay(self){}
 
-    public void home(self){}
+
     */
