@@ -1,4 +1,4 @@
-package src;
+package com.example.cyslidealif;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
+
 
 
 public class EndScreen extends Application {
@@ -92,6 +93,7 @@ public class EndScreen extends Application {
 
 
 
+
         //---------------------------------------- Create "Replay" button------------------------------------------------------
         Button replay = new Button("Replay");
         replay.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leoscar'");//set the style of the button
@@ -100,6 +102,10 @@ public class EndScreen extends Application {
             PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
             pauseTransition.setOnFinished(e -> replay.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leoscar'"));//to remove the transparent
             pauseTransition.play();
+        });
+        replay.setOnAction(event -> { //to check if the user push the button
+            endStage.close();
+            mainmenu.start_new_game();
         });
 
 
@@ -184,12 +190,12 @@ public class EndScreen extends Application {
     public void saveScore(int point) {
 
         try{ //to check the availability of score
-        FileWriter writer = new FileWriter("point.txt");
-        writer.write("Score: " + point); //to register the point on point.txt
-        writer.close();
+            FileWriter writer = new FileWriter("point.txt");
+            writer.write("Score: " + point); //to register the point on point.txt
+            writer.close();
         } catch (IOException e) {
-        System.out.println("Error  : " + e.getMessage());
-    }
+            System.out.println("Error  : " + e.getMessage());
+        }
 
     }
 

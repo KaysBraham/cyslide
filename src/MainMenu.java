@@ -26,6 +26,7 @@ public class MainMenu extends Application {
     private Label labellevel;
 
     private static Stage stage;
+    Taquin taquin=new Taquin();
 
     public static void setStage(Stage stage) {
         MainMenu.stage = stage;
@@ -63,6 +64,10 @@ public class MainMenu extends Application {
             pauseTransition.setOnFinished(e -> new_game_button.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leoscar'"));//to remove the transparent
             pauseTransition.play();
         });
+        new_game_button.setOnAction(event -> { //to check if the user push the button
+            MainStage.close();
+            start_new_game();
+        });
 
         // ------------------------------------"Difficulty button" ---------------------------------------------------------
         Button Difficulty = new Button("Choose difficulty");
@@ -91,11 +96,11 @@ public class MainMenu extends Application {
                 e.printStackTrace();
             }
         });
-        ranking.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leoscar'");//set the style of the button
+        ranking.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leos-car'");//set the style of the button
         ranking.setOnMousePressed(event -> {
             ranking.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
             PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
-            pauseTransition.setOnFinished(e -> ranking.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leoscar'"));//to remove the transparent
+            pauseTransition.setOnFinished(e -> ranking.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leos-car'"));//to remove the transparent
             pauseTransition.play(); //un bouton pour afficher le classement des meilleurs scores.
         });
         // ---------------------------------------Create "leave" button---------------------------------------------------
@@ -105,11 +110,11 @@ public class MainMenu extends Application {
 
             quit_game(MainStage);
         });
-        leave.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leoscar'");
+        leave.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leos-car'");
         leave.setOnMousePressed(event -> {
             leave.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
             PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
-            pauseTransition.setOnFinished(e -> leave.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leoscar'"));//to remove the transparent
+            pauseTransition.setOnFinished(e -> leave.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leos-car'"));//to remove the transparent
             pauseTransition.play();
         });
 
@@ -149,32 +154,33 @@ public class MainMenu extends Application {
 
 
 
+    public void start_new_game(){//new games
+
+        taquin.start();
 
 
-
-    public void start_new_game(){
-
-    } //une méthode appelée lorsque le bouton "Nouvelle partie" est cliqué.
+    }
 
 
     public void open_difficulty_settings() {
 
         Stage difficultystage = new Stage();
-        VBox difficultycontainer = new VBox();
+        VBox difficultycontainer = new VBox(10);
         difficultycontainer.setAlignment(Pos.CENTER); //to center the buttons
 
 
         for (int difficulty = 1; difficulty <= 10; difficulty++) {
 
             Button levelButton = new Button("Level " + difficulty);
+            levelButton.setPrefSize(100,50); //set the button size
 
-            levelButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leoscar'");//set the style of the button
+            levelButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leos-car'");//set the style of the button
             int finalDifficulty = difficulty;
             levelButton.setOnMousePressed(event -> {
                 labellevel.setText("level: " + finalDifficulty);
                 levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
                 PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
-                pauseTransition.setOnFinished(e -> levelButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leoscar'"));//to remove the transparent
+                pauseTransition.setOnFinished(e -> levelButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leos-car'"));//to remove the transparent
                 pauseTransition.play();
             });
 
@@ -185,6 +191,9 @@ public class MainMenu extends Application {
         Background background = new Background(black); //set the color defined by background
         difficultycontainer.setBackground(background);
         Button backButton = new Button("Return");
+        backButton.setPrefSize(100,50);//set the button size
+        backButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leos-car'");//set the style of the button
+
         difficultycontainer.getChildren().add(backButton);
         backButton.setOnAction(event -> {
 
@@ -201,14 +210,13 @@ public class MainMenu extends Application {
 
     } //une méthode appelée lorsque le bouton "Réglage de difficulté" est cliqué.
 
-    private void start() {
-    }
+
 
     public void show_leaderboard() throws FileNotFoundException {//To see the ranking
 
 
         Stage rankingstage = new Stage();
-        VBox rankingcontainer = new VBox();//to print button on vertical
+        VBox rankingcontainer = new VBox(10);//to print button on vertical
         rankingcontainer.setAlignment(Pos.CENTER); //to center the buttons
 
 
@@ -217,12 +225,15 @@ public class MainMenu extends Application {
 
 
             Button levelButton = new Button("Level " + difficulty);
+            levelButton.setPrefSize(100,50);
 
-            levelButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leoscar'");//set the style of the button
+            levelButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leos-car'");//set the style of the button
             int finalDifficulty = difficulty;
             levelButton.setOnMousePressed(event -> {
                 rankingcontainer.getChildren().clear();//to remove all the button in order to print th ranking
                 levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
+
+
                 PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
                 pauseTransition.play();
 
@@ -262,7 +273,7 @@ public class MainMenu extends Application {
                         }
                         else{
                             labelrank[count] = new Label("Point: " + integer + " | Level: " + finalDifficulty);//to set the rank
-                            labelrank[count].setStyle("-fx-text-fill: white;-fx-font-size: 15;-fx-font-family: 'Leoscar'");
+                            labelrank[count].setStyle("-fx-text-fill: white;-fx-font-size: 15;-fx-font-family: 'Leos-car'");
                             rankingcontainer.getChildren().add(labelrank[count]);//add the ranking into the container
                             count++;
                         }
@@ -282,6 +293,9 @@ public class MainMenu extends Application {
         rankingcontainer.setBackground(background);
 
         Button backButton = new Button("Return");
+        backButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leos-car'");//set the style of the button
+        backButton.setPrefWidth(100);
+        backButton.setPrefHeight(50);
         rankingcontainer.getChildren().add(backButton);
         backButton.setOnAction(event -> {
 
