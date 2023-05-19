@@ -1,8 +1,18 @@
 package src;
-import java.util.*;
+
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class Level {
     private Tile[][] tiles;
     private boolean solved;
+
+    public Level(Tile[][] tiles) {
+        this.tiles = tiles;
+        this.solved = true;
+    }
 
     public Tile getTile(int x, int y) {
         return tiles[x][y];
@@ -29,5 +39,9 @@ public class Level {
                 }
             }
         }
+    }
+
+    public Tile[][] getTiles() {
+        return tiles;
     }
 }
