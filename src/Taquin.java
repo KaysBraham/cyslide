@@ -35,23 +35,6 @@ public class Taquin {
     public void loadLevels(){}
     public void selectLevel(int currentLevel){}
     public void shuffleLevel(){}
-    public void swapTile(int x1, int y1, int x2, int y2){
-
-        int temp;
-        // ensure the two chosen tiles are adjacent
-        if (!(x1 == x2 && Math.abs(y1 - y2) == 1) && !(y1 == y2 && Math.abs(x1 - x2) == 1)){
-            System.out.println("The two chosen tiles are not adjacent");
-            return;
-        }
-        // ensure the tile is valid to move (at least one of its neighboring squares is empty)
-        if (!(currentLevel.getTile(x2,y2).getValue() == 0) || !((currentLevel.getTile(x1,y1).getValue() != -1) && (currentLevel.getTile(x1,y1).getValue() != 0))){
-            System.out.println("Invalid movement");
-            return;
-        }
-        temp = currentLevel.getTile(x1,y1).getValue();
-        currentLevel.getTile(x1,y2).setValue(currentLevel.getTile(x2,y2).getValue());
-        currentLevel.getTile(x2,y2).setValue(temp);
-    }
 
 
     public void checkSolvable(){}
