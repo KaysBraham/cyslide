@@ -94,7 +94,7 @@ public class GenerateGame {
 
 
 
-//-----------------------------------------step 4:build taquin protoptype---------------------------------------------------------------------
+//-----------------------------------------step 4:build puzzle protoptype---------------------------------------------------------------------
         int index=0;
         List<Integer> listnumbers = new ArrayList<>();//List number
 

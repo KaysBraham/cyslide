@@ -20,7 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.animation.PauseTransition;
 
-public class Taquin extends Application {
+public class PuzzleGame extends Application {
     private Level[] levels;
     private Level currentLevel;
     private Level[] unlockedLevels;

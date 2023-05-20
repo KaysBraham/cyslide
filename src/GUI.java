@@ -1,7 +1,7 @@
 package src;
 
 public class GUI {
-    private Taquin taquin;
+    private PuzzleGame puzzle;
     
     public void initialize(){}
     public void createLevelButtons(){}
