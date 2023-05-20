@@ -51,25 +51,9 @@ public class PuzzleGame {
     public void showEndScreen(){}
 
     public static void main(String[] args) {
-        String folderPath = "../data";
-
+        String folderPath = "data";
         FileIO fileLoader = new FileIO(folderPath);
         List<Level> levels = fileLoader.loadLevels();
-
-//test
-        for (int i = 0; i < levels.size(); i++) {
-            System.out.println("Level " + (i + 1) + ":");
-            Level level = levels.get(i);
-            Tile[][] tiles = level.getTiles();
-            for (Tile[] row : tiles) {
-                for (Tile tile : row) {
-                    System.out.print(tile.getValue() + " ");
-                }
-                System.out.println();
-            }
-            System.out.println();
-        }
-//fin test
     }
 }
 
