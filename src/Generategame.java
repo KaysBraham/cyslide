@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class Generategame {
+public class GenerateGame {
     //supposing that the cases are correctly blocked
     private int format; //3*3
 
@@ -13,13 +13,13 @@ public class Generategame {
     private String [][] filledcase=new String[format][format];
 
     //option 1:randomly
-    public Generategame(int numbers) {
+    public GenerateGame(int numbers) {
         this.format = numbers;
         emptycase = new int[format][format];
         filledcase = new String[format][format];
     }
     //option 2:by the user
-    public Generategame(int format, int[][] emptycase, String[][] filledcase) {
+    public GenerateGame(int format, int[][] emptycase, String[][] filledcase) {
         this.format = format;
 
         this.emptycase = emptycase;
@@ -161,7 +161,7 @@ public class Generategame {
     }
 //if you want to test the program
     public static void main(String[] args) {
-        Generategame listnumber = new Generategame(9);
+        GenerateGame listnumber = new GenerateGame(9);
         //List<Integer> numbers = listnumber.generateNumbers();
         String tab[][]=listnumber.generateNumbers();
 

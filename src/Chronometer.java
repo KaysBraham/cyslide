@@ -1,5 +1,8 @@
 package src;
-public class Chronometer {
+
+import javafx.scene.layout.HBox;
+
+public class Chronometer extends HBox{
     private int startTime; // Holds the starting time in seconds
     private int elapsedTime = 0; // Holds the elapsed time in seconds
     private boolean running = false; // Indicates whether the chronometer is running or not

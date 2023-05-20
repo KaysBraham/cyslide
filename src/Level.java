@@ -1,8 +1,18 @@
 package src;
+
 import java.util.*;
+
 public class Level {
     private Tile[][] tiles;
     private boolean solved;
+
+	public Level(Tile[][] tiles) {
+		this.tiles = tiles;
+	}
+
+	public Tile[][] getTiles() {
+		return tiles;
+	}
 
     public Tile getTile(int x, int y) {
         return tiles[x][y];
@@ -25,7 +35,7 @@ public class Level {
             for (int j = 0; j <= nColumns - 1; j++) {
                 if (tiles[i][j].getValue() != -1) {
                     tiles[i][j] = tempList.get(p);
-                    p += 1;
+                    p++;
                 }
             }
         }
