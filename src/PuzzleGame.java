@@ -1,9 +1,12 @@
 package src;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.Math;
 
@@ -203,14 +206,71 @@ public class PuzzleGame extends Application {
 		VBox leaderboardLayout = new VBox(10);
 		leaderboardLayout.setAlignment(Pos.CENTER);
 		leaderboardLayout.setStyle("-fx-background-color: #00a8c4;");
-		
-		// TODO
-		
-		try {
-            /* TODO */throw new FileNotFoundException();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+
+        for (int difficulty = 1; difficulty <= 10; difficulty++) { // to print the button
+            Button levelButton = new Button("Level " + difficulty);
+            levelButton.setPrefSize(100,50);
+
+            levelButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leos-car'");//set the style of the button
+            int finalDifficulty = difficulty;
+            levelButton.setOnMousePressed(event -> {
+            	leaderboardLayout.getChildren().clear(); // to remove all the button in order to print th ranking
+                levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); // to make grey transparent
+
+                PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1)); // during 0.1 second
+                pauseTransition.play();
+
+                File file = new File("pointlastgame.txt."); // to retrieve point
+                // collect the point
+                Scanner pointlastgame;
+                try {
+                    pointlastgame = new Scanner(file);
+
+                    String[] data = pointlastgame.next().split(";");//to separate point and level according to ;
+                    Label[] labelrank = new Label[10];
+                    Integer[] listpoint = new Integer[10];
+                    Arrays.fill(listpoint, 0);//to initialize in zer0
+                    int count = 0;
+                    do {
+                        if (Integer.parseInt(data[1]) == finalDifficulty) {
+                            listpoint[count]= Integer.parseInt(data[0]);
+                            count++;
+                        }
+
+                        if (pointlastgame.hasNextLine()) data = pointlastgame.nextLine().split(";");
+                        else break;
+                    } while (pointlastgame.hasNextLine());
+                    
+                    count = 0;
+
+                    Arrays.sort(listpoint, Comparator.reverseOrder()); //to sort in reverse
+                    for (Integer integer : listpoint) {
+
+                        if(count == 10) break;
+                        else {
+                            labelrank[count] = new Label("Point: " + integer + " | Level: " + finalDifficulty); // to set the rank
+                            labelrank[count].setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
+                            leaderboardLayout.getChildren().add(labelrank[count]); // add the ranking into the container
+                            count++;
+                        }
+                    }
+                    pointlastgame.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            leaderboardLayout.getChildren().add(levelButton);
         }
+        Button backButton = new Button("Return");
+        backButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leos-car'");//set the style of the button
+        backButton.setPrefWidth(100);
+        backButton.setPrefHeight(50);
+        backButton.setOnAction(event -> getPrimaryStage().setScene(getHomeScene()));
+        leaderboardLayout.getChildren().add(backButton);
+        
+        Scene leaderboardScene = new Scene(leaderboardLayout);
+        primaryStage.setScene(leaderboardScene);
 	}
 	
     public void display(Chronometer chronometer){}
