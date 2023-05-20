@@ -102,5 +102,21 @@ public class Level {
         }
     }
 
+    public boolean checkShuffle() { // checks if all tiles are in a new place after mixing
+        int nLines = tiles.length ;
+        int nColumns = tiles[0].length ;
+        int compt = 1 ;
+        for (int i = 0; i <= nLines - 1; i++) {
+            for (int j = 0; j <= nColumns - 1; j++) {
+                if (tiles[i][j].getValue() == compt) {
+                    return false;
+                } else if (tiles[i][j].getValue() != compt) {
+                    compt += 1;
+                }
+            }
+        }
+        return true;
+    }
+
 }
 
