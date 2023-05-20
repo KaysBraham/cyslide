@@ -26,7 +26,7 @@ public class MainMenu extends Application {
     private Label labellevel;
 
     private static Stage stage;
-    Taquin taquin=new Taquin();
+    PuzzleGame puzzle =new PuzzleGame();
 
     public static void setStage(Stage stage) {
         MainMenu.stage = stage;
@@ -156,7 +156,7 @@ public class MainMenu extends Application {
 
     public void start_new_game(){//new games
 
-        taquin.start();
+        puzzle.start();
 
 
     }

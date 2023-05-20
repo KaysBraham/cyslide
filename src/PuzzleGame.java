@@ -3,10 +3,8 @@ package src ;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.lang.Math;
-import java.lang.Object;
 
-public class Taquin {
+public class PuzzleGame {
     private Level[] levels;
     private Level currentLevel;
     private Level[] unlockedLevels;
