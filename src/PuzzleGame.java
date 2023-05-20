@@ -8,6 +8,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.Math;
 
 import javafx.application.Application;
@@ -32,12 +34,8 @@ public class PuzzleGame extends Application {
     private Scene homeScene;
     private Timer timer = null;
     private Label levelLabel;
-
-
-    public static int getLevel() {
-        return level;
-    }
     public static int level = 1;
+    private int point;
     
     public Stage getPrimaryStage() {
 		return primaryStage;
@@ -70,6 +68,18 @@ public class PuzzleGame extends Application {
 	public void setLevelLabel(Label levelLabel) {
 		this.levelLabel = levelLabel;
 	}
+
+    public int getPoint() {
+		return point;
+	}
+
+	public void setPoint(int point) {
+		this.point = point;
+	}
+
+	public static int getLevel() {
+        return level;
+    }
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -169,6 +179,10 @@ public class PuzzleGame extends Application {
         // at the end of a game
         // getTimer().cancel(); // stop the timer
         // showEndScreen();
+    }
+	
+    public void display(Chronometer chronometer){
+    	// TODO
     }
 	
 	public void openDifficultySettings() {
@@ -273,10 +287,97 @@ public class PuzzleGame extends Application {
         primaryStage.setScene(leaderboardScene);
 	}
 	
-    public void display(Chronometer chronometer){}
+    public void showEndScreen() throws FileNotFoundException{
+    	
+    	collectLevel();
+    	collectPoints();
+
+        //-------------------------------------create point label----------------------------------------------------------------
+        Label pointLabel = new Label("Points: "+getPoint()); // to print point
+        pointLabel.setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+        Label levelLabel = new Label("Level: "+getLevel()); // to print level
+        levelLabel.setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+        HBox hbox = new HBox(5); // to create a vertical space 10px
+        hbox.setAlignment(Pos.CENTER); // to center the buttons
+        hbox.getChildren().addAll(pointLabel, levelLabel); // to align horizontally point+level
+        
+        // ------------------------------------Create "Try Again" button---------------------------------------------------------
+        Button tryAgainButton = new Button("Try Again");
+
+        //---------------------------------------- Create "Replay" button------------------------------------------------------
+        Button replayButton = new Button("Replay");
+        replayButton.setOnAction(event -> startGame());
+
+        //--------------------------------------- Create "Save score" button--------------------------------------------------
+        Button saveScoreButton = new Button("Save score");
+
+        int finalPoint = getPoint();
+        saveScoreButton.setOnAction(event -> saveScore(finalPoint));
+
+        //----------------------------------------- Create "Home" button----------------------------------------------------
+        Button homeButton = new Button("Home");
+        homeButton.setOnAction(event -> getPrimaryStage().setScene(getHomeScene()));
+        
+        // Buttons formatting
+		List<Button> buttons = Arrays.asList(tryAgainButton, replayButton, saveScoreButton, homeButton);
+		for(Button button : buttons) {
+			button.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+			button.setOnMousePressed(event -> {
+				button.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
+	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
+	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leoscar'"));//to remove the transparent
+	            pauseTransition.play();
+	        });
+		}
+        
+        // ----------------------------Create VBox to set label and button with space--------------------------------------
+        VBox endScreenLayout = new VBox(10); // to create a vertical space 10px
+        endScreenLayout.setAlignment(Pos.CENTER); // to center the buttons
+        endScreenLayout.getChildren().add(hbox); // to add the hbox
+        endScreenLayout.getChildren().addAll(buttons); // to add the buttons
+
+        //---------------------------------------to define the scene-----------------------------------------------------------------
+		Scene endScreenScene = new Scene(endScreenLayout, 300, 300);
+		primaryStage.setScene(endScreenScene);
+		
+    }
+    
+    public void collectPoints() throws FileNotFoundException {
+
+        File file = new File("pointLastGame.txt"); // to register pointlastgame
+        Scanner pointlastgame = new Scanner(file); // collect the point
+        String[] data = pointlastgame.next().split(";");
+        setPoint(Integer.parseInt(data[0])); // convert string to int
+        pointlastgame.close();
+
+    }
+    
+    public void collectLevel() throws FileNotFoundException {
+    	
+        File file = new File("pointlastgame.txt"); // to register pointlastgame
+        Scanner pointlastgame = new Scanner(file); // collect the point
+        String[] data = pointlastgame.next().split(";");
+
+        PuzzleGame.level = Integer.parseInt(data[1]); // convert string to int
+        pointlastgame.close();
+        
+    }
+    
+    public void saveScore(int point) {
+
+        try{ // to check the availability of score
+            FileWriter writer = new FileWriter("point.txt");
+            writer.write("Score: " + point); //to register the point on point.txt
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Error  : " + e.getMessage());
+        }
+    }
+	
     public void loadLevels(){}
     public void selectLevel(int currentLevel){}
     public void shuffleLevel(){}
+    
     public void swapTile(int x1, int y1, int x2, int y2){
 
         // ensure the two chosen tiles are adjacent
@@ -295,7 +396,6 @@ public class PuzzleGame extends Application {
         currentLevel.getTile(x2,y2).setValue(temp);
     }
 
-
     public void checkSolvable(){}
     public void checkVictory(){}
     public void saveScore(){}
@@ -307,7 +407,6 @@ public class PuzzleGame extends Application {
     public int getMoveCount() {
         return moveCount;
     }
-    public void showEndScreen(){}
 
     public static void main(String[] args) {
         launch(args);
