@@ -66,11 +66,14 @@ public class Level {
         int i = 0;
         int j = 0;
         int n = 0;
-        while (n != 1000) {
-            while (i != nLines - 1) {
-                while (j != nColumns - 1) {
+        while (n < 1000) {
+            i = 0;
+            while (i != nLines) {
+                j = 0;
+                while (j != nColumns) {
                     if (tiles[i][j].getValue() == 0) {
-                        if (i == 0) {
+                        
+                        /*if (i == 0) {
                             swapTile(i, j, i + 1, j);
                         } else if (i == nLines - 1) {
                             swapTile(i, j, i - 1, j);
@@ -78,26 +81,45 @@ public class Level {
                             swapTile(i, j, i, j + 1);
                         } else if (j == nColumns - 1) {
                             swapTile(i, j, i, j - 1);
-                        } else {
+                        } else {*/
+
                             Random random = new Random();
                             int nb;
-                            nb = random.nextInt(4);
-                            if (nb == 0) {
-                                swapTile(i, j, i - 1, j);
-                            } else if (nb == 1) {
-                                swapTile(i, j, i, j + 1);
-                            } else if (nb == 2) {
-                                swapTile(i, j, i + 1, j);
-                            } else if (nb == 3) {
-                                swapTile(i, j, i, j - 1);
-                            }
-                        }
-                        n = n + 1 ;
-                    } else {
-                        i = i + 1;
+                            int verif = 0;
+                            do {
+                                nb = random.nextInt(4);
+                                if (nb == 0) {
+                                    if (i != 0 && tiles[i - 1, j].getValue() != -1) //check if the exchanged tile exists
+                                    {
+                                        swapTile(i, j, i - 1, j);
+                                        verif = 1;
+                                    }
+                                } else if (nb == 1) {
+                                    if (j != nColumns - 1 && tiles[i, j + 1].getValue() != -1) //check if the exchanged tile exists
+                                    {
+                                        swapTile(i, j, i, j + 1);
+                                        verif = 1;
+                                    }
+                                } else if (nb == 2) {
+                                    if (i != nLines - 1 && tiles[i + 1, j].getValue() != -1) //check if the exchanged tile exists
+                                    {
+                                        swapTile(i, j, i + 1, j);
+                                        verif = 1;
+                                    }
+                                } else if (nb == 3) {
+                                    if (j != 0 && tiles[i, j - 1].getValue() != -1) //check if the exchanged tile exists
+                                    {
+                                        swapTile(i, j, i, j - 1);
+                                        verif = 1;
+                                    }
+                                }
+                            } while (verif == 0)
+                        //}
+                        n += 1 ;
                     }
+                    j += 1;
                 }
-                j = j + 1;
+                i += 1;
             }
         }
     }
