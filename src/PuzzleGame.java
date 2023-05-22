@@ -134,10 +134,23 @@ public class PuzzleGame extends Application {
     	playLayout.setStyle("-fx-background-color: #00a8c4;");
         
         HBox topLayout = new HBox(64);
+        
         // TODO undo, redo etc.
         
         GridPane gridLayout = new GridPane();
-        // TODO tiles
+        
+        // TODO tiles in gridLayout
+        
+//        if(isGameFinished()) {
+//            getTimer().stop();
+//            try {
+//				showEndScreen();
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			}
+//        }
+        
+        HBox bottomLayout = new HBox(64);
     	
         Chronometer chronometer = new Chronometer();
         
@@ -148,13 +161,9 @@ public class PuzzleGame extends Application {
         	getPrimaryStage().setScene(getHomeScene());
         });
         
-        HBox bottomLayout = new HBox(64);
-        bottomLayout.getChildren().add(chronometer);
-        bottomLayout.getChildren().add(giveUpButton);
+        bottomLayout.getChildren().addAll(chronometer, giveUpButton);
 
-        playLayout.getChildren().add(topLayout);
-        playLayout.getChildren().add(gridLayout);
-        playLayout.getChildren().add(bottomLayout);
+        playLayout.getChildren().addAll(topLayout, gridLayout, bottomLayout);
     	
     	Scene playScene = new Scene(playLayout, 1600, 900); // HD+ scene
     	
@@ -171,12 +180,13 @@ public class PuzzleGame extends Application {
         setTimer(new SequentialTransition(timerUpdate));
         getTimer().setCycleCount(PauseTransition.INDEFINITE);
         getTimer().play();
-        
-        // TODO at the end of a game
-        // getTimer().cancel(); // stop the timer
-        // showEndScreen();
     }
 	
+	private boolean isGameFinished() {
+		// TODO
+		return false;
+	}
+
 	public void openDifficultySettings() {
 		VBox difficultyLayout = new VBox(10);
 		difficultyLayout.setAlignment(Pos.CENTER);
