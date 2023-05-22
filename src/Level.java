@@ -89,37 +89,37 @@ public class Level {
                             do {
                                 nb = random.nextInt(4);
                                 if (nb == 0) {
-                                    if (i != 0 && tiles[i - 1, j].getValue() != -1) //check if the exchanged tile exists
+                                    if (i != 0 && tiles[i - 1][j].getValue() != -1) //check if the exchanged tile exists
                                     {
                                         swapTile(i, j, i - 1, j);
                                         verif = 1;
                                     }
                                 } else if (nb == 1) {
-                                    if (j != nColumns - 1 && tiles[i, j + 1].getValue() != -1) //check if the exchanged tile exists
+                                    if (j != nColumns - 1 && tiles[i][j + 1].getValue() != -1) //check if the exchanged tile exists
                                     {
                                         swapTile(i, j, i, j + 1);
                                         verif = 1;
                                     }
                                 } else if (nb == 2) {
-                                    if (i != nLines - 1 && tiles[i + 1, j].getValue() != -1) //check if the exchanged tile exists
+                                    if (i != nLines - 1 && tiles[i + 1][j].getValue() != -1) //check if the exchanged tile exists
                                     {
                                         swapTile(i, j, i + 1, j);
                                         verif = 1;
                                     }
                                 } else if (nb == 3) {
-                                    if (j != 0 && tiles[i, j - 1].getValue() != -1) //check if the exchanged tile exists
+                                    if (j != 0 && tiles[i][j - 1].getValue() != -1) //check if the exchanged tile exists
                                     {
                                         swapTile(i, j, i, j - 1);
                                         verif = 1;
                                     }
                                 }
-                            } while (verif == 0)
+                            } while (verif == 0);
                         //}
-                        n += 1 ;
+                        n++;
                     }
-                    j += 1;
+                    j++;
                 }
-                i += 1;
+                i++;
             }
         }
     }
