@@ -172,16 +172,7 @@ public class PuzzleGame extends Application {
         getTimer().setCycleCount(PauseTransition.INDEFINITE);
         getTimer().play();
         
-/*        getTimer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                chronometer.updateElapsedTime(); // Update the chronometer
-            }
-        }, 0, 1000);
-*/
-        // TODO
-        
-        // at the end of a game
+        // TODO at the end of a game
         // getTimer().cancel(); // stop the timer
         // showEndScreen();
     }
