@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -24,6 +22,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.animation.PauseTransition;
+import javafx.animation.SequentialTransition;
 
 public class PuzzleGame extends Application {
     private Level[] levels;
@@ -32,7 +31,7 @@ public class PuzzleGame extends Application {
     private int moveCount;
     private Stage primaryStage;
     private Scene homeScene;
-    private Timer timer = null;
+    private SequentialTransition timer;
     private Label levelLabel;
     public static int level = 1;
     private int point;
@@ -53,11 +52,11 @@ public class PuzzleGame extends Application {
 		this.homeScene = homeScene;
 	}
 
-	public Timer getTimer() {
+	public SequentialTransition getTimer() {
 		return timer;
 	}
 
-	public void setTimer(Timer timer) {
+	public void setTimer(SequentialTransition timer) {
 		this.timer = timer;
 	}
 
@@ -124,7 +123,7 @@ public class PuzzleGame extends Application {
 
 	@Override
 	public void stop(){
-		if(getTimer() != null) getTimer().cancel(); // at least 1 game has been started. Subsequent calls of cancel() have no effect.
+		if(getTimer() != null) getTimer().stop(); // at least 1 game has been started. Subsequent calls of stop() have no effect.
     	getPrimaryStage().setScene(getHomeScene());
 	}
 
@@ -140,14 +139,12 @@ public class PuzzleGame extends Application {
         GridPane gridLayout = new GridPane();
         // TODO tiles
     	
-        setTimer(new Timer());
         Chronometer chronometer = new Chronometer();
-        // TODO chronometer (HBox)
         
         Button giveUpButton = new Button("Give up");
         giveUpButton.setStyle("-fx-font-size:32");
         giveUpButton.setOnAction(e -> {
-        	getTimer().cancel();
+        	getTimer().stop();
         	getPrimaryStage().setScene(getHomeScene());
         });
         
@@ -166,23 +163,27 @@ public class PuzzleGame extends Application {
         chronometer.start();
 
         // Schedule the task to run every second
-        getTimer().scheduleAtFixedRate(new TimerTask() {
+        final PauseTransition timerUpdate = new PauseTransition(Duration.seconds(1));
+        // Update the chronometer
+        timerUpdate.setOnFinished(e -> chronometer.updateElapsedTime());
+        
+        // start the timer
+        setTimer(new SequentialTransition(timerUpdate));
+        getTimer().setCycleCount(PauseTransition.INDEFINITE);
+        getTimer().play();
+        
+/*        getTimer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 chronometer.updateElapsedTime(); // Update the chronometer
-                display(chronometer);
             }
         }, 0, 1000);
-
+*/
         // TODO
         
         // at the end of a game
         // getTimer().cancel(); // stop the timer
         // showEndScreen();
-    }
-	
-    public void display(Chronometer chronometer){
-    	// TODO
     }
 	
 	public void openDifficultySettings() {
