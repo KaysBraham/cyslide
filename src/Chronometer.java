@@ -76,7 +76,7 @@ public class Chronometer extends HBox{
         setElapsedTime(currentTimeSec() - getStartTime());
 
         int hours = getElapsedTime() / 3600;
-        int minutes = (getElapsedTime() / 60) % 3600;
+        int minutes = (getElapsedTime() / 60) % 60;
         int seconds = getElapsedTime() % 60;
         
         getHoursLabel().setText(hours != 0 ? String.format("%02d", hours) + " : " : ""); // If one hour or more passed, display the hours
