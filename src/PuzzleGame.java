@@ -265,7 +265,7 @@ public class PuzzleGame extends Application {
         undoButton.setStyle("-fx-font-size:32");
         undoButton.setOnAction(e -> undoMove());
 
-        Button redoButton = new Button("Undo");
+        Button redoButton = new Button("Redo");
         redoButton.setStyle("-fx-font-size:32");
         redoButton.setOnAction(e -> redoMove());
         
