@@ -362,6 +362,8 @@ public class PuzzleGame extends Application {
                 PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
                 pauseTransition.setOnFinished(e -> levelButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leos-car'"));//to remove the transparent
                 pauseTransition.play();
+                getPrimaryStage().setScene(getHomeScene());//return to home after pushing the level button
+
             });
             difficultyLayout.getChildren().add(levelButton);
         }
