@@ -372,6 +372,12 @@ public class PuzzleGame extends Application {
 		VBox leaderboardLayout = new VBox(10);
 		leaderboardLayout.setAlignment(Pos.CENTER);
 		leaderboardLayout.setStyle("-fx-background-color: #00a8c4;");
+        //create back button
+        Button backButton = new Button("Return");
+        backButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leos-car'");//set the style of the button
+        backButton.setPrefWidth(100);
+        backButton.setPrefHeight(50);
+        backButton.setOnAction(event -> getPrimaryStage().setScene(getHomeScene()));
 
         for (int difficulty = 1; difficulty <= 10; difficulty++) { // to print the button
             Button levelButton = new Button("Level " + difficulty);
@@ -420,6 +426,7 @@ public class PuzzleGame extends Application {
                             count++;
                         }
                     }
+                    leaderboardLayout.getChildren().add(backButton);
                     pointlastgame.close();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -428,12 +435,8 @@ public class PuzzleGame extends Application {
 
             leaderboardLayout.getChildren().add(levelButton);
         }
-        Button backButton = new Button("Return");
-        backButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leos-car'");//set the style of the button
-        backButton.setPrefWidth(100);
-        backButton.setPrefHeight(50);
-        backButton.setOnAction(event -> getPrimaryStage().setScene(getHomeScene()));
-        leaderboardLayout.getChildren().add(backButton);
+
+        leaderboardLayout.getChildren().add(backButton); //add back button
         
         Scene leaderboardScene = new Scene(leaderboardLayout);
         primaryStage.setScene(leaderboardScene);
