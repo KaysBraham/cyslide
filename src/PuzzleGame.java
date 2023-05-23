@@ -24,62 +24,181 @@ import javafx.scene.control.Label;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 
+/**
+ * The PuzzleGame class represents a puzzle game application.
+ * It uses JavaFX and extends the JavaFX Application class.
+ */
 public class PuzzleGame extends Application {
+	
+	/**
+     * The array of available levels.
+     */
     private Level[] levels;
+    
+    /**
+     * The currently selected level.
+     */
     private Level currentLevel;
+    
+    /**
+     * The array of unlocked levels.
+     */
     private Level[] unlockedLevels;
+    
+    /**
+     * The count of moves made in the current level.
+     */
     private int moveCount;
+    
+    /**
+     * The primary stage of the JavaFX application.
+     */
     private Stage primaryStage;
+    
+    /**
+     * The scene representing the home screen of the game.
+     */
     private Scene homeScene;
-    private SequentialTransition timer;
+    
+    /**
+     * The sequential transition used as a timer in the game.
+     */
+    private SequentialTransition timer = null;
+    
+    /**
+     * The label displaying the current level.
+     */
     private Label levelLabel;
     public static int level = 1;
-    private int point;
     
-    public Stage getPrimaryStage() {
-		return primaryStage;
-	}
+    /**
+     * The current score of the player.
+     */
+    private int score;
 
-	public void setPrimaryStage(Stage primaryStage) {
-		this.primaryStage = primaryStage;
-	}
-
-	public Scene getHomeScene() {
-		return homeScene;
-	}
-
-	public void setHomeScene(Scene homeScene) {
-		this.homeScene = homeScene;
-	}
-
-	public SequentialTransition getTimer() {
-		return timer;
-	}
-
-	public void setTimer(SequentialTransition timer) {
-		this.timer = timer;
-	}
-
-	public Label getLevelLabel() {
-		return levelLabel;
-	}
-
-	public void setLevelLabel(Label levelLabel) {
-		this.levelLabel = levelLabel;
-	}
-
-    public int getPoint() {
-		return point;
-	}
-
-	public void setPoint(int point) {
-		this.point = point;
-	}
-
+    /**
+     * Returns the current level in the game.
+     *
+     * @return The current level.
+     */
 	public static int getLevel() {
         return level;
     }
 
+    /**
+     * Get the move count of the current level.
+     *
+     * @return The move count.
+     */
+    public int getMoveCount() {
+        return moveCount;
+    }
+
+    /**
+     * Sets the move count of the current level.
+     *
+     * @param moveCount The move count.
+     */
+    public void setMoveCount(int moveCount) {
+		this.moveCount = moveCount;
+	}
+
+	/**
+     * Returns the primary stage of the JavaFX application.
+     *
+     * @return The primary stage.
+     */
+    public Stage getPrimaryStage() {
+		return primaryStage;
+	}
+    
+    /**
+     * Sets the primary stage of the JavaFX application.
+     *
+     * @param primaryStage The primary stage.
+     */
+	public void setPrimaryStage(Stage primaryStage) {
+		this.primaryStage = primaryStage;
+	}
+
+    /**
+     * Returns the scene representing the home screen of the game.
+     *
+     * @return The home screen scene.
+     */
+	public Scene getHomeScene() {
+		return homeScene;
+	}
+
+    /**
+     * Sets the scene representing the home screen of the game.
+     *
+     * @param homeScene The home screen scene.
+     */
+	public void setHomeScene(Scene homeScene) {
+		this.homeScene = homeScene;
+	}
+
+    /**
+     * Returns the timer used in the game.
+     *
+     * @return The timer.
+     */
+	public SequentialTransition getTimer() {
+		return timer;
+	}
+
+    /**
+     * Sets the timer used in the game.
+     *
+     * @param timer The timer.
+     */
+	public void setTimer(SequentialTransition timer) {
+		this.timer = timer;
+	}
+
+    /**
+     * Returns the label displaying the current level.
+     *
+     * @return The level label.
+     */
+	public Label getLevelLabel() {
+		return levelLabel;
+	}
+
+    /**
+     * Sets the label displaying the current level.
+     *
+     * @param levelLabel The level label.
+     */
+	public void setLevelLabel(Label levelLabel) {
+		this.levelLabel = levelLabel;
+	}
+
+    /**
+     * Returns the current score of the player in the game.
+     *
+     * @return The current score of the player.
+     */
+    public int getScore() {
+		return score;
+	}
+
+    /**
+     * Sets the current score of the player in the game.
+     *
+     * @param score The current score of the player.
+     */
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+    /**
+     * Starts the JavaFX application by setting up the primary stage and the home screen scene.
+     *
+     * @param primaryStage The primary stage.
+     * @throws Exception If an exception occurs during the startup of the application.
+     */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		
@@ -121,12 +240,18 @@ public class PuzzleGame extends Application {
 		getPrimaryStage().show();
 	}
 
+    /**
+     * Stops the timer to allow the application to stop properly, then closes the application.
+     */
 	@Override
 	public void stop(){
-		if(getTimer() != null) getTimer().stop(); // at least 1 game has been started. Subsequent calls of stop() have no effect.
-    	getPrimaryStage().setScene(getHomeScene());
+		if(getTimer() != null) getTimer().stop(); // at least 1 game has been started. Subsequent calls of SequentialTransition.stop() have no effect.
+		Platform.exit();
 	}
 
+    /**
+     * Starts a new game by setting up the play screen scene and initializing the game components.
+     */
     public void startGame(){
 
     	VBox playLayout = new VBox(32);
@@ -134,21 +259,33 @@ public class PuzzleGame extends Application {
     	playLayout.setStyle("-fx-background-color: #00a8c4;");
         
         HBox topLayout = new HBox(64);
+
+        Button undoButton = new Button("Undo");
+        undoButton.setStyle("-fx-font-size:32");
+        undoButton.setOnAction(e -> undoMove());
+
+        Button redoButton = new Button("Undo");
+        redoButton.setStyle("-fx-font-size:32");
+        redoButton.setOnAction(e -> redoMove());
         
-        // TODO undo, redo etc.
+        topLayout.getChildren().addAll(undoButton, redoButton);
         
         GridPane gridLayout = new GridPane();
         
         // TODO tiles in gridLayout
         
-//        if(isGameFinished()) {
-//            getTimer().stop();
-//            try {
-//				showEndScreen();
-//			} catch (FileNotFoundException e) {
-//				e.printStackTrace();
-//			}
-//        }
+        if(isGameFinished()) {
+	        getTimer().stop();
+	        try {
+				showEndScreen();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+        }
+        else {
+        	setMoveCount(getMoveCount() + 1);
+        	// TODO
+        }
         
         HBox bottomLayout = new HBox(64);
     	
@@ -181,12 +318,20 @@ public class PuzzleGame extends Application {
         getTimer().setCycleCount(PauseTransition.INDEFINITE);
         getTimer().play();
     }
-	
+
+    /**
+     * Checks if the current game is finished.
+     *
+     * @return true if the game is finished, false otherwise.
+     */
 	private boolean isGameFinished() {
 		// TODO
 		return false;
 	}
 
+    /**
+     * Opens the difficulty settings screen.
+     */
 	public void openDifficultySettings() {
 		VBox difficultyLayout = new VBox(10);
 		difficultyLayout.setAlignment(Pos.CENTER);
@@ -218,6 +363,9 @@ public class PuzzleGame extends Application {
         getPrimaryStage().setScene(difficultyscene);
 	}
 
+    /**
+     * Opens the leaderboard screen.
+     */
 	public void openLeaderboard() {
 		VBox leaderboardLayout = new VBox(10);
 		leaderboardLayout.setAlignment(Pos.CENTER);
@@ -288,14 +436,19 @@ public class PuzzleGame extends Application {
         Scene leaderboardScene = new Scene(leaderboardLayout);
         primaryStage.setScene(leaderboardScene);
 	}
-	
+
+    /**
+     * Shows the end screen.
+     *
+     * @throws FileNotFoundException if the "scoreLastGame.txt" file is not found.
+     */
     public void showEndScreen() throws FileNotFoundException{
     	
     	collectLevel();
     	collectPoints();
 
         //-------------------------------------create point label----------------------------------------------------------------
-        Label pointLabel = new Label("Points: "+getPoint()); // to print point
+        Label pointLabel = new Label("Points: "+getScore()); // to print point
         pointLabel.setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
         Label levelLabel = new Label("Level: "+getLevel()); // to print level
         levelLabel.setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
@@ -313,7 +466,7 @@ public class PuzzleGame extends Application {
         //--------------------------------------- Create "Save score" button--------------------------------------------------
         Button saveScoreButton = new Button("Save score");
 
-        int finalPoint = getPoint();
+        int finalPoint = getScore();
         saveScoreButton.setOnAction(event -> saveScore(finalPoint));
 
         //----------------------------------------- Create "Home" button----------------------------------------------------
@@ -343,43 +496,85 @@ public class PuzzleGame extends Application {
 		primaryStage.setScene(endScreenScene);
 		
     }
-    
+
+    /**
+     * Collects the score from the "scoreLastGame.txt" file.
+     *
+     * @throws FileNotFoundException if the file is not found.
+     */
     public void collectPoints() throws FileNotFoundException {
 
-        File file = new File("pointLastGame.txt"); // to register pointlastgame
-        Scanner pointlastgame = new Scanner(file); // collect the point
-        String[] data = pointlastgame.next().split(";");
-        setPoint(Integer.parseInt(data[0])); // convert string to int
-        pointlastgame.close();
+        File file = new File("scoreLastGame.txt"); // to register scoreLastGame
+        Scanner scoreLastGame = new Scanner(file); // collect the point
+        String[] data = scoreLastGame.next().split(";");
+        setScore(Integer.parseInt(data[0])); // convert string to int
+        scoreLastGame.close();
 
     }
-    
+
+    /**
+     * Collects the current level from the "scoreLastGame.txt" file.
+     *
+     * @throws FileNotFoundException if the file is not found.
+     */
     public void collectLevel() throws FileNotFoundException {
     	
-        File file = new File("pointlastgame.txt"); // to register pointlastgame
-        Scanner pointlastgame = new Scanner(file); // collect the point
-        String[] data = pointlastgame.next().split(";");
+        File file = new File("scoreLastGame.txt"); // to register scoreLastGame
+        Scanner scoreLastGame = new Scanner(file); // collect the score
+        String[] data = scoreLastGame.next().split(";");
 
         PuzzleGame.level = Integer.parseInt(data[1]); // convert string to int
-        pointlastgame.close();
+        scoreLastGame.close();
         
     }
-    
-    public void saveScore(int point) {
 
-        try{ // to check the availability of score
-            FileWriter writer = new FileWriter("point.txt");
-            writer.write("Score: " + point); //to register the point on point.txt
+    /**
+     * Saves the player score to a file.
+     *
+     * @param score The score to save.
+     */
+    public void saveScore(int score) {
+
+        try { // to check the availability of score
+            FileWriter writer = new FileWriter("score.txt");
+            writer.write("Score: " + score); // to register the score in score.txt
             writer.close();
         } catch (IOException e) {
             System.out.println("Error  : " + e.getMessage());
         }
     }
-	
-    public void loadLevels(){}
-    public void selectLevel(int currentLevel){}
-    public void shuffleLevel(){}
+
+    /**
+     * Loads the levels.
+     */
+    public void loadLevels(){
+    	// TODO
+    }
     
+    /**
+     * Selects the current level.
+     *
+     * @param currentLevel The level to select.
+     */
+    public void selectLevel(int currentLevel){
+    	// TODO
+    }
+
+    /**
+     * Shuffles the current level.
+     */
+    public void shuffleLevel(){
+    	// TODO
+    }
+
+    /**
+     * Swaps two tiles on the current level.
+     *
+     * @param x1 The x-coordinate of the first tile.
+     * @param y1 The y-coordinate of the first tile.
+     * @param x2 The x-coordinate of the second tile.
+     * @param y2 The y-coordinate of the second tile.
+     */
     public void swapTile(int x1, int y1, int x2, int y2){
 
         // ensure the two chosen tiles are adjacent
@@ -398,18 +593,50 @@ public class PuzzleGame extends Application {
         currentLevel.getTile(x2,y2).setValue(temp);
     }
 
-    public void checkSolvable(){}
-    public void checkVictory(){}
-    public void saveScore(){}
-
-    public void unlockNextLevel(){}
-    public void displayLevelSolved(){}
-    public void undoMove(){}
-
-    public int getMoveCount() {
-        return moveCount;
+    /**
+     * Checks if the current level is solvable.
+     */
+    public void checkSolvable(){
+    	// TODO
     }
 
+    /**
+     * Unlocks the next level.
+     */
+    public void unlockNextLevel(){
+    	// TODO
+    }
+
+    /**
+     * Displays a message indicating that the level is solved.
+     */
+    public void displayLevelSolved(){
+    	// TODO
+    }
+
+    /**
+     * Undoes the last move.
+     * Decrements the move count.
+     */
+    public void undoMove(){
+    	setMoveCount(getMoveCount() - 1);
+    	// TODO
+    }
+
+    /**
+     * Redoes the undid move.
+     * Increments the move count.
+     */
+    public void redoMove(){
+    	setMoveCount(getMoveCount() + 1);
+    	// TODO
+    }
+
+    /**
+     * The main method to launch the application.
+     *
+     * @param args The command-line arguments.
+     */
     public static void main(String[] args) {
         launch(args);
     }
