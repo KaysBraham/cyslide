@@ -233,6 +233,7 @@ public class PuzzleGame extends Application {
 		VBox homeLayout = new VBox(48); // Big spacing
 		homeLayout.setAlignment(Pos.CENTER);
 		homeLayout.setStyle("-fx-background-color: #00a8c4;");
+		homeLayout.getChildren().add(getLevelLabel());
 		homeLayout.getChildren().addAll(buttons);
 		
 		setHomeScene(new Scene(homeLayout, 640, 480)); // VGA scene
