@@ -9,6 +9,7 @@ import java.util.List;
 
 public class FileIO {
     private final String folderPath;
+    private static int numberOfLevels;
 
     public FileIO(String folderPath) {
         this.folderPath = folderPath;
@@ -58,7 +59,8 @@ public class FileIO {
                 rowIndex++;
             }
 
-            level = new Level(tiles);
+            level = new Level(tiles,numberOfLevels);
+            numberOfLevels++;
         } catch (IOException e) {
             e.printStackTrace();
         }

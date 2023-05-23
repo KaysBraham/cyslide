@@ -29,52 +29,63 @@ import javafx.animation.SequentialTransition;
  * It uses JavaFX and extends the JavaFX Application class.
  */
 public class PuzzleGame extends Application {
-	
+    private static final String folderPath = "data";
+    private static final FileIO fileLoader = new FileIO(folderPath);
+
 	/**
      * The array of available levels.
      */
-    private Level[] levels;
-    
+    private static final List<Level> levels = fileLoader.loadLevels();
+
     /**
      * The currently selected level.
      */
-    private Level currentLevel;
-    
+    private static Level currentLevel = levels.get(0).copy();
+
     /**
      * The array of unlocked levels.
      */
     private Level[] unlockedLevels;
-    
+
     /**
      * The count of moves made in the current level.
      */
     private int moveCount;
-    
+
     /**
      * The primary stage of the JavaFX application.
      */
     private Stage primaryStage;
-    
+
     /**
      * The scene representing the home screen of the game.
      */
     private Scene homeScene;
-    
+
     /**
      * The sequential transition used as a timer in the game.
      */
     private SequentialTransition timer = null;
-    
+
     /**
      * The label displaying the current level.
      */
     private Label levelLabel;
-    public static int level = 1;
+    public static int currentLevelNumber = 1;
     
     /**
      * The current score of the player.
      */
     private int score;
+
+    /**
+     * Returns the current level in the game.
+     *
+     * @return The current level.
+     */
+    public static int getCurrentLevelNumber() {
+        return currentLevelNumber;
+    }
 
     /**
      * Returns the current level in the game.
@@ -111,7 +122,7 @@ public class PuzzleGame extends Application {
     public Stage getPrimaryStage() {
 		return primaryStage;
 	}
-    
+
     /**
      * Sets the primary stage of the JavaFX application.
      *
@@ -204,7 +215,7 @@ public class PuzzleGame extends Application {
 		
 		setPrimaryStage(primaryStage);
 		
-		setLevelLabel(new Label("level: " + getLevel())); //to print level
+		setLevelLabel(new Label("level: " + getCurrentLevelNumber())); //to print level
 		getLevelLabel().setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
 		
 		Button startButton = new Button("New game");
@@ -268,11 +279,11 @@ public class PuzzleGame extends Application {
         Button redoButton = new Button("Redo");
         redoButton.setStyle("-fx-font-size:32");
         redoButton.setOnAction(e -> redoMove());
-        
+
         topLayout.getChildren().addAll(undoButton, redoButton);
         
         GridPane gridLayout = new GridPane();
-        
+
         // TODO tiles in gridLayout
         // ---- when making a move
 	        if(isGameFinished()) {
@@ -288,9 +299,9 @@ public class PuzzleGame extends Application {
 	        	// TODO
 	        }
         // ---- end
-        
+
         HBox bottomLayout = new HBox(64);
-    	
+
         Chronometer chronometer = new Chronometer();
         
         Button giveUpButton = new Button("Give up");
@@ -455,7 +466,7 @@ public class PuzzleGame extends Application {
         //-------------------------------------create point label----------------------------------------------------------------
         Label pointLabel = new Label("Points: "+getScore()); // to print point
         pointLabel.setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
-        Label levelLabel = new Label("Level: "+getLevel()); // to print level
+        Label levelLabel = new Label("Level: "+getCurrentLevelNumber()); // to print level
         levelLabel.setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
         HBox hbox = new HBox(5); // to create a vertical space 10px
         hbox.setAlignment(Pos.CENTER); // to center the buttons
@@ -528,7 +539,7 @@ public class PuzzleGame extends Application {
         Scanner scoreLastGame = new Scanner(file); // collect the score
         String[] data = scoreLastGame.next().split(";");
 
-        PuzzleGame.level = Integer.parseInt(data[1]); // convert string to int
+        PuzzleGame.currentLevelNumber = Integer.parseInt(data[1]); // convert string to int
         scoreLastGame.close();
         
     }
@@ -644,5 +655,49 @@ public class PuzzleGame extends Application {
      */
     public static void main(String[] args) {
         launch(args);
+        //tests
+
+        currentLevel.print();
+        levels.get(0).print();
+        /*
+        if (PuzzleSolver.isGoalState(currentLevel)){
+            System.out.println("oui c egal");
+        }
+        else {
+            System.out.println("non c pas egal");
+        }
+
+         */
+        currentLevel.stepByStepShuffleLevel();
+        currentLevel.print();
+        levels.get(0).print();
+        /*
+        if (PuzzleSolver.isGoalState(currentLevel)){
+            System.out.println("oui c egal");
+        }
+        else {
+            System.out.println("non c pas egal");
+        }
+
+         */
+
+
+      /*
+
+        for (int i = 0; i < levels.size(); i++) {
+            System.out.println("Level " + (i + 1) + ":");
+            Level level = levels.get(i);
+            Tile[][] tiles = level.getTiles();
+            for (Tile[] row : tiles) {
+                for (Tile tile : row) {
+                    System.out.print(tile.getValue() + " ");
+                }
+                System.out.println();
+            }
+            System.out.println();
+        }
+
+         */
+        //fin test
     }
 }
