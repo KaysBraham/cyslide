@@ -386,7 +386,7 @@ public class PuzzleGame extends Application {
                 PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1)); // during 0.1 second
                 pauseTransition.play();
 
-                File file = new File("pointlastgame.txt."); // to retrieve point
+                File file = new File("scoreLastGame.txt."); // to retrieve point
                 // collect the point
                 Scanner pointlastgame;
                 try {
