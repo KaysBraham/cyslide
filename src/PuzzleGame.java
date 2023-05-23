@@ -274,19 +274,20 @@ public class PuzzleGame extends Application {
         GridPane gridLayout = new GridPane();
         
         // TODO tiles in gridLayout
-        
-        if(isGameFinished()) {
-	        getTimer().stop();
-	        try {
-				showEndScreen();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-        }
-        else {
-        	setMoveCount(getMoveCount() + 1);
-        	// TODO
-        }
+        // ---- when making a move
+	        if(isGameFinished()) {
+		        getTimer().stop();
+		        try {
+					showEndScreen();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+	        }
+	        else {
+	        	setMoveCount(getMoveCount() + 1);
+	        	// TODO
+	        }
+        // ---- end
         
         HBox bottomLayout = new HBox(64);
     	
