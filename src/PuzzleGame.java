@@ -92,8 +92,8 @@ public class PuzzleGame extends Application {
      *
      * @return The current level.
      */
-	public static int getLevel() {
-        return level;
+	public static Level getLevel(int n) {
+        return levels.get(n);
     }
 
     /**

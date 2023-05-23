@@ -3,6 +3,7 @@ package src;
 import java.util.*;
 
 public class Level {
+    private final int levelNumber ;
     private Tile[][] tiles;
     private boolean solved = true;
 
