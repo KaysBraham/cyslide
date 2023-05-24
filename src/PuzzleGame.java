@@ -77,6 +77,17 @@ public class PuzzleGame extends Application {
      * The current score of the player.
      */
     private int score;
+    
+    /**
+     * The undo Button.
+     */
+    private Button undoButton;
+
+    
+    /**
+     * The redo Button.
+     */
+    private Button redoButton;
 
     /**
      * Returns the current level in the game.
@@ -205,6 +216,42 @@ public class PuzzleGame extends Application {
 	}
 
     /**
+     * Returns the undo button.
+     *
+     * @return The undo button.
+     */
+    public Button getUndoButton() {
+		return undoButton;
+	}
+
+    /**
+     * Sets the undo button.
+     *
+     * @param undoButton The undo button.
+     */
+	public void setUndoButton(Button undoButton) {
+		this.undoButton = undoButton;
+	}
+
+    /**
+     * Returns the redo button.
+     *
+     * @return The redo button.
+     */
+	public Button getRedoButton() {
+		return redoButton;
+	}
+
+    /**
+     * Sets the redi button.
+     *
+     * @param redoButton The redo button.
+     */
+	public void setRedoButton(Button redoButton) {
+		this.redoButton = redoButton;
+	}
+
+	/**
      * Starts the JavaFX application by setting up the primary stage and the home screen scene.
      *
      * @param primaryStage The primary stage.
@@ -272,17 +319,19 @@ public class PuzzleGame extends Application {
         
         HBox topLayout = new HBox(64);
 
-        Button undoButton = new Button("Undo");
-        undoButton.setStyle("-fx-font-size:32");
-        undoButton.setOnAction(e -> undoMove());
-
-        Button redoButton = new Button("Redo");
-        redoButton.setStyle("-fx-font-size:32");
-        redoButton.setOnAction(e -> redoMove());
+        setUndoButton(new Button("Undo"));
+        getUndoButton().setStyle("-fx-font-size:32");
+        getUndoButton().setDisable(true);
+        getUndoButton().setOnAction(e -> undoMove());
+        
+        setRedoButton(new Button("Redo"));
+        getRedoButton().setStyle("-fx-font-size:32");
+        getUndoButton().setDisable(true);
+        getRedoButton().setOnAction(e -> redoMove());
 
         topLayout.getChildren().addAll(undoButton, redoButton);
-        
-        GridPane gridLayout = new GridPane();
+
+        GridPane gridLayout = new GridPane(); // new GridPane();
 
         // TODO tiles in gridLayout
         // ---- when making a move
@@ -638,6 +687,10 @@ public class PuzzleGame extends Application {
      */
     public void undoMove(){
     	setMoveCount(getMoveCount() - 1);
+    	
+    	getRedoButton().setDisable(false);
+    	getUndoButton().setDisable(true);
+    	
     	// TODO
     }
 
@@ -647,6 +700,10 @@ public class PuzzleGame extends Application {
      */
     public void redoMove(){
     	setMoveCount(getMoveCount() + 1);
+    	
+    	getRedoButton().setDisable(true);
+    	getUndoButton().setDisable(false);
+    	
     	// TODO
     }
 
