@@ -380,8 +380,9 @@ public class PuzzleGame extends Application {
 
         GridPane gridLayout = new GridPane();
 
-        // putting the tiles in gridLayout
         setCurrentLevel(getLevels().get(getCurrentLevelNumber() - 1).copy());
+
+        // putting the tiles in the gridpane
         int i, j = 0;
         for (Tile[] tiles: getCurrentLevel().getTiles()) {
         	i = 0;
@@ -395,33 +396,29 @@ public class PuzzleGame extends Application {
 	        			break;
 	        		default:
 	        			tile.setText(Integer.toString(tile.getValue()));
-	        	        tile.setStyle("-fx-font-size: 48;"
+	        	        tile.setStyle("-fx-font-size: 40;"
 	        	        		+ "-fx-text-fill: #fff;"
 	        	        		+ "-fx-background-color: #640;"); // dark wood
 	        	        tile.setAlignment(Pos.CENTER);
 	            		tile.setOnAction(e -> {
-	            			
+	            			// TODO
+	            	        if(isGameFinished()) {
+	            		        getTimer().stop();
+	            		        try {
+	            					showEndScreen();
+	            				} catch (FileNotFoundException ex) {
+	            					ex.printStackTrace();
+	            				}
+	            	        }
+	            	        else {
+	            	        	setMoveCount(getMoveCount() + 1);
+	            	        }
 	            		});
         		}
         		gridLayout.add(tile, i++, j);
         	}
         	j++;
         }
-        
-        // ---- when making a move
-	        if(isGameFinished()) {
-		        getTimer().stop();
-		        try {
-					showEndScreen();
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
-	        }
-	        else {
-	        	setMoveCount(getMoveCount() + 1);
-	        	// TODO
-	        }
-        // ---- end
 
         HBox bottomLayout = new HBox(64);
 
