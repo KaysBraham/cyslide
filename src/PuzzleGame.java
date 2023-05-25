@@ -428,12 +428,10 @@ public class PuzzleGame extends Application {
 
         setRandomShuffleButton(new Button("Random Shuffle"));
         getRandomShuffleButton().setStyle("-fx-font-size:25");
-        getRandomShuffleButton().setDisable(true);
         getRandomShuffleButton().setOnAction(e -> currentLevel.randomShuffleLevel());
 
         setStepByStepShuffleButton(new Button("Step by step Shuffle"));
         getStepByStepShuffleButton().setStyle("-fx-font-size:25");
-        getStepByStepShuffleButton().setDisable(true);
         getStepByStepShuffleButton().setOnAction(e -> currentLevel.stepByStepShuffleLevel());
 
         topLayout.getChildren().addAll(undoButton, redoButton, randomShuffleButton, stepByStepShuffleButton);
@@ -845,46 +843,12 @@ public class PuzzleGame extends Application {
         //tests
 
         currentLevel.print();
-        levels.get(0).print();
-        /*
-        if (PuzzleSolver.isGoalState(currentLevel)){
-            System.out.println("oui c egal");
-        }
-        else {
-            System.out.println("non c pas egal");
-        }
+        getLevel(currentLevel.getLevelNumber()).print();
 
-         */
         currentLevel.stepByStepShuffleLevel();
+
         currentLevel.print();
-        levels.get(0).print();
-        /*
-        if (PuzzleSolver.isGoalState(currentLevel)){
-            System.out.println("oui c egal");
-        }
-        else {
-            System.out.println("non c pas egal");
-        }
 
-         */
-
-
-      /*
-
-        for (int i = 0; i < levels.size(); i++) {
-            System.out.println("Level " + (i + 1) + ":");
-            Level level = levels.get(i);
-            Tile[][] tiles = level.getTiles();
-            for (Tile[] row : tiles) {
-                for (Tile tile : row) {
-                    System.out.print(tile.getValue() + " ");
-                }
-                System.out.println();
-            }
-            System.out.println();
-        }
-
-         */
         //fin test
     }
 }
