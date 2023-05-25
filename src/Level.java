@@ -62,7 +62,7 @@ public class Level {
     }
 
     public void randomShuffleLevel() {
-        while (!checkShuffle()) {
+        do {
             List<Tile> tempList = new ArrayList<>();
             int nLines = tiles.length;
             int nColumns = tiles[0].length;
@@ -85,7 +85,7 @@ public class Level {
             }
             System.out.println("un melange de fait");
             solved=false;
-        }
+        }while (!checkShuffle());
     }
 
     public boolean checkShuffle() { // checks if all tiles are in a new place after mixing
@@ -94,7 +94,7 @@ public class Level {
         Level solvedLevel = PuzzleGame.getLevel(this.getLevelNumber());
         for (int i = 0; i <= nLines - 1; i++) {
             for (int j = 0; j <= nColumns - 1; j++) {
-                if (tiles[i][j].getValue() == solvedLevel.getTiles()[i][j].getValue()) {
+                if (tiles[i][j].getValue() == solvedLevel.getTiles()[i][j].getValue() && tiles[i][j].getValue() !=-1) {
                     System.out.println("un melange mauvais");
                     return false;
                 }
