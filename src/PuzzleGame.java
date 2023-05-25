@@ -15,7 +15,9 @@ import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.Scene;
@@ -553,7 +555,7 @@ public class PuzzleGame extends Application {
         
         Button backButton = new Button("Return");
         backButton.setPrefSize(100,50);//set the button size
-        backButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leos-car'");//set the style of the button
+        backButton.setStyle("-fx-text-fill: #c07a1a;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar';");
         backButton.setOnAction(event -> getPrimaryStage().setScene(getHomeScene()));
         difficultyLayout.getChildren().add(backButton);
         
@@ -572,7 +574,7 @@ public class PuzzleGame extends Application {
         Button backButton = new Button("Return");
         backButton.setStyle("-fx-text-fill: #c07a1a;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar';");
 
-        backButton.setPrefWidth(100);
+        backButton.setPrefWidth(150);
         backButton.setPrefHeight(50);
         backButton.setOnAction(event -> getPrimaryStage().setScene(getHomeScene()));
 
@@ -600,7 +602,7 @@ public class PuzzleGame extends Application {
                     String[] data = pointlastgame.next().split(";");//to separate point and level according to ;
                     Label[] labelrank = new Label[10];
                     Integer[] listpoint = new Integer[10];
-                    Arrays.fill(listpoint, 0);//to initialize in zer0
+                    Arrays.fill(listpoint, 0);//to initialize in zero
                     int count = 0;
                     do {
                         if (Integer.parseInt(data[1]) == finalDifficulty) {
@@ -619,14 +621,23 @@ public class PuzzleGame extends Application {
 
                         if(count == 10) break;
                         else {
-                            labelrank[count] = new Label("Point: " + integer + " | Level: " + finalDifficulty); // to set the rank
+                            Label rankLabel = new Label((count + 1) + "."); //to write the ranking
+                            rankLabel.setStyle("-fx-text-fill: black;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
+                            rankLabel.setMinWidth(25); //to avoid the dynamic text
+
+                            labelrank[count] = new Label(" Point: " + integer); // to set the rank
                             labelrank[count].setStyle("-fx-text-fill: black;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
-                            leaderboardLayout.getChildren().add(labelrank[count]); // add the ranking into the container
+                            HBox labelRanking = new HBox(10);
+
+                            labelRanking.getChildren().addAll(rankLabel, labelrank[count]);//to associate point and ranking
+
+                            leaderboardLayout.getChildren().add(labelRanking);// add the ranking into the container
                             count++;
                         }
                     }
 
                     leaderboardLayout.getChildren().add(backButton);
+                    backButton.setOnMousePressed(event1 -> {openLeaderboard();});//return to list of level leaderboard
 
                     pointlastgame.close();
                 } catch (FileNotFoundException e) {
