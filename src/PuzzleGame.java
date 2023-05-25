@@ -398,21 +398,12 @@ public class PuzzleGame extends Application {
 	        			tile.setText(Integer.toString(tile.getValue()));
 	        	        tile.setStyle("-fx-font-size: 40;"
 	        	        		+ "-fx-text-fill: #fff;"
+	        	        		+ "-fx-border-width: 2;"
+	        	        		+ "-fx-border-color: #420;" // very dark brown
 	        	        		+ "-fx-background-color: #640;"); // dark wood
 	        	        tile.setAlignment(Pos.CENTER);
 	            		tile.setOnAction(e -> {
-	            			// TODO
-	            	        if(isGameFinished()) {
-	            		        getTimer().stop();
-	            		        try {
-	            					showEndScreen();
-	            				} catch (FileNotFoundException ex) {
-	            					ex.printStackTrace();
-	            				}
-	            	        }
-	            	        else {
-	            	        	setMoveCount(getMoveCount() + 1);
-	            	        }
+	            			// TODO swapTile
 	            		});
         		}
         		gridLayout.add(tile, i++, j);
@@ -731,6 +722,17 @@ public class PuzzleGame extends Application {
         int temp = currentLevel.getTile(x1,y1).getValue();
         currentLevel.getTile(x1,y2).setValue(currentLevel.getTile(x2,y2).getValue());
         currentLevel.getTile(x2,y2).setValue(temp);
+        
+    	setMoveCount(getMoveCount() + 1);
+    	
+        if(isGameFinished()) {
+	        getTimer().stop();
+	        try {
+				showEndScreen();
+			} catch (FileNotFoundException ex) {
+				ex.printStackTrace();
+			}
+        }
     }
 
     /**
