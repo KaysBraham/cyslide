@@ -291,9 +291,12 @@ public class PuzzleGame extends Application {
 
         //to have image in background
         StackPane root = new StackPane(); // Use StackPane
-        // Ajouter l'ImageView de l'image en arrière-plan
-        ImageView backgroundImage = new ImageView("file:H:/Documents/GitHub/cyslide/chemin.png");
-        backgroundImage.fitWidthProperty().bind(primaryStage.widthProperty());
+
+
+        File imageFile = new File("chemin.png");
+        ImageView backgroundImage = new ImageView("file:" + imageFile.getAbsolutePath());
+
+        backgroundImage.fitWidthProperty().bind(primaryStage.widthProperty()); //to adapt the image according the size of scene
         backgroundImage.fitHeightProperty().bind(primaryStage.heightProperty());
         root.getChildren().add(backgroundImage);
 
