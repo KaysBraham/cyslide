@@ -450,10 +450,6 @@ public class PuzzleGame extends Application {
 
         topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton());
 
-
-
-
-
         HBox bottomLayout = new HBox(64);
         bottomLayout.setAlignment(Pos.CENTER);
 
@@ -474,10 +470,10 @@ public class PuzzleGame extends Application {
 
         playScene.addEventFilter(MouseEvent.MOUSE_CLICKED, event1 -> {
             playScene.addEventFilter(MouseEvent.MOUSE_CLICKED, event2 -> {
-                int clickedRow = gridLayout.getRowIndex((Rectangle) event1.getTarget());
-                int clickedCol = gridLayout.getColumnIndex((Rectangle) event1.getTarget());
-                int emptyRowPos = gridLayout.getRowIndex((Rectangle) event2.getTarget());
-                int emptyColPos = gridLayout.getColumnIndex((Rectangle) event2.getTarget());
+                int clickedRow = gridLayout.getRowIndex((Tile) event1.getTarget());
+                int clickedCol = gridLayout.getColumnIndex((Tile) event1.getTarget());
+                int emptyRowPos = gridLayout.getRowIndex((Tile) event2.getTarget());
+                int emptyColPos = gridLayout.getColumnIndex((Tile) event2.getTarget());
                 if (currentLevel.getTile(clickedRow,clickedCol).getValue() == 0 || currentLevel.getTile(clickedRow,clickedCol).getValue() == -1) {
                     System.out.println("prohibit movement");
                 }
@@ -485,7 +481,7 @@ public class PuzzleGame extends Application {
                     swapTile(clickedRow, clickedCol, emptyRowPos, emptyColPos) ;
                 }
 
-               tileGridConstuctor(gridLayout) ;
+                //currentLevel.getTiles().setOnAction(e ->tileGridConstuctor(gridLayout)) ;
 
             });
         });
