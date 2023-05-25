@@ -41,9 +41,9 @@ public class PuzzleGame extends Application {
     /**
      * The currently selected level.
      */
-    private static Level currentLevel = levels.get(0).copy();
+    private static Level currentLevel;
 
-    /**
+	/**
      * The array of unlocked levels.
      */
     private Level[] unlockedLevels;
@@ -90,10 +90,37 @@ public class PuzzleGame extends Application {
      */
     private Button redoButton;
 
-    /**
+	/**
+     * Returns a list containing the levels.
+     *
+     * @return The level list.
+     */
+	public static List<Level> getLevels() {
+		return levels;
+	}
+
+	/**
      * Returns the current level in the game.
      *
      * @return The current level.
+     */
+    public static Level getCurrentLevel() {
+		return currentLevel;
+	}
+
+    /**
+     * Sets the current level.
+     *
+     * @param currentLevel The current level.
+     */
+	public static void setCurrentLevel(Level currentLevel) {
+		PuzzleGame.currentLevel = currentLevel;
+	}
+
+	/**
+     * Returns the current level number.
+     *
+     * @return The current level number.
      */
     public static int getCurrentLevelNumber() {
         return currentLevelNumber;
@@ -198,6 +225,15 @@ public class PuzzleGame extends Application {
 		this.levelLabel = levelLabel;
 	}
 
+    /**
+     * Sets the current level number.
+     *
+     * @param currentLevelNumber The current level number.
+     */
+    public static void setCurrentLevelNumber(int currentLevelNumber) {
+		PuzzleGame.currentLevelNumber = currentLevelNumber;
+	}
+    
     /**
      * Returns the current score of the player in the game.
      *
@@ -342,23 +378,47 @@ public class PuzzleGame extends Application {
 
         topLayout.getChildren().addAll(undoButton, redoButton);
 
-        GridPane gridLayout = new GridPane(); // new GridPane();
+        GridPane gridLayout = new GridPane();
 
-        // TODO tiles in gridLayout
-        // ---- when making a move
-	        if(isGameFinished()) {
-		        getTimer().stop();
-		        try {
-					showEndScreen();
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
-	        }
-	        else {
-	        	setMoveCount(getMoveCount() + 1);
-	        	// TODO
-	        }
-        // ---- end
+        setCurrentLevel(getLevels().get(getCurrentLevelNumber() - 1).copy());
+
+        // putting the tiles in the gridpane
+        int i, j = 0;
+        for (Tile[] tiles: getCurrentLevel().getTiles()) {
+        	i = 0;
+        	for(Tile tile : tiles) {
+        		switch(tile.getValue()) {
+	        		case -1:
+	        			tile.setVisible(false);
+	        			break;
+	        		case 0:
+	        	        tile.setStyle("-fx-background-color: #fc6;"); // light wood
+	        			break;
+	        		default:
+	        			tile.setText(Integer.toString(tile.getValue()));
+	        	        tile.setStyle("-fx-font-size: 40;"
+	        	        		+ "-fx-text-fill: #fff;"
+	        	        		+ "-fx-background-color: #640;"); // dark wood
+	        	        tile.setAlignment(Pos.CENTER);
+	            		tile.setOnAction(e -> {
+	            			// TODO
+	            	        if(isGameFinished()) {
+	            		        getTimer().stop();
+	            		        try {
+	            					showEndScreen();
+	            				} catch (FileNotFoundException ex) {
+	            					ex.printStackTrace();
+	            				}
+	            	        }
+	            	        else {
+	            	        	setMoveCount(getMoveCount() + 1);
+	            	        }
+	            		});
+        		}
+        		gridLayout.add(tile, i++, j);
+        	}
+        	j++;
+        }
 
         HBox bottomLayout = new HBox(64);
 
@@ -417,13 +477,14 @@ public class PuzzleGame extends Application {
             levelButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leos-car'");//set the style of the button
             int finalDifficulty = difficulty;
             levelButton.setOnMousePressed(event -> {
-                getLevelLabel().setText("level: " + finalDifficulty);
+                // TODO
+                setCurrentLevelNumber(finalDifficulty);
+                getLevelLabel().setText("level: " + finalDifficulty); // updating the label in home screen
                 levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
                 PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
                 pauseTransition.setOnFinished(e -> levelButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leos-car'"));//to remove the transparent
                 pauseTransition.play();
-                getPrimaryStage().setScene(getHomeScene());//return to home after pushing the level button
-
+                getPrimaryStage().setScene(getHomeScene()); // return to home screen after selecting a level
             });
             difficultyLayout.getChildren().add(levelButton);
         }
