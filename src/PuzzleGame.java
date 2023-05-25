@@ -433,9 +433,6 @@ public class PuzzleGame extends Application {
         GridPane gridLayout = new GridPane();
         gridLayout.setAlignment(Pos.CENTER);
 
-        Scene scene = new Scene(gridLayout, 300, 300);
-
-
         setCurrentLevel(getLevels().get(getCurrentLevelNumber() - 1).copy());
 
         // putting the tiles in the gridpane
@@ -474,7 +471,26 @@ public class PuzzleGame extends Application {
         playLayout.getChildren().addAll(topLayout, gridLayout, bottomLayout);
     	
     	Scene playScene = new Scene(playLayout, 1600, 900); // HD+ scene
-    	
+
+        playScene.addEventFilter(MouseEvent.MOUSE_CLICKED, event1 -> {
+            playScene.addEventFilter(MouseEvent.MOUSE_CLICKED, event2 -> {
+                int clickedRow = gridLayout.getRowIndex((Rectangle) event1.getTarget());
+                int clickedCol = gridLayout.getColumnIndex((Rectangle) event1.getTarget());
+                int emptyRowPos = gridLayout.getRowIndex((Rectangle) event2.getTarget());
+                int emptyColPos = gridLayout.getColumnIndex((Rectangle) event2.getTarget());
+                if (currentLevel.getTile(clickedRow,clickedCol).getValue() == 0 || currentLevel.getTile(clickedRow,clickedCol).getValue() == -1) {
+                    System.out.println("prohibit movement");
+                }
+                else {
+                    swapTile(clickedRow, clickedCol, emptyRowPos, emptyColPos) ;
+                }
+
+               tileGridConstuctor(gridLayout) ;
+
+            });
+        });
+
+
         getPrimaryStage().setScene(playScene);
 
         chronometer.start();
