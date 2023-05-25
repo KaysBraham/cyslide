@@ -479,9 +479,9 @@ public class PuzzleGame extends Application {
                 }
                 else {
                     swapTile(clickedRow, clickedCol, emptyRowPos, emptyColPos) ;
+                    tileGridConstuctor(gridLayout);
                 }
 
-                //currentLevel.getTiles().setOnAction(e ->tileGridConstuctor(gridLayout)) ;
 
             });
         });
