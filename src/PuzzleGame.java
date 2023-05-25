@@ -363,7 +363,7 @@ public class PuzzleGame extends Application {
     	VBox playLayout = new VBox(32);
     	playLayout.setAlignment(Pos.CENTER);
     	playLayout.setStyle("-fx-background-color: #00a8c4;");
-        
+
         HBox topLayout = new HBox(64);
 
         setUndoButton(new Button("Undo"));
@@ -421,11 +421,11 @@ public class PuzzleGame extends Application {
         	getTimer().stop();
         	getPrimaryStage().setScene(getHomeScene());
         });
-        
+
         bottomLayout.getChildren().addAll(chronometer, giveUpButton);
 
         playLayout.getChildren().addAll(topLayout, gridLayout, bottomLayout);
-    	
+
     	Scene playScene = new Scene(playLayout, 1600, 900); // HD+ scene
     	
         getPrimaryStage().setScene(playScene);
@@ -459,7 +459,7 @@ public class PuzzleGame extends Application {
 	public void openDifficultySettings() {
 		VBox difficultyLayout = new VBox(10);
 		difficultyLayout.setAlignment(Pos.CENTER);
-		difficultyLayout.setStyle("-fx-background-color: #00a8c4;");
+        difficultyLayout.setStyle("-fx-background-color: #FFA500;");
 		
 		for (int difficulty = 1; difficulty <= 10; difficulty++) {
             Button levelButton = new Button("Level " + difficulty);
@@ -496,10 +496,11 @@ public class PuzzleGame extends Application {
 	public void openLeaderboard() {
 		VBox leaderboardLayout = new VBox(10);
 		leaderboardLayout.setAlignment(Pos.CENTER);
-		leaderboardLayout.setStyle("-fx-background-color: #00a8c4;");
+        leaderboardLayout.setStyle("-fx-background-color: #FFA500;");
         //create back button
         Button backButton = new Button("Return");
-        backButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 15;-fx-font-family: 'Leos-car'");//set the style of the button
+        backButton.setStyle("-fx-text-fill: white; -fx-border-color: white; -fx-background-color: black; -fx-font-size: 18; -fx-font-family: 'Leos-car'");
+
         backButton.setPrefWidth(100);
         backButton.setPrefHeight(50);
         backButton.setOnAction(event -> getPrimaryStage().setScene(getHomeScene()));
@@ -519,6 +520,8 @@ public class PuzzleGame extends Application {
 
                 File file = new File("scoreLastGame.txt."); // to retrieve point
                 // collect the point
+
+
                 Scanner pointlastgame;
                 try {
                     pointlastgame = new Scanner(file);
@@ -537,7 +540,7 @@ public class PuzzleGame extends Application {
                         if (pointlastgame.hasNextLine()) data = pointlastgame.nextLine().split(";");
                         else break;
                     } while (pointlastgame.hasNextLine());
-                    
+
                     count = 0;
 
                     Arrays.sort(listpoint, Comparator.reverseOrder()); //to sort in reverse
@@ -553,17 +556,20 @@ public class PuzzleGame extends Application {
                     }
 
                     leaderboardLayout.getChildren().add(backButton);
+
                     pointlastgame.close();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
             });
 
-            leaderboardLayout.getChildren().add(levelButton);
+            leaderboardLayout.getChildren().add(levelButton);//back button when the ranking is printing
+
         }
 
         leaderboardLayout.getChildren().add(backButton); //add back button
-        
+
+
         Scene leaderboardScene = new Scene(leaderboardLayout);
         primaryStage.setScene(leaderboardScene);
 	}
