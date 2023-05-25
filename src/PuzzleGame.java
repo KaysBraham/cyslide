@@ -507,7 +507,7 @@ public class PuzzleGame extends Application {
 
         for (int difficulty = 1; difficulty <= 10; difficulty++) { // to print the button
             Button levelButton = new Button("Level " + difficulty);
-            levelButton.setPrefSize(100,50);
+            levelButton.setPrefSize(150,50);
 
             levelButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leos-car'");//set the style of the button
             int finalDifficulty = difficulty;
@@ -549,7 +549,7 @@ public class PuzzleGame extends Application {
                         if(count == 10) break;
                         else {
                             labelrank[count] = new Label("Point: " + integer + " | Level: " + finalDifficulty); // to set the rank
-                            labelrank[count].setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
+                            labelrank[count].setStyle("-fx-text-fill: black;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
                             leaderboardLayout.getChildren().add(labelrank[count]); // add the ranking into the container
                             count++;
                         }
@@ -571,6 +571,7 @@ public class PuzzleGame extends Application {
 
 
         Scene leaderboardScene = new Scene(leaderboardLayout);
+
         primaryStage.setScene(leaderboardScene);
 	}
 
@@ -629,7 +630,8 @@ public class PuzzleGame extends Application {
         endScreenLayout.getChildren().addAll(buttons); // to add the buttons
 
         //---------------------------------------to define the scene-----------------------------------------------------------------
-		Scene endScreenScene = new Scene(endScreenLayout, 300, 300);
+        endScreenLayout.setStyle("-fx-background-color: black;");//to set background in black
+        Scene endScreenScene = new Scene(endScreenLayout, 300, 300);
 		primaryStage.setScene(endScreenScene);
 		
     }
