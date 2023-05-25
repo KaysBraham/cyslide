@@ -289,18 +289,8 @@ public class PuzzleGame extends Application {
 	        });
 		}
 
-        Image image = new Image("file:H:/Documents/GitHub/cyslide/chemin.png");
-        image.errorProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                System.out.println("Erreur lors du chargement de l'image : " + image.getException());
-            }
-        });
-
-
-
+        //to have image in background
         StackPane root = new StackPane(); // Use StackPane
-
-
         // Ajouter l'ImageView de l'image en arrière-plan
         ImageView backgroundImage = new ImageView("file:H:/Documents/GitHub/cyslide/chemin.png");
         backgroundImage.fitWidthProperty().bind(primaryStage.widthProperty());
