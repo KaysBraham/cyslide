@@ -498,7 +498,7 @@ public class PuzzleGame extends Application {
 	        			break;
 	        		default:
 	        			tile.setText(Integer.toString(tile.getValue()));
-	        	        tile.setStyle("-fx-font-size: 40;"
+	        	        tile.setStyle("-fx-font-size: 38;"
 	        	        		+ "-fx-text-fill: #fff;"
 	        	        		+ "-fx-border-width: 2;"
 	        	        		+ "-fx-border-color: #420;" // very dark brown
