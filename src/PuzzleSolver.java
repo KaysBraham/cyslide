@@ -100,16 +100,16 @@ public class PuzzleSolver {
     private static int calculateManhattanDistance(Level stateLevel) {
         Tile[][] stateTile = stateLevel.getTiles();
         int sum = 0;
-        int nLines = stateTile.length;
+        int nLine = stateTile.length;
         int nColumn = stateTile[0].length;
-        for (int i = 0; i < nLines; i++) {
+        for (int i = 0; i < nLine; i++) {
             for (int j = 0; j < nColumn; j++) {
                 int temp = stateTile[i][j].getValue();
                 if (temp == 0) {
                     Level solvedLevel = PuzzleGame.getLevel(stateLevel.getLevelNumber());
                     Tile[][] solvedTile = solvedLevel.getTiles();
                     int tempSum = Integer.MAX_VALUE;
-                    for (int k = 0; k < nLines; k++) {
+                    for (int k = 0; k < nLine; k++) {
                         for (int l = 0; l < nColumn; l++) {
                             if (solvedTile[k][l].getValue() == 0) {
                                 if (Math.abs(i - k) + Math.abs(j - l) < tempSum) {
@@ -119,19 +119,18 @@ public class PuzzleSolver {
                         }
                     }
                     sum += tempSum;
-                }
-                else {
+                } else {
                     Level solvedLevel = PuzzleGame.getLevel(stateLevel.getLevelNumber());
                     Tile[][] solvedTile = solvedLevel.getTiles();
-                    int compt1 = 0;
-                    int compt2 = 0;
-                    while (solvedTile[compt1][compt2].getValue() != temp && compt1 != nLines - 1) {
-                        while (solvedTile[compt1][compt2].getValue() != temp && compt2 != nColumn - 1) {
-                            compt1++;
+                    outerLoop :
+                    for (int k = 0; k < nLine; k++) {
+                        for (int l = 0; l < nColumn; l++) {
+                            if (solvedTile[k][l].getValue() == temp) {
+                                sum += Math.abs(i - k) + Math.abs(j - l);
+                                break outerLoop;
+                            }
                         }
-                        compt2++;
                     }
-                    sum += Math.abs(i - compt1) + Math.abs(j - compt2);
                 }
             }
         }
