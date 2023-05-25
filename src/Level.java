@@ -61,6 +61,7 @@ public class Level {
         }
     }
 
+
     public void randomShuffleLevel() {
         do {
             List<Tile> tempList = new ArrayList<>();

@@ -24,6 +24,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 /**
  * The PuzzleGame class represents a puzzle game application.
@@ -430,6 +433,9 @@ public class PuzzleGame extends Application {
         GridPane gridLayout = new GridPane();
         gridLayout.setAlignment(Pos.CENTER);
 
+        Scene scene = new Scene(gridLayout, 300, 300);
+
+
         setCurrentLevel(getLevels().get(getCurrentLevelNumber() - 1).copy());
 
         // putting the tiles in the gridpane
@@ -446,6 +452,8 @@ public class PuzzleGame extends Application {
                                                         tileGridConstuctor(gridLayout);});
 
         topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton());
+
+
 
 
 
