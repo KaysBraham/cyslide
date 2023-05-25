@@ -415,6 +415,7 @@ public class PuzzleGame extends Application {
     	playLayout.setStyle("-fx-background-color: #00a8c4;");
         
         HBox topLayout = new HBox(64);
+    	topLayout.setAlignment(Pos.CENTER);
 
         setUndoButton(new Button("Undo"));
         getUndoButton().setStyle("-fx-font-size:32");
@@ -427,6 +428,7 @@ public class PuzzleGame extends Application {
         getRedoButton().setOnAction(e -> redoMove());
 
         GridPane gridLayout = new GridPane();
+        gridLayout.setAlignment(Pos.CENTER);
 
         setCurrentLevel(getLevels().get(getCurrentLevelNumber() - 1).copy());
 
@@ -443,11 +445,12 @@ public class PuzzleGame extends Application {
         getStepByStepShuffleButton().setOnAction(e -> {currentLevel.stepByStepShuffleLevel();
                                                         tileGridConstuctor(gridLayout);});
 
-        topLayout.getChildren().addAll(undoButton, redoButton, randomShuffleButton, stepByStepShuffleButton);
+        topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton());
 
 
 
         HBox bottomLayout = new HBox(64);
+        bottomLayout.setAlignment(Pos.CENTER);
 
         Chronometer chronometer = new Chronometer();
         
@@ -490,6 +493,7 @@ public class PuzzleGame extends Application {
 	        			tile.setVisible(false);
 	        			break;
 	        		case 0:
+	        			tile.setText("");
 	        	        tile.setStyle("-fx-background-color: #fc6;"); // light wood
 	        			break;
 	        		default:
