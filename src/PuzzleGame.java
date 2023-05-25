@@ -290,12 +290,9 @@ public class PuzzleGame extends Application {
 		}
 
         //to have image in background
-        StackPane root = new StackPane(); // Use StackPane
-
-
+        StackPane root = new StackPane(); // Use StackPane to set the image
         File imageFile = new File("chemin.png");
         ImageView backgroundImage = new ImageView("file:" + imageFile.getAbsolutePath());
-
         backgroundImage.fitWidthProperty().bind(primaryStage.widthProperty()); //to adapt the image according the size of scene
         backgroundImage.fitHeightProperty().bind(primaryStage.heightProperty());
         root.getChildren().add(backgroundImage);
@@ -502,6 +499,7 @@ public class PuzzleGame extends Application {
                             count++;
                         }
                     }
+
                     leaderboardLayout.getChildren().add(backButton);
                     pointlastgame.close();
                 } catch (FileNotFoundException e) {
