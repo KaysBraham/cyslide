@@ -426,48 +426,26 @@ public class PuzzleGame extends Application {
         getRedoButton().setDisable(true);
         getRedoButton().setOnAction(e -> redoMove());
 
-        setRandomShuffleButton(new Button("Random Shuffle"));
-        getRandomShuffleButton().setStyle("-fx-font-size:25");
-        getRandomShuffleButton().setOnAction(e -> currentLevel.randomShuffleLevel());
-
-        setStepByStepShuffleButton(new Button("Step by step Shuffle"));
-        getStepByStepShuffleButton().setStyle("-fx-font-size:25");
-        getStepByStepShuffleButton().setOnAction(e -> currentLevel.stepByStepShuffleLevel());
-
-        topLayout.getChildren().addAll(undoButton, redoButton, randomShuffleButton, stepByStepShuffleButton);
-
         GridPane gridLayout = new GridPane();
 
         setCurrentLevel(getLevels().get(getCurrentLevelNumber() - 1).copy());
 
         // putting the tiles in the gridpane
-        int i, j = 0;
-        for (Tile[] tiles: getCurrentLevel().getTiles()) {
-        	i = 0;
-        	for(Tile tile : tiles) {
-        		switch(tile.getValue()) {
-	        		case -1:
-	        			tile.setVisible(false);
-	        			break;
-	        		case 0:
-	        	        tile.setStyle("-fx-background-color: #fc6;"); // light wood
-	        			break;
-	        		default:
-	        			tile.setText(Integer.toString(tile.getValue()));
-	        	        tile.setStyle("-fx-font-size: 40;"
-	        	        		+ "-fx-text-fill: #fff;"
-	        	        		+ "-fx-border-width: 2;"
-	        	        		+ "-fx-border-color: #420;" // very dark brown
-	        	        		+ "-fx-background-color: #640;"); // dark wood
-	        	        tile.setAlignment(Pos.CENTER);
-	            		tile.setOnAction(e -> {
-	            			// TODO swapTile
-	            		});
-        		}
-        		gridLayout.add(tile, i++, j);
-        	}
-        	j++;
-        }
+        tileGridConstuctor(gridLayout);
+
+        setRandomShuffleButton(new Button("Random Shuffle"));
+        getRandomShuffleButton().setStyle("-fx-font-size:25");
+        getRandomShuffleButton().setOnAction(e -> {currentLevel.randomShuffleLevel();
+                                                tileGridConstuctor(gridLayout);});
+
+        setStepByStepShuffleButton(new Button("Step by step Shuffle"));
+        getStepByStepShuffleButton().setStyle("-fx-font-size:25");
+        getStepByStepShuffleButton().setOnAction(e -> {currentLevel.stepByStepShuffleLevel();
+                                                        tileGridConstuctor(gridLayout);});
+
+        topLayout.getChildren().addAll(undoButton, redoButton, randomShuffleButton, stepByStepShuffleButton);
+
+
 
         HBox bottomLayout = new HBox(64);
 
@@ -499,6 +477,37 @@ public class PuzzleGame extends Application {
         setTimer(new SequentialTransition(timerUpdate));
         getTimer().setCycleCount(PauseTransition.INDEFINITE);
         getTimer().play();
+    }
+
+    private static void tileGridConstuctor(GridPane gridLayout) {
+        gridLayout.getChildren().clear();
+        int i, j = 0;
+        for (Tile[] tiles: getCurrentLevel().getTiles()) {
+        	i = 0;
+        	for(Tile tile : tiles) {
+        		switch(tile.getValue()) {
+	        		case -1:
+	        			tile.setVisible(false);
+	        			break;
+	        		case 0:
+	        	        tile.setStyle("-fx-background-color: #fc6;"); // light wood
+	        			break;
+	        		default:
+	        			tile.setText(Integer.toString(tile.getValue()));
+	        	        tile.setStyle("-fx-font-size: 40;"
+	        	        		+ "-fx-text-fill: #fff;"
+	        	        		+ "-fx-border-width: 2;"
+	        	        		+ "-fx-border-color: #420;" // very dark brown
+	        	        		+ "-fx-background-color: #640;"); // dark wood
+	        	        tile.setAlignment(Pos.CENTER);
+	            		tile.setOnAction(e -> {
+	            			// TODO swapTile
+	            		});
+        		}
+        		gridLayout.add(tile, i++, j);
+        	}
+        	j++;
+        }
     }
 
     /**
