@@ -82,7 +82,18 @@ public class PuzzleGame extends Application {
      */
     private Button undoButton;
 
-    
+    /**
+     * The random shuffle Button.
+     */
+
+    private Button randomShuffleButton;
+
+    /**
+     * The step by step shuffle Button.
+     */
+
+    private Button stepByStepShuffleButton;
+
     /**
      * The redo Button.
      */
@@ -286,7 +297,46 @@ public class PuzzleGame extends Application {
 		this.redoButton = redoButton;
 	}
 
-	/**
+
+    /**
+     * Returns the random shuffle button.
+     *
+     * @return The random shuffle button.
+     */
+
+    public Button getRandomShuffleButton() {
+        return randomShuffleButton;
+    }
+
+    /**
+     * Sets the random shuffle button.
+     *
+     * @param randomShuffleButton The random shuffle button.
+     */
+    public void setRandomShuffleButton(Button randomShuffleButton) {
+        this.randomShuffleButton = randomShuffleButton;
+    }
+
+    /**
+     * Returns the step by step shuffle button.
+     *
+     * @return The step by step shuffle button.
+     */
+
+    public Button getStepByStepShuffleButton() {
+        return stepByStepShuffleButton;
+    }
+
+    /**
+     * Sets the step by step shuffle button.
+     *
+     * @param stepByStepShuffleButton The shuffle button.
+     */
+    public void setStepByStepShuffleButton(Button stepByStepShuffleButton) {
+        this.stepByStepShuffleButton = stepByStepShuffleButton;
+    }
+
+    /**
      * Starts the JavaFX application by setting up the primary stage and the home screen scene.
      *
      * @param primaryStage The primary stage.
@@ -371,10 +421,18 @@ public class PuzzleGame extends Application {
         
         setRedoButton(new Button("Redo"));
         getRedoButton().setStyle("-fx-font-size:32");
-        getUndoButton().setDisable(true);
+        getRedoButton().setDisable(true);
         getRedoButton().setOnAction(e -> redoMove());
 
-        topLayout.getChildren().addAll(undoButton, redoButton);
+        setRandomShuffleButton(new Button("Random Shuffle"));
+        getRandomShuffleButton().setStyle("-fx-font-size:25");
+        getRandomShuffleButton().setOnAction(e -> currentLevel.randomShuffleLevel());
+
+        setStepByStepShuffleButton(new Button("Step by step Shuffle"));
+        getStepByStepShuffleButton().setStyle("-fx-font-size:25");
+        getStepByStepShuffleButton().setOnAction(e -> currentLevel.stepByStepShuffleLevel());
+
+        topLayout.getChildren().addAll(undoButton, redoButton, randomShuffleButton, stepByStepShuffleButton);
 
         GridPane gridLayout = new GridPane();
 
@@ -697,12 +755,6 @@ public class PuzzleGame extends Application {
     	// TODO
     }
 
-    /**
-     * Shuffles the current level.
-     */
-    public void shuffleLevel(){
-    	// TODO
-    }
 
     /**
      * Swaps two tiles on the current level.
@@ -798,46 +850,12 @@ public class PuzzleGame extends Application {
         //tests
 
         currentLevel.print();
-        levels.get(0).print();
-        /*
-        if (PuzzleSolver.isGoalState(currentLevel)){
-            System.out.println("oui c egal");
-        }
-        else {
-            System.out.println("non c pas egal");
-        }
+        getLevel(currentLevel.getLevelNumber()).print();
 
-         */
         currentLevel.stepByStepShuffleLevel();
+
         currentLevel.print();
-        levels.get(0).print();
-        /*
-        if (PuzzleSolver.isGoalState(currentLevel)){
-            System.out.println("oui c egal");
-        }
-        else {
-            System.out.println("non c pas egal");
-        }
 
-         */
-
-
-      /*
-
-        for (int i = 0; i < levels.size(); i++) {
-            System.out.println("Level " + (i + 1) + ":");
-            Level level = levels.get(i);
-            Tile[][] tiles = level.getTiles();
-            for (Tile[] row : tiles) {
-                for (Tile tile : row) {
-                    System.out.print(tile.getValue() + " ");
-                }
-                System.out.println();
-            }
-            System.out.println();
-        }
-
-         */
         //fin test
     }
 }
