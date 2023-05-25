@@ -478,10 +478,11 @@ public class PuzzleGame extends Application {
                     System.out.println("prohibit movement");
                 }
                 else {
-                    swapTile(clickedRow, clickedCol, emptyRowPos, emptyColPos) ;
+                    currentLevel.swapTile(clickedRow, clickedCol, emptyRowPos, emptyColPos) ;
                     tileGridConstuctor(gridLayout);
                 }
 
+                //currentLevel.getTiles().setOnAction(e ->tileGridConstuctor(gridLayout)) ;
 
             });
         });
@@ -782,14 +783,7 @@ public class PuzzleGame extends Application {
     }
 
 
-    /**
-     * Swaps two tiles on the current level.
-     *
-     * @param x1 The x-coordinate of the first tile.
-     * @param y1 The y-coordinate of the first tile.
-     * @param x2 The x-coordinate of the second tile.
-     * @param y2 The y-coordinate of the second tile.
-     */
+    /*
     public void swapTile(int x1, int y1, int x2, int y2){
 
         // ensure the two chosen tiles are adjacent
@@ -874,14 +868,14 @@ public class PuzzleGame extends Application {
     public static void main(String[] args) {
         launch(args);
         //tests
-
+        /*
         currentLevel.print();
         getLevel(currentLevel.getLevelNumber()).print();
 
         currentLevel.stepByStepShuffleLevel();
 
         currentLevel.print();
-
+        */
         //fin test
     }
 }
