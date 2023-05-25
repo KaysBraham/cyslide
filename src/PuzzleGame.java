@@ -13,12 +13,13 @@ import java.lang.Math;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.Scene;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.GridPane;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.animation.PauseTransition;
@@ -323,17 +324,27 @@ public class PuzzleGame extends Application {
 	            pauseTransition.play();
 	        });
 		}
-		
-		VBox homeLayout = new VBox(48); // Big spacing
-		homeLayout.setAlignment(Pos.CENTER);
-		homeLayout.setStyle("-fx-background-color: #00a8c4;");
-		homeLayout.getChildren().add(getLevelLabel());
-		homeLayout.getChildren().addAll(buttons);
-		
-		setHomeScene(new Scene(homeLayout, 640, 480)); // VGA scene
-		getPrimaryStage().setScene(getHomeScene());
-		getPrimaryStage().show();
-	}
+
+        //to have image in background
+        StackPane root = new StackPane(); // Use StackPane
+        // Ajouter l'ImageView de l'image en arrière-plan
+        ImageView backgroundImage = new ImageView("file:H:/Documents/GitHub/cyslide/chemin.png");
+        backgroundImage.fitWidthProperty().bind(primaryStage.widthProperty());
+        backgroundImage.fitHeightProperty().bind(primaryStage.heightProperty());
+        root.getChildren().add(backgroundImage);
+
+        VBox homeLayout = new VBox(48);
+        homeLayout.setAlignment(Pos.CENTER);
+        homeLayout.getChildren().add(getLevelLabel());
+        homeLayout.getChildren().addAll(buttons);
+        root.getChildren().add(homeLayout);
+
+        setHomeScene(new Scene(root, 640, 480));
+
+        getPrimaryStage().setScene(getHomeScene());
+        getPrimaryStage().show();
+
+    }
 
     /**
      * Stops the timer to allow the application to stop properly, then closes the application.
