@@ -15,6 +15,7 @@ import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.Scene;
@@ -346,44 +347,58 @@ public class PuzzleGame extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		
 		setPrimaryStage(primaryStage);
-		
-		setLevelLabel(new Label("level: " + getCurrentLevelNumber())); //to print level
-		getLevelLabel().setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
-		
-		Button startButton = new Button("New game");
+        String levelText = "level: " + getCurrentLevelNumber();
+		setLevelLabel(new Label(levelText)); //to print level
+		getLevelLabel().setStyle("-fx-text-fill: #c07a1a;-fx-font-size: 18;-fx-font-family: 'Leoscar'"); // to set the style of label
+        Circle circle = new Circle(0, 0, levelText.length() * 4); // Adjust the circle according to the size of text
+        circle.setStyle("-fx-fill: #25140c");
+
+
+        //-----------------------------------------Create start button------------------------------------------------
+		Button startButton = new Button("New game");//create new game button
 		startButton.setOnAction(e -> startGame());
-		
-		Button setDifficultyButton = new Button("Difficulty settings");
+
+        //-----------------------------------------Create difficulty setting button------------------------------------------------
+
+        Button setDifficultyButton = new Button("Difficulty settings");
 		setDifficultyButton.setOnAction(e -> openDifficultySettings());
-		
-		Button showLeaderboardButton = new Button("Leaderboard");
+
+        //-----------------------------------------Create leaderboard button------------------------------------------------
+
+        Button showLeaderboardButton = new Button("Leaderboard");
 		showLeaderboardButton.setOnAction(e -> openLeaderboard());
 		
-		Button exitButton = new Button("Exit");
+		Button exitButton = new Button("Exit");//create exit button
 		exitButton.setOnAction(e -> Platform.exit());
+
 		
 		List<Button> buttons = Arrays.asList(startButton, setDifficultyButton, showLeaderboardButton, exitButton);
 		for(Button button : buttons) {
-			button.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+			button.setStyle("-fx-text-fill: #c07a1a;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar';");
+            button.setPrefSize(165,50);
+            button.setWrapText(true);
 			button.setOnMousePressed(event -> {
 				button.setStyle("-fx-border-color: black; -fx-background-color: grey;"); // to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1)); // during 0.1 second
-	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leoscar'"));//to remove the transparent
+	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill: #c07a1a;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar';"));//to remove the transparent
 	            pauseTransition.play();
 	        });
 		}
 
         //to have image in background
         StackPane root = new StackPane(); // Use StackPane to set the image
-        File imageFile = new File("chemin.png");
+        File imageFile = new File("chemin.png");//to find chemin.png
         ImageView backgroundImage = new ImageView("file:" + imageFile.getAbsolutePath());
         backgroundImage.fitWidthProperty().bind(primaryStage.widthProperty()); //to adapt the image according the size of scene
         backgroundImage.fitHeightProperty().bind(primaryStage.heightProperty());
         root.getChildren().add(backgroundImage);
 
-        VBox homeLayout = new VBox(48);
+        VBox homeLayout = new VBox(48);//Create a vertical box to print button in vertical
         homeLayout.setAlignment(Pos.CENTER);
-        homeLayout.getChildren().add(getLevelLabel());
+
+
+        homeLayout.getChildren().add(new StackPane(circle, getLevelLabel())); //add the fusion between circle and getLevelLabel
+
         homeLayout.getChildren().addAll(buttons);
         root.getChildren().add(homeLayout);
 
@@ -521,7 +536,7 @@ public class PuzzleGame extends Application {
             Button levelButton = new Button("Level " + difficulty);
             levelButton.setPrefSize(100,50); //set the button size
 
-            levelButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leos-car'");//set the style of the button
+            levelButton.setStyle("-fx-text-fill: #c07a1a;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar';");
             int finalDifficulty = difficulty;
             levelButton.setOnMousePressed(event -> {
                 // TODO
@@ -555,7 +570,7 @@ public class PuzzleGame extends Application {
         leaderboardLayout.setStyle("-fx-background-color: #FFA500;");
         //create back button
         Button backButton = new Button("Return");
-        backButton.setStyle("-fx-text-fill: white; -fx-border-color: white; -fx-background-color: black; -fx-font-size: 18; -fx-font-family: 'Leos-car'");
+        backButton.setStyle("-fx-text-fill: #c07a1a;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar';");
 
         backButton.setPrefWidth(100);
         backButton.setPrefHeight(50);
@@ -565,7 +580,7 @@ public class PuzzleGame extends Application {
             Button levelButton = new Button("Level " + difficulty);
             levelButton.setPrefSize(150,50);
 
-            levelButton.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leos-car'");//set the style of the button
+            levelButton.setStyle("-fx-text-fill: #c07a1a;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar';");
             int finalDifficulty = difficulty;
             levelButton.setOnMousePressed(event -> {
             	leaderboardLayout.getChildren().clear(); // to remove all the button in order to print th ranking
@@ -670,8 +685,8 @@ public class PuzzleGame extends Application {
         // Buttons formatting
 		List<Button> buttons = Arrays.asList(tryAgainButton, replayButton, saveScoreButton, homeButton);
 		for(Button button : buttons) {
-			button.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
-			button.setOnMousePressed(event -> {
+			button.setStyle("-fx-text-fill: #c07a1a;-fx-border-color: white; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar';");
+            button.setOnMousePressed(event -> {
 				button.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
 	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leoscar'"));//to remove the transparent
