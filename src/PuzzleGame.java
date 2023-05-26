@@ -28,6 +28,9 @@ import javafx.animation.SequentialTransition;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+
 
 /**
  * The PuzzleGame class represents a puzzle game application.
@@ -481,26 +484,50 @@ public class PuzzleGame extends Application {
         bottomLayout.getChildren().addAll(chronometer, giveUpButton);
 
         playLayout.getChildren().addAll(topLayout, gridLayout, bottomLayout);
-    	
-    	Scene playScene = new Scene(playLayout, 1600, 900); // HD+ scene
 
-        playScene.addEventFilter(MouseEvent.MOUSE_CLICKED, event1 -> {
-            playScene.addEventFilter(MouseEvent.MOUSE_CLICKED, event2 -> {
-                int clickedRow = gridLayout.getRowIndex((Tile) event1.getTarget());
-                int clickedCol = gridLayout.getColumnIndex((Tile) event1.getTarget());
-                int emptyRowPos = gridLayout.getRowIndex((Tile) event2.getTarget());
-                int emptyColPos = gridLayout.getColumnIndex((Tile) event2.getTarget());
-                if (currentLevel.getTile(clickedRow,clickedCol).getValue() == 0 || currentLevel.getTile(clickedRow,clickedCol).getValue() == -1) {
-                    System.out.println("prohibit movement");
-                }
-                else {
-                    currentLevel.swapTile(clickedRow, clickedCol, emptyRowPos, emptyColPos) ;
+    	Scene playScene = new Scene(playLayout, 1600, 900); // HD+ scene
+        playScene.setOnKeyPressed(event -> {
+            int emptyRow = currentLevel.getEmptyTiles()[0][0];
+            int emptyCol = currentLevel.getEmptyTiles()[0][1];
+            int tileRow = 0;
+            int tileCol = 0;
+            switch (event.getCode()) {
+                case UP -> {
+                    tileRow = emptyRow;
+                    tileCol = emptyCol - 1;
+                    currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
                     tileGridConstuctor(gridLayout);
                 }
-
-                //currentLevel.getTiles().setOnAction(e ->tileGridConstuctor(gridLayout)) ;
-
-            });
+                case DOWN -> {
+                    tileRow = emptyRow;
+                    tileCol = emptyCol + 1;
+                    currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
+                    tileGridConstuctor(gridLayout);
+                }
+                case LEFT -> {
+                    tileRow = emptyRow - 1;
+                    tileCol = emptyCol;
+                    currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
+                    tileGridConstuctor(gridLayout);
+                }
+                case RIGHT -> {
+                    tileRow = emptyRow + 1;
+                    tileCol = emptyCol;
+                    currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
+                    tileGridConstuctor(gridLayout);
+                }
+                case ENTER -> {
+                    if (emptyRow == currentLevel.getEmptyTiles()[0][0] && emptyCol == currentLevel.getEmptyTiles()[0][1]) {
+                        emptyRow = currentLevel.getEmptyTiles()[1][0];
+                        emptyCol = currentLevel.getEmptyTiles()[1][1];
+                    } else {
+                        emptyRow = currentLevel.getEmptyTiles()[0][0];
+                        emptyCol = currentLevel.getEmptyTiles()[0][1];
+                    }
+                }
+                default -> {
+                }
+            }
         });
 
 
