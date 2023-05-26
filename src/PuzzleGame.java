@@ -641,9 +641,16 @@ public class PuzzleGame extends Application {
 
                         if(count == 10) break;
                         else {
+                            Label rankLabel = new Label((count + 1) + ".");
+                            rankLabel.setStyle("-fx-text-fill: black;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
+                            rankLabel.setMinWidth(30);
                             labelrank[count] = new Label("Point: " + integer + " | Level: " + finalDifficulty); // to set the rank
                             labelrank[count].setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
                             leaderboardLayout.getChildren().add(labelrank[count]); // add the ranking into the container
+                            HBox labelRanking = new HBox(10);
+                            labelRanking.getChildren().addAll(rankLabel, labelrank[count]);
+
+                            leaderboardLayout.getChildren().add(labelRanking);
                             count++;
                         }
                     }
@@ -662,7 +669,7 @@ public class PuzzleGame extends Application {
         }
 
         leaderboardLayout.getChildren().add(backButton); //add back button
-        
+
         Scene leaderboardScene = new Scene(leaderboardLayout);
         primaryStage.setScene(leaderboardScene);
 	}
