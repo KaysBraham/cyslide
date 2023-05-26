@@ -1,9 +1,6 @@
 package src;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -459,12 +456,12 @@ public class PuzzleGame extends Application {
 
         setRandomShuffleButton(new Button("Random Shuffle"));
         getRandomShuffleButton().setStyle("-fx-font-size:25");
-        getRandomShuffleButton().setOnAction(e -> {currentLevel.randomShuffleLevel();
+        getRandomShuffleButton().setOnAction(e -> {randomShuffleLevel();
                                                 tileGridConstuctor(gridLayout);});
 
         setStepByStepShuffleButton(new Button("Step by step Shuffle"));
         getStepByStepShuffleButton().setStyle("-fx-font-size:25");
-        getStepByStepShuffleButton().setOnAction(e -> {currentLevel.stepByStepShuffleLevel();
+        getStepByStepShuffleButton().setOnAction(e -> {stepByStepShuffleLevel();
                                                         tileGridConstuctor(gridLayout);});
 
         topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton());
@@ -495,25 +492,25 @@ public class PuzzleGame extends Application {
                 case UP -> {
                     tileRow = emptyRow;
                     tileCol = emptyCol - 1;
-                    currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
+                    swapTile(tileRow, tileCol, emptyRow, emptyCol);
                     tileGridConstuctor(gridLayout);
                 }
                 case DOWN -> {
                     tileRow = emptyRow;
                     tileCol = emptyCol + 1;
-                    currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
+                    swapTile(tileRow, tileCol, emptyRow, emptyCol);
                     tileGridConstuctor(gridLayout);
                 }
                 case LEFT -> {
                     tileRow = emptyRow - 1;
                     tileCol = emptyCol;
-                    currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
+                    swapTile(tileRow, tileCol, emptyRow, emptyCol);
                     tileGridConstuctor(gridLayout);
                 }
                 case RIGHT -> {
                     tileRow = emptyRow + 1;
                     tileCol = emptyCol;
-                    currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
+                    swapTile(tileRow, tileCol, emptyRow, emptyCol);
                     tileGridConstuctor(gridLayout);
                 }
                 case ENTER -> {
@@ -847,7 +844,44 @@ public class PuzzleGame extends Application {
     	// TODO
     }
 
+    public boolean isMoveValid(int x1, int y1, int x2, int y2){
+        // ensure the two chosen tiles are adjacent
+        if (!(x1 == x2 && Math.abs(y1 - y2) == 1) && !(y1 == y2 && Math.abs(x1 - x2) == 1)){
+            System.out.println("The two chosen tiles are not adjacent");
+            return false;
+        }
+        // ensure the tile is valid to move (at least one of its neighboring squares is empty)
+        /*
+        if (!(tiles[x2][y2].getValue() == 0) || !((tiles[x1][y1].getValue() != -1) && (tiles[x1][y1].getValue() != 0))){
+            System.out.println("Invalid movement");
+            return false;
+        }
+        */
+        if (!(x1<currentLevel.getTiles().length && x1>=0 && y1<currentLevel.getTiles()[0].length && y1>=0
+                && x2<currentLevel.getTiles().length && x2>=0 && y2<currentLevel.getTiles()[0].length && y2>=0
+                && ((currentLevel.getTiles()[x1][y1].getValue()==0 && currentLevel.getTiles()[x2][y2].getValue()!=-1) || (currentLevel.getTiles()[x1][y1].getValue()!=-1 && currentLevel.getTiles()[x2][y2].getValue()==0)))){
+            System.out.println("Invalid movement");
+            return false;
+        }
+        return true;
+    }
 
+    /**
+     * Swaps two tiles on the current level.
+     *
+     * @param x1 The x-coordinate of the first tile.
+     * @param y1 The y-coordinate of the first tile.
+     * @param x2 The x-coordinate of the second tile.
+     * @param y2 The y-coordinate of the second tile.
+     */
+    public void swapTile(int x1, int y1, int x2, int y2){
+        int temp;
+        if(isMoveValid(x1, y1, x2, y2)){
+            temp = currentLevel.getTiles()[x1][y1].getValue();
+            currentLevel.getTiles()[x1][y1].setValue(currentLevel.getTiles()[x2][y2].getValue()) ;
+            currentLevel.getTiles()[x2][y2].setValue(temp);
+        }
+    }
     /*
     public void swapTile(int x1, int y1, int x2, int y2){
 
@@ -881,6 +915,113 @@ public class PuzzleGame extends Application {
     /**
      * Checks if the current level is solvable.
      */
+
+    public void stepByStepShuffleLevel() {
+        int nLines = currentLevel.getTiles().length;
+        int nColumns = currentLevel.getTiles().length;
+        int numberOfEmptyTiles=0;
+        for (Tile[] row : currentLevel.getTiles()) {
+            for (Tile tile : row) {
+                if (tile.getValue()==0){
+                    numberOfEmptyTiles++;
+                }
+            }
+        }
+        int n = 0;
+        while(n<1000){
+            int[][] emptyTiles = new int[numberOfEmptyTiles][2];
+            int c = 0;
+            for(int i = 0;i<nLines;i++){
+                for(int j = 0;j<nColumns;j++){
+                    if (currentLevel.getTiles()[i][j].getValue() == 0) {
+                        emptyTiles[c][0]=i;
+                        emptyTiles[c][1]=j;
+                        c++;
+                    }
+                }
+            }
+
+
+            Random random = new Random();
+            int randomEmptyTile = random.nextInt(numberOfEmptyTiles);
+            boolean isMoveDone = false;
+            do {int randomMove = random.nextInt(4);
+                switch (randomMove){
+                    case 0 :
+                        if (isMoveValid(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0]+1,emptyTiles[randomEmptyTile][1])){
+                            swapTile(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0]+1,emptyTiles[randomEmptyTile][1]);
+                            isMoveDone=true;
+                        }
+                    case 1 :
+                        if (isMoveValid(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1]+1)){
+                            swapTile(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1]+1);
+                            isMoveDone=true;
+                        }
+                    case 2 :
+                        if (isMoveValid(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1]-1)){
+                            swapTile(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1]-1);
+                            isMoveDone=true;
+                        }
+                    case 3 :
+                        if (isMoveValid(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0]-1,emptyTiles[randomEmptyTile][1])){
+                            swapTile(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0]-1,emptyTiles[randomEmptyTile][1]);
+                            isMoveDone=true;
+                        }
+                    default:
+                        break;
+
+                }
+
+            }while (!isMoveDone);
+            currentLevel.print();
+            if (!(n==999 && !checkShuffle())){
+                n++;
+            }
+        }
+    }
+    public void randomShuffleLevel() {
+        do {
+            List<Tile> tempList = new ArrayList<>();
+            int nLines = currentLevel.getTiles().length;
+            int nColumns = currentLevel.getTiles().length;
+            for (int i = 0; i <= nLines - 1; i++) {
+                for (int j = 0; j <= nColumns - 1; j++) {
+                    if (currentLevel.getTiles()[i][j].getValue() != -1) {
+                        tempList.add(currentLevel.getTiles()[i][j]);
+                    }
+                }
+            }
+            Collections.shuffle(tempList);
+            int p = 0;
+            for (int i = 0; i <= nLines - 1; i++) {
+                for (int j = 0; j <= nColumns - 1; j++) {
+                    if (currentLevel.getTiles()[i][j].getValue() != -1) {
+                        currentLevel.getTiles()[i][j] = tempList.get(p);
+                        p += 1;
+                    }
+                }
+            }
+            System.out.println("un melange de fait");
+            currentLevel.setSolved(false);
+        }while (!checkShuffle());
+    }
+
+    public boolean checkShuffle() { // checks if all tiles are in a new place after mixing
+        int nLines = currentLevel.getTiles().length ;
+        int nColumns = currentLevel.getTiles()[0].length ;
+        Level solvedLevel = PuzzleGame.getLevel(currentLevel.getLevelNumber());
+        for (int i = 0; i <= nLines - 1; i++) {
+            for (int j = 0; j <= nColumns - 1; j++) {
+                if (currentLevel.getTiles()[i][j].getValue() == solvedLevel.getTiles()[i][j].getValue() && currentLevel.getTiles()[i][j].getValue() !=-1) {
+                    System.out.println("un melange mauvais");
+                    return false;
+                }
+            }
+        }
+        System.out.println("Bon melange");
+        return true;
+    }
+
     public void checkSolvable(){
     	// TODO
     }
@@ -932,15 +1073,6 @@ public class PuzzleGame extends Application {
      */
     public static void main(String[] args) {
         launch(args);
-        //tests
-        /*
-        currentLevel.print();
-        getLevel(currentLevel.getLevelNumber()).print();
 
-        currentLevel.stepByStepShuffleLevel();
-
-        currentLevel.print();
-        */
-        //fin test
     }
 }
