@@ -647,7 +647,11 @@ public class PuzzleGame extends Application {
                             count++;
                         }
                     }
+                    backButton.setOnAction(event1 -> openLeaderboard());
+
                     leaderboardLayout.getChildren().add(backButton);
+
+
                     pointlastgame.close();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -658,7 +662,6 @@ public class PuzzleGame extends Application {
         }
 
         leaderboardLayout.getChildren().add(backButton); //add back button
-        backButton.setOnAction(event -> openLeaderboard());
         
         Scene leaderboardScene = new Scene(leaderboardLayout);
         primaryStage.setScene(leaderboardScene);
