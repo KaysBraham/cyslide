@@ -157,6 +157,31 @@ public class Level {
         }
     }
 */
+public int[][] getEmptyTiles() {
+    int nLines = tiles.length;
+    int nColumns = tiles[0].length;
+    int numberOfEmptyTiles = 0;
+    for (Tile[] row : tiles) {
+        for (Tile tile : row) {
+            if (tile.getValue() == 0) {
+                numberOfEmptyTiles++;
+            }
+        }
+    }
+    int n = 0;
+    int[][] emptyTiles = new int[numberOfEmptyTiles][2];
+    int c = 0;
+    for (int i = 0; i < nLines; i++) {
+        for (int j = 0; j < nColumns; j++){
+            if (tiles[i][j].getValue() == 0) {
+                emptyTiles[c][0] = i;
+                emptyTiles[c][1] = j;
+                c++;
+            }
+        }
+    }
+    return emptyTiles;
+}
 
 public void stepByStepShuffleLevel() {
     int nLines = tiles.length;
