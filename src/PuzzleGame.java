@@ -350,7 +350,7 @@ public class PuzzleGame extends Application {
      */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		
+
 		setPrimaryStage(primaryStage);
         String levelText = "level: " + getCurrentLevelNumber();
 
@@ -384,7 +384,7 @@ public class PuzzleGame extends Application {
 
         //to have image in background
         StackPane root = new StackPane(); // Use StackPane
-        // Ajouter l'ImageView de l'image en arrière-plan
+        // add imageview in background image
         ImageView backgroundImage = new ImageView("file:chemin.png");
         backgroundImage.fitWidthProperty().bind(primaryStage.widthProperty());
         backgroundImage.fitHeightProperty().bind(primaryStage.heightProperty());
@@ -592,7 +592,8 @@ public class PuzzleGame extends Application {
 	public void openLeaderboard() {
 		VBox leaderboardLayout = new VBox(10);
 
-		leaderboardLayout.setStyle("-fx-background-color: #00a8c4;");
+        leaderboardLayout.setStyle("-fx-background-color: black;");
+        leaderboardLayout.setAlignment(Pos.CENTER); //to set all the button on the center
         //create back button
         Button backButton = new Button("Return");
         backButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
@@ -608,13 +609,14 @@ public class PuzzleGame extends Application {
             int finalDifficulty = difficulty;
             levelButton.setOnMousePressed(event -> {
             	leaderboardLayout.getChildren().clear(); // to remove all the button in order to print th ranking
+
                 levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); // to make grey transparent
 
                 PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1)); // during 0.1 second
                 pauseTransition.play();
 
                 File file = new File("scoreLastGame.txt."); // to retrieve point
-                // collect the point
+
                 Scanner pointlastgame;
                 try {
                     pointlastgame = new Scanner(file);
@@ -643,14 +645,17 @@ public class PuzzleGame extends Application {
                         else {
                             Label rankLabel = new Label((count + 1) + ".");
                             rankLabel.setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
-                            rankLabel.setMinWidth(30);
+                            rankLabel.setMinWidth(35);//to avoid the points to move when the ranking is ten
                             labelrank[count] = new Label("Point: " + integer); // to set the rank
                             labelrank[count].setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
-                            HBox labelRanking = new HBox(10);
-                            labelRanking.getChildren().addAll(rankLabel, labelrank[count]);
-                            labelRanking.setAlignment(Pos.CENTER);
+                            HBox labelRanking = new HBox(10); //create horizontal box
+
+
+                            labelRanking.getChildren().addAll(rankLabel, labelrank[count]); //add the label containing rank and point
+                            labelRanking.setAlignment(Pos.CENTER);//to set the label contaning rank+point on the center
                             leaderboardLayout.getChildren().add(labelRanking);
-                            leaderboardLayout.setAlignment(Pos.CENTER);
+
+
 
                             count++;
                         }
@@ -658,7 +663,7 @@ public class PuzzleGame extends Application {
                     leaderboardLayout.getChildren().add(backButton);
 
                     backButton.setOnAction(event1 -> openLeaderboard());
-                    leaderboardLayout.setAlignment(Pos.CENTER);
+
 
 
 
@@ -670,14 +675,12 @@ public class PuzzleGame extends Application {
             });
 
             leaderboardLayout.getChildren().add(levelButton);
-            leaderboardLayout.setAlignment(Pos.CENTER);
+
         }
 
         leaderboardLayout.getChildren().add(backButton); //add back button
-        leaderboardLayout.setStyle("-fx-background-color: black;");
 
-
-        Scene leaderboardScene = new Scene(leaderboardLayout);
+        Scene leaderboardScene = new Scene(leaderboardLayout,640,600);
         primaryStage.setScene(leaderboardScene);
 	}
 
@@ -720,11 +723,11 @@ public class PuzzleGame extends Application {
         // Buttons formatting
 		List<Button> buttons = Arrays.asList(tryAgainButton, replayButton, saveScoreButton, homeButton);
 		for(Button button : buttons) {
-			button.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+			button.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
 			button.setOnMousePressed(event -> {
 				button.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
-	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill: white;-fx-border-color: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leoscar'"));//to remove the transparent
+	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'"));//to remove the transparent
 	            pauseTransition.play();
 	        });
 		}
