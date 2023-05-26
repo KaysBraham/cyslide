@@ -614,7 +614,8 @@ public class PuzzleGame extends Application {
             });
             difficultyLayout.getChildren().add(levelButton);
         }
-        
+
+
         Button backButton = new Button("Return");
         backButton.setPrefSize(100,50);//set the button size
         backButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
