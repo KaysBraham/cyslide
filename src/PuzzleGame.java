@@ -555,7 +555,7 @@ public class PuzzleGame extends Application {
 	public void openDifficultySettings() {
 		VBox difficultyLayout = new VBox(10);
 		difficultyLayout.setAlignment(Pos.CENTER);
-		difficultyLayout.setStyle("-fx-background-color: #00a8c4;");
+		difficultyLayout.setStyle("-fx-background-color: black;");
 		
 		for (int difficulty = 1; difficulty <= 10; difficulty++) {
             Button levelButton = new Button("Level " + difficulty);
@@ -591,7 +591,7 @@ public class PuzzleGame extends Application {
      */
 	public void openLeaderboard() {
 		VBox leaderboardLayout = new VBox(10);
-		leaderboardLayout.setAlignment(Pos.CENTER);
+
 		leaderboardLayout.setStyle("-fx-background-color: #00a8c4;");
         //create back button
         Button backButton = new Button("Return");
@@ -642,33 +642,40 @@ public class PuzzleGame extends Application {
                         if(count == 10) break;
                         else {
                             Label rankLabel = new Label((count + 1) + ".");
-                            rankLabel.setStyle("-fx-text-fill: black;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
+                            rankLabel.setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
                             rankLabel.setMinWidth(30);
-                            labelrank[count] = new Label("Point: " + integer + " | Level: " + finalDifficulty); // to set the rank
-                            labelrank[count].setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
-                            leaderboardLayout.getChildren().add(labelrank[count]); // add the ranking into the container
+                            labelrank[count] = new Label("Point: " + integer); // to set the rank
+                            labelrank[count].setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
                             HBox labelRanking = new HBox(10);
                             labelRanking.getChildren().addAll(rankLabel, labelrank[count]);
-
+                            labelRanking.setAlignment(Pos.CENTER);
                             leaderboardLayout.getChildren().add(labelRanking);
+                            leaderboardLayout.setAlignment(Pos.CENTER);
+
                             count++;
                         }
                     }
-                    backButton.setOnAction(event1 -> openLeaderboard());
-
                     leaderboardLayout.getChildren().add(backButton);
+
+                    backButton.setOnAction(event1 -> openLeaderboard());
+                    leaderboardLayout.setAlignment(Pos.CENTER);
+
 
 
                     pointlastgame.close();
+
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
             });
 
             leaderboardLayout.getChildren().add(levelButton);
+            leaderboardLayout.setAlignment(Pos.CENTER);
         }
 
         leaderboardLayout.getChildren().add(backButton); //add back button
+        leaderboardLayout.setStyle("-fx-background-color: black;");
+
 
         Scene leaderboardScene = new Scene(leaderboardLayout);
         primaryStage.setScene(leaderboardScene);
