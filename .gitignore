@@ -3,6 +3,7 @@
 
 # IDE files
 .project
+/bin/
 
 # Log file
 *.log

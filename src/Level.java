@@ -52,6 +52,14 @@ public class Level {
         return true;
     }
 
+    /**
+     * Swaps two tiles on the current level.
+     *
+     * @param x1 The x-coordinate of the first tile.
+     * @param y1 The y-coordinate of the first tile.
+     * @param x2 The x-coordinate of the second tile.
+     * @param y2 The y-coordinate of the second tile.
+     */
     public void swapTile(int x1, int y1, int x2, int y2){
         int temp;
         if(isMoveValid(x1, y1, x2, y2)){
@@ -60,6 +68,7 @@ public class Level {
             tiles[x2][y2].setValue(temp);
         }
     }
+
 
     public void randomShuffleLevel() {
         do {
