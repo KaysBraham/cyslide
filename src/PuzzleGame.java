@@ -354,10 +354,12 @@ public class PuzzleGame extends Application {
 		setPrimaryStage(primaryStage);
         String levelText = "level: " + getCurrentLevelNumber();
 
-        Circle circle = new Circle(0, 0, levelText.length() * 4);
-        circle.setStyle("-fx-fill: #25140c");
-		setLevelLabel(new Label(levelText)); //to print level
-		getLevelLabel().setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+        Circle circle = new Circle(0, 0, levelText.length() * 4.5); //to have a circle 4.5 times bigger than the text
+        circle.setStyle("-fx-stroke:black; -fx-stroke-width: 1px; -fx-fill: #25140c;"); //to configure border
+
+
+        setLevelLabel(new Label(levelText)); //to print level
+		getLevelLabel().setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//to configure levellabel
 		
 		Button startButton = new Button("New game");
 		startButton.setOnAction(e -> startGame());
@@ -385,16 +387,26 @@ public class PuzzleGame extends Application {
         //to have image in background
         StackPane root = new StackPane(); // Use StackPane
         // add imageview in background image
+
         ImageView backgroundImage = new ImageView("file:chemin.png");
         backgroundImage.fitWidthProperty().bind(primaryStage.widthProperty());
         backgroundImage.fitHeightProperty().bind(primaryStage.heightProperty());
-        root.getChildren().add(backgroundImage);
+        root.getChildren().add(backgroundImage); //to add the image
 
-        VBox homeLayout = new VBox(48);
+        VBox homeLayout = new VBox(5);//to create vertical box
         homeLayout.setAlignment(Pos.CENTER);
-        homeLayout.getChildren().add(new StackPane(circle, levelLabel));
-        homeLayout.getChildren().addAll(buttons);
-        root.getChildren().add(homeLayout);
+
+        StackPane circleStackPane = new StackPane(circle, levelLabel); //to superimpose circle and label
+        circleStackPane.setAlignment(Pos.CENTER);
+        homeLayout.getChildren().add(circleStackPane);
+
+        HBox buttonsBox = new HBox(10); // To adjust space between button
+        buttonsBox.setAlignment(Pos.CENTER);
+        buttonsBox.getChildren().addAll(buttons);
+
+        homeLayout.getChildren().addAll(buttonsBox);
+
+        root.getChildren().add(homeLayout);// to add homeLayout in order to superimpose
 
         setHomeScene(new Scene(root, 640, 480));
 
@@ -737,9 +749,10 @@ public class PuzzleGame extends Application {
         endScreenLayout.setAlignment(Pos.CENTER); // to center the buttons
         endScreenLayout.getChildren().add(hbox); // to add the hbox
         endScreenLayout.getChildren().addAll(buttons); // to add the buttons
+        endScreenLayout.setStyle("-fx-background-color: black;");//
 
         //---------------------------------------to define the scene-----------------------------------------------------------------
-		Scene endScreenScene = new Scene(endScreenLayout, 300, 300);
+		Scene endScreenScene = new Scene(endScreenLayout, 640, 480);
 		primaryStage.setScene(endScreenScene);
 		
     }
