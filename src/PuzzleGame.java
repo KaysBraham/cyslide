@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.* ;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -117,7 +118,15 @@ public class PuzzleGame extends Application {
 		return levels;
 	}
 
-	/**
+    /**
+     * Returns a list of the blocked levels.
+     *
+     * @return The level list.
+     */
+    private boolean[] levelsWon;
+
+
+    /**
      * Returns the current level in the game.
      *
      * @return The current level.
@@ -432,6 +441,20 @@ public class PuzzleGame extends Application {
      */
     public void startGame(){
 
+
+        levelsWon = new boolean[getLevels().size()];
+
+        if (getCurrentLevelNumber() > 1) {
+            for (int i = 0; i < getCurrentLevelNumber() - 1; i++) {
+                if (!levelsWon[i]) {
+                    String message;
+                    Label messageLabel = new Label();
+                    messageLabel.setText("Vous devez gagner les niveaux précédent pour débloquer celui-ci");
+                    return;
+                }
+            }
+        }
+
     	VBox playLayout = new VBox(32);
     	playLayout.setAlignment(Pos.CENTER);
     	playLayout.setStyle("-fx-background-color: #00a8c4;");
@@ -585,6 +608,7 @@ public class PuzzleGame extends Application {
      */
 	private boolean isGameFinished() {
 		// TODO
+        //levelsWon[levelNumber - 1] = true;
 		return false;
 	}
 
