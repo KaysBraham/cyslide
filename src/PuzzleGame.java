@@ -22,6 +22,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
@@ -37,6 +40,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.text.Font;
+
+
 
 
 /**
@@ -393,14 +399,15 @@ public class PuzzleGame extends Application {
 	public void start(Stage primaryStage) throws Exception {
 
 		setPrimaryStage(primaryStage);
-        String levelText = "level: " + getCurrentLevelNumber();
 
-        Circle circle = new Circle(0, 0, levelText.length() * 4.5); //to have a circle 4.5 times bigger than the text
-        circle.setStyle("-fx-stroke:black; -fx-stroke-width: 1px; -fx-fill: #25140c;"); //to configure border
+        String levelText = "Level: " + getCurrentLevelNumber();
+
+        Rectangle rectangle = new Rectangle(200, 30);
+        rectangle.setStyle("-fx-stroke:rgba(68,34,0,0); -fx-stroke-width: 1px; -fx-fill: rgba(68,34,0,0); -fx-text-fill:#420"); //to configure border
 
 
         setLevelLabel(new Label(levelText)); //to print level
-		getLevelLabel().setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//to configure levellabel
+		getLevelLabel().setStyle("-fx-text-fill: #442200;-fx-font-size: 25;-fx-font-family: 'Rockwell'");//to configure levellabel
 		
 		Button startButton = new Button("New game");
 		startButton.setOnAction(e -> startGame());
@@ -416,11 +423,11 @@ public class PuzzleGame extends Application {
 		
 		List<Button> buttons = Arrays.asList(startButton, setDifficultyButton, showLeaderboardButton, exitButton);
 		for(Button button : buttons) {
-			button.setStyle("-fx-text-fill:#e19116; -fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+            button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 30; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
 			button.setOnMousePressed(event -> {
-				button.setStyle("-fx-border-color: black; -fx-background-color: grey;"); // to make grey transparent
+				button.setStyle("-fx-border-color: black; -fx-background-color: #000000;"); // to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1)); // during 0.1 second
-	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'"));//to remove the transparent
+	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:#000000 ;-fx-border-color: #af0000; -fx-background-color: #000000;-fx-font-size: 18;-fx-font-family: 'Leoscar'"));//to remove the transparent
 	            pauseTransition.play();
 	        });
 		}
@@ -429,15 +436,22 @@ public class PuzzleGame extends Application {
         StackPane root = new StackPane(); // Use StackPane
         // add imageview in background image
 
-        ImageView backgroundImage = new ImageView("file:chemin.png");
+        ImageView backgroundImage = new ImageView("file:background2-min.jpg");
         backgroundImage.fitWidthProperty().bind(primaryStage.widthProperty());
         backgroundImage.fitHeightProperty().bind(primaryStage.heightProperty());
         root.getChildren().add(backgroundImage); //to add the image
 
+
         VBox homeLayout = new VBox(5);//to create vertical box
         homeLayout.setAlignment(Pos.CENTER);
 
-        StackPane circleStackPane = new StackPane(circle, levelLabel); //to superimpose circle and label
+        Text titleText = new Text("KANT");
+        titleText.setFont(Font.font("Rockwell extra bold", FontWeight.BOLD, 90));
+        titleText.setFill(Color.web("#420"));
+        homeLayout.getChildren().add(titleText);
+
+
+        StackPane circleStackPane = new StackPane(rectangle, levelLabel); //to superimpose circle and label
         circleStackPane.setAlignment(Pos.CENTER);
         homeLayout.getChildren().add(circleStackPane);
 
@@ -894,7 +908,7 @@ public class PuzzleGame extends Application {
         // Buttons formatting
 		List<Button> buttons = Arrays.asList(tryAgainButton, replayButton, saveScoreButton, homeButton);
 		for(Button button : buttons) {
-			button.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+			button.setStyle("-fx-text-fill:rgb(255,255,255) ;-fx-border-color: #e70000; -fx-background-color: #ffffff;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
 			button.setOnMousePressed(event -> {
 				button.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
