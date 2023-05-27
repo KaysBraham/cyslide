@@ -106,13 +106,12 @@ public class Level {
                         }
                     }
                 }
-                System.out.println("un melange de fait");
                 solved=false;
             }while (!checkShuffle());
-            if (!PuzzleSolver.solve(this)) {
-                System.out.println("Ce melange n'est pas resoluble");
+            if (!PuzzleSolver.solvePuzzle(this)) {
+                System.out.println("Unsolvable shuffle");
             }
-        }while (!PuzzleSolver.solve(this));
+        }while (!PuzzleSolver.solvePuzzle(this));
     }
 
     public void stepByStepShuffleLevel() {
