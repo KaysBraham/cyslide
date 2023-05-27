@@ -15,6 +15,7 @@ import java.lang.Math;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
@@ -126,9 +127,9 @@ public class PuzzleGame extends Application {
 	}
 
     /**
-     * Returns a list of the blocked levels.
+     * Returns a list of a booleans.
      *
-     * @return The level list.
+     * @return The boolean list.
      */
     private boolean[] levelsWon;
 
@@ -140,6 +141,8 @@ public class PuzzleGame extends Application {
     public static Level getCurrentLevel() {
 		return currentLevel;
 	}
+
+
 
     /**
      * Sets the current level.
@@ -476,7 +479,9 @@ public class PuzzleGame extends Application {
     public void startGame(){
 
 
+
         levelsWon = new boolean[getLevels().size()];
+
 
         if (getCurrentLevelNumber() > 1) {
             for (int i = 0; i < getCurrentLevelNumber() - 1; i++) {
@@ -487,12 +492,25 @@ public class PuzzleGame extends Application {
             }
         }
 
-    	VBox playLayout = new VBox(32);
+        Label titleLabel = new Label("Resolved \n level");
+        titleLabel.setStyle("-fx-font-size: 15px ;");
+
+
+        VBox playLayout = new VBox(32);
     	playLayout.setAlignment(Pos.CENTER);
     	playLayout.setStyle("-fx-background-color: #00a8c4;");
+
         
         HBox topLayout = new HBox(64);
     	topLayout.setAlignment(Pos.CENTER);
+
+        GridPane gridLayout = new GridPane();
+        gridLayout.setAlignment(Pos.CENTER);
+
+        GridPane grid = new GridPane();
+        solvedLevelPreview(grid);
+
+
 
         setUndoButton(new Button("Undo"));
         getUndoButton().setStyle("-fx-font-size:32");
@@ -504,9 +522,6 @@ public class PuzzleGame extends Application {
         getRedoButton().setDisable(true);
         getRedoButton().setOnAction(e -> redoMove());
 
-        GridPane gridLayout = new GridPane();
-        gridLayout.setAlignment(Pos.CENTER);
-
         setCurrentLevel(getLevels().get(getCurrentLevelNumber() - 1).copy());
         currentLevel.randomShuffleLevel();
         tileGridConstuctor(gridLayout);
@@ -515,28 +530,33 @@ public class PuzzleGame extends Application {
         setRandomShuffleButton(new Button("Random Shuffle"));
         getRandomShuffleButton().setStyle("-fx-font-size:25");
         getRandomShuffleButton().setOnAction(e -> {currentLevel.randomShuffleLevel();
-                                                tileGridConstuctor(gridLayout);});
+            tileGridConstuctor(gridLayout); });
 
         setStepByStepShuffleButton(new Button("Step by step Shuffle"));
         getStepByStepShuffleButton().setStyle("-fx-font-size:25");
         getStepByStepShuffleButton().setOnAction(e -> {currentLevel.stepByStepShuffleLevel();
-                                                        tileGridConstuctor(gridLayout);});
+                                                        tileGridConstuctor(gridLayout); });
 
         topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton());
 
         HBox bottomLayout = new HBox(64);
         bottomLayout.setAlignment(Pos.CENTER);
 
+        HBox resolvedLevelLayout = new HBox();
+
+        resolvedLevelLayout.getChildren().addAll(titleLabel, grid) ;
+
         Chronometer chronometer = new Chronometer();
         
         Button giveUpButton = new Button("Give up");
-        giveUpButton.setStyle("-fx-font-size:32");
+        giveUpButton.setStyle("-fx-font-size:35");
         giveUpButton.setOnAction(e -> {
         	getTimer().stop();
         	getPrimaryStage().setScene(getHomeScene());
         });
+
         
-        bottomLayout.getChildren().addAll(chronometer, giveUpButton);
+        bottomLayout.getChildren().addAll(chronometer, giveUpButton, resolvedLevelLayout);
 
         playLayout.getChildren().addAll(topLayout, gridLayout, bottomLayout);
 
@@ -655,6 +675,36 @@ public class PuzzleGame extends Application {
         		gridLayout.add(tile, i++, j);
         	}
         	j++;
+        }
+    }
+
+    private static void solvedLevelPreview(GridPane gridLayout) {
+        gridLayout.getChildren().clear();
+        int i, j = 0;
+        for (Tile[] tiles: getLevel(getCurrentLevelNumber() - 1).getTiles()) {
+            i = 0;
+            for(Tile tile : tiles) {
+                tile.setPrefSize(50, 50);
+                switch(tile.getValue()) {
+                    case -1:
+                        tile.setVisible(false);
+                        break;
+                    case 0:
+                        tile.setText("");
+                        tile.setStyle("-fx-background-color: #fc6;"); // light wood
+                        break;
+                    default:
+                        tile.setText(Integer.toString(tile.getValue()));
+                        tile.setStyle("-fx-font-size: 15;"
+                                + "-fx-text-fill: #fff;"
+                                + "-fx-border-width: 2;"
+                                + "-fx-border-color: #420;" // very dark brown
+                                + "-fx-background-color: #640;"); // dark wood
+                        tile.setAlignment(Pos.CENTER);
+                }
+                gridLayout.add(tile, i++, j);
+            }
+            j++;
         }
     }
 
