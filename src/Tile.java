@@ -7,7 +7,6 @@ public class Tile extends Button {
 
     public Tile(int value) {
         this.value = value;
-		this.setPrefSize(100, 100);
 		this.setStyle("-fx-border-radius: 0;");
     }
 
