@@ -702,7 +702,6 @@ public class PuzzleGame extends Application {
                             dragboard.setContent(content);
 
                             event.consume();
-                            System.out.println("OnDragDetected");
 
                         }
                     });
@@ -760,18 +759,10 @@ public class PuzzleGame extends Application {
                                     rowOffset= (int) (offsetY/Math.abs(offsetY));
                                     colOffset = 0;
                                 }
-                                System.out.println("OnDragDropped");
-                                System.out.println("offsetX offsetY");
-                                System.out.println(offsetX+" "+offsetY);
-                                System.out.println("colOffset rowOffset");
-                                System.out.println(colOffset+" "+rowOffset);
 
                                 if ((Math.abs(colOffset) + Math.abs(rowOffset) == 1) && getCurrentLevel().getTiles()[finalI1][finalJ1].getValue()==0) {
                                     int originCol = finalJ1 - colOffset;
                                     int originRow = finalI1 - rowOffset;
-                                    System.out.println("finalJ1 finalI1");
-                                    System.out.println(finalJ1 +" "+ finalI1);
-                                    System.out.println(originCol+" "+originRow);
                                     swapTiles(finalJ1, finalI1, originCol, originRow);
                                     getUndoButton().setDisable(false);
                                     setMoveCount(getMoveCount() + 1);
@@ -810,33 +801,27 @@ public class PuzzleGame extends Application {
             }
         }
     }
+    
     private static void swapTiles(int col1, int row1, int col2, int row2) {
         Node tile1 = getNodeByRowColumnIndex(row1, col1);
         Node tile2 = getNodeByRowColumnIndex(row2, col2);
-        System.out.println("swaptile1");
         if (tile1 != null && tile2 != null) {
-        	getCurrentLevel().swapTile(row1,col1,row2,col2);
+        	getCurrentLevel().swapTile(row1, col1, row2, col2);
             int tile1Index = getGridLayout().getChildren().indexOf(tile1);
             int tile2Index = getGridLayout().getChildren().indexOf(tile2);
-            System.out.println("swaptile2");
             GridPane.setConstraints(tile1, col2, row2);
             GridPane.setConstraints(tile2, col1, row1);
-            System.out.println("swaptile3");
-            getGridLayout().getChildren().set(tile2Index, new Button());
+            getGridLayout().getChildren().set(tile2Index, new Button()); // buffer to avoid an exception for duplicate children
             getGridLayout().getChildren().set(tile1Index, tile2);
-            System.out.println("swaptile4");
             getGridLayout().getChildren().set(tile2Index, tile1);
-            System.out.println("Grid disposition :");
-            getCurrentLevel().print();
             tileGridConstuctor(getGridLayout());
             updateMoveCountLabel();
         }
     }
+
     private static Node getNodeByRowColumnIndex(final int row, final int col) {
         for (Node node : getGridLayout().getChildren()) {
-
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
-                System.out.println("coucou1");
                 return node;
             }
         }
@@ -879,11 +864,6 @@ public class PuzzleGame extends Application {
      * @return true if the game is finished, false otherwise.
      */
 	private static boolean isGameFinished() {
-		System.out.println("Current grid disposition");
-		getCurrentLevel().print();
-		System.out.println("Finished grid disposition");
-		getLevels().get(getCurrentLevelNumber() - 1).print();
-		System.out.println(getCurrentLevel().equals(getLevels().get(getCurrentLevelNumber() - 1)));
 		return getCurrentLevel().equals(getLevels().get(getCurrentLevelNumber() - 1));
 	}
 
