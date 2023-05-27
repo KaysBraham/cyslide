@@ -957,7 +957,7 @@ public class PuzzleGame extends Application {
                 pauseTransition.play();
 
                 Scene Scene = getHomeScene();
-                StackPane root = new StackPane();//to create a root in order to retrieve the containing of leaderboard scene
+                StackPane root = new StackPane();//to create a root in order to retrieve the containing of  scene
                 root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), Scene.getRoot());//to superimpose the actual scene from primarystage with the Scene
                 getPrimaryStage().setScene( new Scene(root)); // return to home screen after selecting a level
             });
@@ -973,7 +973,7 @@ public class PuzzleGame extends Application {
 
             Scene Scene = getHomeScene();
 
-            StackPane root = new StackPane();//to create a root in order to retrieve the containing of leaderboard scene
+            StackPane root = new StackPane();//to create a root in order to retrieve the containing of scene
             root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), Scene.getRoot());//to superimpose the actual scene from primarystage with the Scene
             getPrimaryStage().setScene( new Scene(root));
         });
@@ -1075,7 +1075,7 @@ public class PuzzleGame extends Application {
                     backButton.setOnAction(e -> {
                         setLeaderboardlayout();
                         Scene Scene = getLeaderboardlayout();
-                        StackPane root = new StackPane();//to create a root in order to retrieve the containing of leaderboard scene
+                        StackPane root = new StackPane();//to create a root in order to retrieve the containing of scene
                         root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), Scene.getRoot());//to superimpose the actual scene from primarystage with the Scene
                         getPrimaryStage().setScene(new Scene(root));
                     });
@@ -1136,7 +1136,7 @@ public class PuzzleGame extends Application {
         Button homeButton = new Button("Home");
         homeButton.setOnAction(e -> {
             Scene Scene = getHomeScene();
-            StackPane root = new StackPane();//to create a root in order to retrieve the containing of leaderboard scene
+            StackPane root = new StackPane();//to create a root in order to retrieve the containing of scene
             root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), Scene.getRoot());//to superimpose the actual scene from primarystage with the Scene
             getPrimaryStage().setScene(new Scene(root));
 
