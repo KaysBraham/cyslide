@@ -403,9 +403,11 @@ public class PuzzleGame extends Application {
             if (undoStack.size() == 1){
             getUndoButton().setDisable(true);
             }
+            redoStack.push(currentLevel.copy().getTiles());
             Tile[][] previousState = undoStack.pop();
-            redoStack.push(currentLevel.getTiles());
+            currentLevel.print() ;
             currentLevel.setTiles(previousState);
+            currentLevel.print() ;
 
         }
     }
@@ -416,8 +418,11 @@ public class PuzzleGame extends Application {
             if (redoStack.size() == 1) {
                 getRedoButton().setDisable(true);
             }
+            undoStack.push(currentLevel.copy().getTiles());
             Tile[][] nextState = redoStack.pop();
+            currentLevel.print() ;
             currentLevel.setTiles(nextState);
+            currentLevel.print() ;
         }
     }
 
@@ -619,7 +624,7 @@ public class PuzzleGame extends Application {
         setUndoButton(new Button("Undo"));
         getUndoButton().setStyle("-fx-font-size:32");
         getUndoButton().setDisable(true);
-        getUndoButton().setOnAction(e -> {undo();  getRedoButton().setDisable(false); moveCount -- ; updateMoveCountLabel(); tileGridConstuctor(gridLayout);});
+        getUndoButton().setOnAction(e -> {undo(); getRedoButton().setDisable(false); moveCount -- ; updateMoveCountLabel(); tileGridConstuctor(gridLayout);});
 
         setRedoButton(new Button("Redo"));
         getRedoButton().setStyle("-fx-font-size:32");
@@ -815,8 +820,10 @@ public class PuzzleGame extends Application {
                                     System.out.println("finalJ1 finalI1");
                                     System.out.println(finalJ1 +" "+ finalI1);
                                     System.out.println(originCol+" "+originRow);
+                                    undoStack.push(currentLevel.copy().getTiles());
                                     swapTiles(finalJ1, finalI1, originCol, originRow);
-                                    undoStack.push(currentLevel.getTiles());
+                                    redoStack.clear();
+                                    getRedoButton().setDisable(true);
                                     getUndoButton().setDisable(false);
                                     setMoveCount(getMoveCount() + 1);
                                     event.setDropCompleted(true);
