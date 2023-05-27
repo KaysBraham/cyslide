@@ -1,5 +1,7 @@
 package src;
 
+import java.util.Arrays;
+
 import javafx.scene.control.Button;
 
 public class Tile extends Button {
@@ -16,5 +18,15 @@ public class Tile extends Button {
 
     public void setValue(int value) {
         this.value = value;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj.getClass() != this.getClass()) return false;
+        
+        final Tile otherTile = (Tile) obj;
+
+        return this.getValue() == otherTile.getValue();
     }
 }

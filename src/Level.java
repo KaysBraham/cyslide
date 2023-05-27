@@ -231,7 +231,6 @@ public int[][] getEmptyTiles() {
             }
         }
     }
-    int n = 0;
     int[][] emptyTiles = new int[numberOfEmptyTiles][2];
     int c = 0;
     for (int i = 0; i < nLines; i++) {
@@ -259,8 +258,8 @@ public int[][] getEmptyTiles() {
 
     public Level copy() {
         Tile[][] newTiles = new Tile[tiles.length][tiles[0].length];
-        for (int i = 0 ; i < tiles.length ; i++){
-            for (int j = 0 ; j < tiles[0].length ; j++){
+        for (int i = 0; i < tiles.length; i++){
+            for (int j = 0; j < tiles[0].length; j++){
                 newTiles[i][j] = new Tile(tiles[i][j].getValue());
             }
         }
@@ -268,7 +267,7 @@ public int[][] getEmptyTiles() {
     }
 
     public int getLevelNumber() {
-        return levelNumber ;
+        return levelNumber;
     }
     
     @Override
@@ -277,7 +276,7 @@ public int[][] getEmptyTiles() {
         if (obj.getClass() != this.getClass()) return false;
         
         final Level otherLevel = (Level) obj;
-        
+
         return Arrays.deepEquals(this.getTiles(), otherLevel.getTiles());
     }
 }
