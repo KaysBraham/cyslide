@@ -78,17 +78,17 @@ public class PuzzleGame extends Application {
     /**
      * The primary stage of the JavaFX application.
      */
-    private Stage primaryStage;
+    private static Stage primaryStage;
 
     /**
      * The scene representing the home screen of the game.
      */
-    private Scene homeScene;
+    private static Scene homeScene;
 
     /**
      * The sequential transition used as a timer in the game.
      */
-    private SequentialTransition timer = null;
+    private static SequentialTransition timer = null;
 
     /**
      * The label displaying the current level.
@@ -101,29 +101,29 @@ public class PuzzleGame extends Application {
     /**
      * The current score of the player.
      */
-    private int score;
+    private static int score;
 
     /**
      * The undo Button.
      */
-    private Button undoButton;
+    private static Button undoButton;
 
     /**
      * The random shuffle Button.
      */
 
-    private Button randomShuffleButton;
+    private static Button randomShuffleButton;
 
     /**
      * The step by step shuffle Button.
      */
 
-    private Button stepByStepShuffleButton;
+    private static Button stepByStepShuffleButton;
 
     /**
      * The redo Button.
      */
-    private Button redoButton;
+    private static Button redoButton;
 
     private static Pair<Integer, Integer> selectedCell = null;
 
@@ -144,7 +144,7 @@ public class PuzzleGame extends Application {
      *
      * @return The boolean list.
      */
-    private boolean[] completedLevels = new boolean[getLevels().size()];;
+    private static boolean[] completedLevels = new boolean[getLevels().size()];;
 
     /**
      * Returns the current level in the game.
@@ -189,7 +189,7 @@ public class PuzzleGame extends Application {
      *
      * @return The completed levels.
      */
-    public boolean[] getCompletedLevels() {
+    public static boolean[] getCompletedLevels() {
 		return completedLevels;
 	}
 
@@ -215,7 +215,7 @@ public class PuzzleGame extends Application {
      * @param moveCount The move count.
      */
     public static void setMoveCount(int moveCount) {
-        moveCount = moveCount;
+        PuzzleGame.moveCount = moveCount;
     }
 
 
@@ -224,7 +224,7 @@ public class PuzzleGame extends Application {
      *
      * @return The primary stage.
      */
-    public Stage getPrimaryStage() {
+    public static Stage getPrimaryStage() {
         return primaryStage;
     }
 
@@ -234,7 +234,7 @@ public class PuzzleGame extends Application {
      * @param primaryStage The primary stage.
      */
     public void setPrimaryStage(Stage primaryStage) {
-        this.primaryStage = primaryStage;
+        PuzzleGame.primaryStage = primaryStage;
     }
 
     /**
@@ -242,7 +242,7 @@ public class PuzzleGame extends Application {
      *
      * @return The home screen scene.
      */
-    public Scene getHomeScene() {
+    public static Scene getHomeScene() {
         return homeScene;
     }
 
@@ -252,7 +252,7 @@ public class PuzzleGame extends Application {
      * @param homeScene The home screen scene.
      */
     public void setHomeScene(Scene homeScene) {
-        this.homeScene = homeScene;
+        PuzzleGame.homeScene = homeScene;
     }
 
     /**
@@ -260,7 +260,7 @@ public class PuzzleGame extends Application {
      *
      * @return The timer.
      */
-    public SequentialTransition getTimer() {
+    public static SequentialTransition getTimer() {
         return timer;
     }
 
@@ -269,8 +269,8 @@ public class PuzzleGame extends Application {
      *
      * @param timer The timer.
      */
-    public void setTimer(SequentialTransition timer) {
-        this.timer = timer;
+    public static void setTimer(SequentialTransition timer) {
+        PuzzleGame.timer = timer;
     }
 
     /**
@@ -313,7 +313,7 @@ public class PuzzleGame extends Application {
      *
      * @return The current score of the player.
      */
-    public int getScore() {
+    public static int getScore() {
         return score;
     }
 
@@ -322,8 +322,8 @@ public class PuzzleGame extends Application {
      *
      * @param score The current score of the player.
      */
-    public void setScore(int score) {
-        this.score = score;
+    public static void setScore(int score) {
+       PuzzleGame.score = score;
     }
 
     /**
@@ -331,7 +331,7 @@ public class PuzzleGame extends Application {
      *
      * @return The undo button.
      */
-    public Button getUndoButton() {
+    public static Button getUndoButton() {
         return undoButton;
     }
 
@@ -340,8 +340,8 @@ public class PuzzleGame extends Application {
      *
      * @param undoButton The undo button.
      */
-    public void setUndoButton(Button undoButton) {
-        this.undoButton = undoButton;
+    public static void setUndoButton(Button undoButton) {
+        PuzzleGame.undoButton = undoButton;
     }
 
     /**
@@ -349,7 +349,7 @@ public class PuzzleGame extends Application {
      *
      * @return The redo button.
      */
-    public Button getRedoButton() {
+    public static Button getRedoButton() {
         return redoButton;
     }
 
@@ -358,8 +358,8 @@ public class PuzzleGame extends Application {
      *
      * @param redoButton The redo button.
      */
-    public void setRedoButton(Button redoButton) {
-        this.redoButton = redoButton;
+    public static void setRedoButton(Button redoButton) {
+        PuzzleGame.redoButton = redoButton;
     }
 
     /**
@@ -388,7 +388,7 @@ public class PuzzleGame extends Application {
      * @return The random shuffle button.
      */
 
-    public Button getRandomShuffleButton() {
+    public static Button getRandomShuffleButton() {
         return randomShuffleButton;
     }
 
@@ -397,8 +397,8 @@ public class PuzzleGame extends Application {
      *
      * @param randomShuffleButton The random shuffle button.
      */
-    public void setRandomShuffleButton(Button randomShuffleButton) {
-        this.randomShuffleButton = randomShuffleButton;
+    public static void setRandomShuffleButton(Button randomShuffleButton) {
+        PuzzleGame.randomShuffleButton = randomShuffleButton;
     }
 
     /**
@@ -407,7 +407,7 @@ public class PuzzleGame extends Application {
      * @return The step by step shuffle button.
      */
 
-    public Button getStepByStepShuffleButton() {
+    public static Button getStepByStepShuffleButton() {
         return stepByStepShuffleButton;
     }
 
@@ -416,8 +416,8 @@ public class PuzzleGame extends Application {
      *
      * @param stepByStepShuffleButton The shuffle button.
      */
-    public void setStepByStepShuffleButton(Button stepByStepShuffleButton) {
-        this.stepByStepShuffleButton = stepByStepShuffleButton;
+    public static void setStepByStepShuffleButton(Button stepByStepShuffleButton) {
+        PuzzleGame.stepByStepShuffleButton = stepByStepShuffleButton;
     }
 
     public static Pair<Integer, Integer> getSelectedCell() {
@@ -514,7 +514,7 @@ public class PuzzleGame extends Application {
 		Platform.exit();
 	}
 
-    private void showMessage(String message) {
+    private static void showMessage(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Message");
         alert.setHeaderText(null);
@@ -525,7 +525,7 @@ public class PuzzleGame extends Application {
     /**
      * Starts a new game by setting up the play screen scene and initializing the game components.
      */
-    public void startGame(){
+    public static void startGame(){
 
         getMoveCountLabel().setStyle("-fx-font-size: 25px ; -fx-font-family: 'Rockwell'");
 
@@ -606,7 +606,7 @@ public class PuzzleGame extends Application {
 
         resolvedLevelLayout.getChildren().addAll(titleLabel, grid) ;
 
-        bottomLayout.getChildren().addAll(moveCountLabel,chronometer, giveUpButton, resolvedLevelLayout);
+        bottomLayout.getChildren().addAll(getMoveCountLabel(),chronometer, giveUpButton, resolvedLevelLayout);
 
         playLayout.getChildren().addAll(topLayout, getGridLayout(), bottomLayout);
 
@@ -745,11 +745,20 @@ public class PuzzleGame extends Application {
                                     System.out.println(finalJ1 +" "+ finalI1);
                                     System.out.println(originCol+" "+originRow);
                                     swapTiles(finalJ1, finalI1, originCol, originRow);
-
-
+                                    getUndoButton().setDisable(false);
+                                    setMoveCount(getMoveCount() + 1);
+                                    
                                     event.setDropCompleted(true);
 
-
+                                    if(isGameFinished()) {
+                            	        getTimer().stop();
+                            	        try {
+                            				showEndScreen();
+                            			} catch (FileNotFoundException ex) {
+                            				ex.printStackTrace();
+                            			}
+                                    }
+                                    
                                     return;
                                 }
                             }
@@ -841,7 +850,7 @@ public class PuzzleGame extends Application {
      *
      * @return true if the game is finished, false otherwise.
      */
-	private boolean isGameFinished() {
+	private static boolean isGameFinished() {
 		// TODO
         //levelsWon[levelNumber - 1] = true;
 		return false;
@@ -988,7 +997,7 @@ public class PuzzleGame extends Application {
      *
      * @throws FileNotFoundException if the "scoreLastGame.txt" file is not found.
      */
-    public void showEndScreen() throws FileNotFoundException{
+    public static void showEndScreen() throws FileNotFoundException{
 
         collectLevel();
         collectPoints();
@@ -1049,7 +1058,7 @@ public class PuzzleGame extends Application {
      *
      * @throws FileNotFoundException if the file is not found.
      */
-    public void collectPoints() throws FileNotFoundException {
+    public static void collectPoints() throws FileNotFoundException {
 
         File file = new File("scoreLastGame.txt"); // to register scoreLastGame
         Scanner scoreLastGame = new Scanner(file); // collect the point
@@ -1064,7 +1073,7 @@ public class PuzzleGame extends Application {
      *
      * @throws FileNotFoundException if the file is not found.
      */
-    public void collectLevel() throws FileNotFoundException {
+    public static void collectLevel() throws FileNotFoundException {
 
         File file = new File("scoreLastGame.txt"); // to register scoreLastGame
         Scanner scoreLastGame = new Scanner(file); // collect the score
@@ -1080,7 +1089,7 @@ public class PuzzleGame extends Application {
      *
      * @param score The score to save.
      */
-    public void saveScore(int score) {
+    public static void saveScore(int score) {
 
         try { // to check the availability of score
             FileWriter writer = new FileWriter("score.txt");
@@ -1105,37 +1114,6 @@ public class PuzzleGame extends Application {
      */
     public void selectLevel(int currentLevel){
     	// TODO
-    }
-
-
-    /*
-    public void swapTile(int x1, int y1, int x2, int y2){
-
-        // ensure the two chosen tiles are adjacent
-        if (!(x1 == x2 && Math.abs(y1 - y2) == 1) && !(y1 == y2 && Math.abs(x1 - x2) == 1)){
-            System.out.println("The two chosen tiles are not adjacent");
-            return;
-        }
-        // ensure the tile is valid to move (at least one of its neighboring squares is empty)
-        if (!(currentLevel.getTile(x2,y2).getValue() == 0) || !((currentLevel.getTile(x1,y1).getValue() != -1) && (currentLevel.getTile(x1,y1).getValue() != 0))){
-            System.out.println("Invalid movement");
-            return;
-        }
-
-        int temp = currentLevel.getTile(x1,y1).getValue();
-        currentLevel.getTile(x1,y2).setValue(currentLevel.getTile(x2,y2).getValue());
-        currentLevel.getTile(x2,y2).setValue(temp);
-        
-    	setMoveCount(getMoveCount() + 1);
-    	
-        if(isGameFinished()) {
-	        getTimer().stop();
-	        try {
-				showEndScreen();
-			} catch (FileNotFoundException ex) {
-				ex.printStackTrace();
-			}
-        }
     }
 
     /**
@@ -1163,7 +1141,7 @@ public class PuzzleGame extends Application {
      * Undoes the last move.
      * Decrements the move count.
      */
-    public void undoMove(){
+    public static void undoMove(){
     	setMoveCount(getMoveCount() - 1);
     	
     	getRedoButton().setDisable(false);
@@ -1176,7 +1154,7 @@ public class PuzzleGame extends Application {
      * Redoes the undid move.
      * Increments the move count.
      */
-    public void redoMove(){
+    public static void redoMove(){
     	setMoveCount(getMoveCount() + 1);
     	
     	getRedoButton().setDisable(true);
