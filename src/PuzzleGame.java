@@ -436,6 +436,7 @@ public class PuzzleGame extends Application {
 	}
 
 
+
 	/**
      * Starts the JavaFX application by setting up the primary stage and the home screen scene.
      *
