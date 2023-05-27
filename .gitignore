@@ -3,6 +3,7 @@
 
 # IDE files
 .project
+.classpath
 /bin/
 
 # Log file
