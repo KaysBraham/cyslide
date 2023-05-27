@@ -4,7 +4,7 @@ import java.util.*;
 public class PuzzleSolver {
 
     // method to generate nodes
-    private static List<Node> generateNeighbors(Node parent) {
+    public static List<Node> generateNeighbors(Node parent) {
         List<Node> neighbors = new ArrayList<>();
         for (int i = 0; i < parent.getState().getTiles().length; i++) {
             for (int j = 0; j < parent.getState().getTiles()[0].length; j++) {
@@ -12,25 +12,25 @@ public class PuzzleSolver {
                     if (parent.getState().isMoveValid(i, j, i + 1, j)) {
                         Level newLevel = parent.getState().copy();
                         newLevel.swapTile(i, j, i + 1, j);
-                        Node newNeighbor = new Node(newLevel, parent, parent.getCostSoFar(),0);
+                        Node newNeighbor = new Node(newLevel, parent, parent.getCostSoFar(),calculateManhattanDistance(newLevel));
                         neighbors.add(newNeighbor);
                     }
                     if (parent.getState().isMoveValid(i, j, i, j + 1)) {
                         Level newLevel = parent.getState().copy();
                         newLevel.swapTile(i, j, i, j + 1);
-                        Node newNeighbor = new Node(newLevel, parent, parent.getCostSoFar(),0);
+                        Node newNeighbor = new Node(newLevel, parent, parent.getCostSoFar(),calculateManhattanDistance(newLevel));
                         neighbors.add(newNeighbor);
                     }
                     if (parent.getState().isMoveValid(i, j, i - 1, j)) {
                         Level newLevel = parent.getState().copy();
                         newLevel.swapTile(i, j, i - 1, j);
-                        Node newNeighbor = new Node(newLevel, parent, parent.getCostSoFar(), 0);
+                        Node newNeighbor = new Node(newLevel, parent, parent.getCostSoFar(), calculateManhattanDistance(newLevel));
                         neighbors.add(newNeighbor);
                     }
                     if (parent.getState().isMoveValid(i, j, i, j - 1)) {
                         Level newLevel = parent.getState().copy();
                         newLevel.swapTile(i, j, i, j - 1);
-                        Node newNeighbor = new Node(newLevel, parent, parent.getCostSoFar(), 0);
+                        Node newNeighbor = new Node(newLevel, parent, parent.getCostSoFar(), calculateManhattanDistance(newLevel));
                         neighbors.add(newNeighbor);
                     }
 
@@ -41,10 +41,10 @@ public class PuzzleSolver {
     }
 
     // method of solving the  game
-    public static void solvePuzzle(Level initialState) {
+    public static boolean solvePuzzle(Level initialState) {
         Node initialNode = new Node(initialState, null, 0, calculateManhattanDistance(initialState));
         PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingInt(n -> n.getCostSoFar() + n.getEstimatedCost()));
-        Set<Node> closedSet = new HashSet<>();
+        Set<Node> closedSet = new LinkedHashSet<>();
 
         openSet.add(initialNode);
 
@@ -56,7 +56,11 @@ public class PuzzleSolver {
                 // Solution trouvée, afficher le chemin ou effectuer les actions nécessaires
                 // selon votre implémentation spécifique
                 System.out.println("Solution found!");
-                return;
+                for (Node node : closedSet){
+                    System.out.println("Etape");
+                    node.getState().print();
+                }
+                return true;
             }
 
             List<Node> neighbors = generateNeighbors(currentNode);
@@ -81,6 +85,7 @@ public class PuzzleSolver {
 
         // No solution
         System.out.println("No solution found.");
+        return false;
     }
 
     // Method to check if the given state corresponds to the desired final state
@@ -97,7 +102,7 @@ public class PuzzleSolver {
     }
 
     // Calculation of the estimated cost through the Manhattan distance
-    private static int calculateManhattanDistance(Level stateLevel) {
+    public static int calculateManhattanDistance(Level stateLevel) {
         Tile[][] stateTile = stateLevel.getTiles();
         int sum = 0;
         int nLine = stateTile.length;
@@ -136,6 +141,4 @@ public class PuzzleSolver {
         }
         return (sum);
     }
-
-
 }
