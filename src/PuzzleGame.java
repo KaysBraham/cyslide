@@ -485,9 +485,9 @@ public class PuzzleGame extends Application {
         gridLayout.setAlignment(Pos.CENTER);
 
         setCurrentLevel(getLevels().get(getCurrentLevelNumber() - 1).copy());
-
-        // putting the tiles in the gridpane
+        currentLevel.randomShuffleLevel();
         tileGridConstuctor(gridLayout);
+
 
         setRandomShuffleButton(new Button("Random Shuffle"));
         getRandomShuffleButton().setStyle("-fx-font-size:25");
