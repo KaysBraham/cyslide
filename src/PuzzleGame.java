@@ -47,7 +47,6 @@ import javafx.scene.text.Font;
 
 
 
-
 /**
  * The PuzzleGame class represents a puzzle game application.
  * It uses JavaFX and extends the JavaFX Application class.
@@ -637,12 +636,13 @@ public class PuzzleGame extends Application {
     static int mousePosY;
     static int initialTranslateX;
     static int initialTranslateY;
+    static final int TILE_SIZE = 200;
     private static void tileGridConstuctor(GridPane gridLayout) {
         gridLayout.getChildren().clear();
         for (int i =0;i<currentLevel.getTiles().length;i++) {
             for(int j =0;j<currentLevel.getTiles()[0].length;j++) {
 
-                currentLevel.getTiles()[i][j].setPrefSize(200, 200);
+                currentLevel.getTiles()[i][j].setPrefSize(TILE_SIZE,TILE_SIZE);
 
 
                 switch(currentLevel.getTiles()[i][j].getValue()) {
@@ -732,8 +732,8 @@ public class PuzzleGame extends Application {
                                 double offsetX = event.getSceneX() - mousePosX;
                                 double offsetY = event.getSceneY() - mousePosY;
 
-                                int colOffset = (int) Math.round(offsetX / 100);
-                                int rowOffset = (int) Math.round(offsetY / 100);
+                                int colOffset = (int) Math.round(offsetX / TILE_SIZE);
+                                int rowOffset = (int) Math.round(offsetY / TILE_SIZE);
                                 System.out.println("OnDragDropped");
                                 System.out.println("offsetX offsetY");
                                 System.out.println(offsetX+" "+offsetY);
