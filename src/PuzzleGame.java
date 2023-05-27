@@ -393,6 +393,36 @@ public class PuzzleGame extends Application {
 		PuzzleGame.gridLayout = gridLayout;
 	}
 
+    static Stack<Tile[][]> undoStack = new Stack<>();
+    static Stack<Tile[][]> redoStack = new Stack<>();
+
+
+    private static void undo() {
+        if (!undoStack.isEmpty()) {
+            getUndoButton().setDisable(false);
+            if (undoStack.size() == 1){
+            getUndoButton().setDisable(true);
+            }
+            Tile[][] previousState = undoStack.pop();
+            currentLevel.setTiles(previousState);
+            redoStack.push(currentLevel.getTiles());
+            tileGridConstuctor(getGridLayout());
+
+        }
+    }
+
+    private static void redo() {
+        getRedoButton().setDisable(false);
+        if (!redoStack.isEmpty()) {
+            if (redoStack.size() == 1) {
+                getRedoButton().setDisable(true);
+            }
+            Tile[][] nextState = redoStack.pop();
+            currentLevel.setTiles(nextState);
+            tileGridConstuctor(getGridLayout());
+        }
+    }
+
 
 
 	/**
@@ -591,12 +621,12 @@ public class PuzzleGame extends Application {
         setUndoButton(new Button("Undo"));
         getUndoButton().setStyle("-fx-font-size:32");
         getUndoButton().setDisable(true);
-        getUndoButton().setOnAction(e -> undoMove());
+        getUndoButton().setOnAction(e -> {undo(); moveCount -- ; updateMoveCountLabel(); tileGridConstuctor(gridLayout);});
 
         setRedoButton(new Button("Redo"));
         getRedoButton().setStyle("-fx-font-size:32");
         getRedoButton().setDisable(true);
-        getRedoButton().setOnAction(e -> redoMove());
+        getRedoButton().setOnAction(e -> {redo(); moveCount ++ ;updateMoveCountLabel(); tileGridConstuctor(gridLayout);});
 
         getGridLayout().setAlignment(Pos.CENTER);
 
@@ -788,9 +818,9 @@ public class PuzzleGame extends Application {
                                     System.out.println(finalJ1 +" "+ finalI1);
                                     System.out.println(originCol+" "+originRow);
                                     swapTiles(finalJ1, finalI1, originCol, originRow);
+                                    undoStack.push(currentLevel.getTiles());
                                     getUndoButton().setDisable(false);
                                     setMoveCount(getMoveCount() + 1);
-                                    
                                     event.setDropCompleted(true);
 
                                     if(isGameFinished()) {
@@ -1238,7 +1268,6 @@ public class PuzzleGame extends Application {
      */
     public static void redoMove(){
     	setMoveCount(getMoveCount() + 1);
-    	
     	getRedoButton().setDisable(true);
     	getUndoButton().setDisable(false);
     	
@@ -1252,15 +1281,13 @@ public class PuzzleGame extends Application {
      */
     public static void main(String[] args) {
         launch(args);
-        //tests
-        /*
+/*
+        currentLevel=levels.get(8).copy();
         currentLevel.print();
-        getLevel(currentLevel.getLevelNumber()).print();
-
         currentLevel.stepByStepShuffleLevel();
-
-        currentLevel.print();
+        src.Node node = new src.Node(currentLevel,null,0,PuzzleSolver.calculateManhattanDistance(currentLevel));
+        PuzzleSolver.solvePuzzle(currentLevel);
         */
-        //fin test
+
     }
 }
