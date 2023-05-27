@@ -404,9 +404,8 @@ public class PuzzleGame extends Application {
             getUndoButton().setDisable(true);
             }
             Tile[][] previousState = undoStack.pop();
-            currentLevel.setTiles(previousState);
             redoStack.push(currentLevel.getTiles());
-            tileGridConstuctor(getGridLayout());
+            currentLevel.setTiles(previousState);
 
         }
     }
@@ -419,7 +418,6 @@ public class PuzzleGame extends Application {
             }
             Tile[][] nextState = redoStack.pop();
             currentLevel.setTiles(nextState);
-            tileGridConstuctor(getGridLayout());
         }
     }
 
@@ -621,7 +619,7 @@ public class PuzzleGame extends Application {
         setUndoButton(new Button("Undo"));
         getUndoButton().setStyle("-fx-font-size:32");
         getUndoButton().setDisable(true);
-        getUndoButton().setOnAction(e -> {undo(); moveCount -- ; updateMoveCountLabel(); tileGridConstuctor(gridLayout);});
+        getUndoButton().setOnAction(e -> {undo();  getRedoButton().setDisable(false); moveCount -- ; updateMoveCountLabel(); tileGridConstuctor(gridLayout);});
 
         setRedoButton(new Button("Redo"));
         getRedoButton().setStyle("-fx-font-size:32");
@@ -924,9 +922,7 @@ public class PuzzleGame extends Application {
      * @return true if the game is finished, false otherwise.
      */
 	private static boolean isGameFinished() {
-		// TODO
-        //levelsWon[levelNumber - 1] = true;
-		return false;
+		return getCurrentLevel().equals(getLevels().get(getCurrentLevelNumber() - 1));
 	}
 
     /**
@@ -1107,13 +1103,14 @@ public class PuzzleGame extends Application {
         collectPoints();
 
         //-------------------------------------create point label----------------------------------------------------------------
-        Label pointLabel = new Label("Points: "+getScore()); // to print point
-        pointLabel.setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
-        Label levelLabel = new Label("Level: "+getCurrentLevelNumber()); // to print level
-        levelLabel.setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+        Label scoreLabel = new Label("Score: " + getScore()); // to print point
+        // FIXME
+        scoreLabel.setStyle("-fx-text-fill:#2f2; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
+        Label levelLabel = new Label("Level: " + getCurrentLevelNumber()); // to print level
+        levelLabel.setStyle("-fx-text-fill:#ddd; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
         HBox hbox = new HBox(5); // to create a vertical space 10px
         hbox.setAlignment(Pos.CENTER); // to center the buttons
-        hbox.getChildren().addAll(pointLabel, levelLabel); // to align horizontally point+level
+        hbox.getChildren().addAll(scoreLabel, levelLabel); // to align horizontally point+level
 
         // ------------------------------------Create "Try Again" button---------------------------------------------------------
         Button tryAgainButton = new Button("Try Again");
@@ -1139,7 +1136,7 @@ public class PuzzleGame extends Application {
         // Buttons formatting
 		List<Button> buttons = Arrays.asList(tryAgainButton, replayButton, saveScoreButton, homeButton);
 		for(Button button : buttons) {
-			button.setStyle("-fx-text-fill:rgb(255,255,255) ;-fx-border-color: #e70000; -fx-background-color: #ffffff;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+			button.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
 			button.setOnMousePressed(event -> {
 				button.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
@@ -1158,7 +1155,7 @@ public class PuzzleGame extends Application {
         //---------------------------------------to define the scene-----------------------------------------------------------------
         // get screensize of monitor
         Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
-        
+
         // set the scene size to fullscreen size
         Scene endScreenScene = new Scene(endScreenLayout, screenSize.getWidth(), screenSize.getHeight());
         getPrimaryStage().setScene(endScreenScene);
@@ -1268,6 +1265,7 @@ public class PuzzleGame extends Application {
      */
     public static void redoMove(){
     	setMoveCount(getMoveCount() + 1);
+
     	getRedoButton().setDisable(true);
     	getUndoButton().setDisable(false);
     	
