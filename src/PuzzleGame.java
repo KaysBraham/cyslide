@@ -642,6 +642,8 @@ public class PuzzleGame extends Application {
         for (int i =0;i<currentLevel.getTiles().length;i++) {
             for(int j =0;j<currentLevel.getTiles()[0].length;j++) {
 
+                currentLevel.getTiles()[i][j].setPrefSize(200, 200);
+
 
                 switch(currentLevel.getTiles()[i][j].getValue()) {
                     case -1:
@@ -809,16 +811,18 @@ public class PuzzleGame extends Application {
         for (Tile[] tiles: getLevel(getCurrentLevelNumber() - 1).getTiles()) {
             i = 0;
             for(Tile tile : tiles) {
-                tile.setPrefSize(50, 50);
                 switch(tile.getValue()) {
                     case -1:
+                        tile.setPrefSize(50, 50);
                         tile.setVisible(false);
                         break;
                     case 0:
+                        tile.setPrefSize(50, 50);
                         tile.setText("");
                         tile.setStyle("-fx-background-color: #fc6;"); // light wood
                         break;
                     default:
+                        tile.setPrefSize(50, 50);
                         tile.setText(Integer.toString(tile.getValue()));
                         tile.setStyle("-fx-font-size: 15;"
                                 + "-fx-text-fill: #fff;"
