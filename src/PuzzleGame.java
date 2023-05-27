@@ -73,7 +73,7 @@ public class PuzzleGame extends Application {
     /**
      * The count of moves made in the current level.
      */
-    private int moveCount;
+    private static int moveCount;
 
     /**
      * The primary stage of the JavaFX application.
@@ -106,6 +106,8 @@ public class PuzzleGame extends Application {
      * The label displaying the current level.
      */
     private Label levelLabel;
+
+    static Label moveCountLabel = new Label("Move count : " + moveCount );
     public static int currentLevelNumber = 1;
 
     /**
@@ -203,6 +205,10 @@ public class PuzzleGame extends Application {
         return moveCount;
     }
 
+    private static void updateMoveCountLabel() {
+        moveCountLabel.setText("Move count : " + moveCount);
+    }
+
     /**
      * Sets the move count of the current level.
      *
@@ -211,6 +217,7 @@ public class PuzzleGame extends Application {
     public void setMoveCount(int moveCount) {
         this.moveCount = moveCount;
     }
+
 
     /**
      * Returns the primary stage of the JavaFX application.
@@ -509,7 +516,7 @@ public class PuzzleGame extends Application {
     public void startGame(){
 
 
-
+        moveCountLabel.setStyle("-fx-font-size: 25px ; -fx-font-family: 'Rockwell'");
         levelsWon = new boolean[getLevels().size()];
 
 
@@ -548,12 +555,12 @@ public class PuzzleGame extends Application {
         setUndoButton(new Button("Undo"));
         getUndoButton().setStyle("-fx-font-size:32");
         getUndoButton().setDisable(true);
-        getUndoButton().setOnAction(e -> undoMove());
+        getUndoButton().setOnAction(e -> {undoMove(); moveCount = 0 ;});
 
         setRedoButton(new Button("Redo"));
         getRedoButton().setStyle("-fx-font-size:32");
         getRedoButton().setDisable(true);
-        getRedoButton().setOnAction(e -> redoMove());
+        getRedoButton().setOnAction(e -> {redoMove(); moveCount -- ;});
 
         setCurrentLevel(getLevels().get(getCurrentLevelNumber() - 1).copy());
         currentLevel.randomShuffleLevel();
@@ -592,7 +599,7 @@ public class PuzzleGame extends Application {
         });
 
 
-        bottomLayout.getChildren().addAll(chronometer, giveUpButton, resolvedLevelLayout);
+        bottomLayout.getChildren().addAll(moveCountLabel,chronometer, giveUpButton, resolvedLevelLayout);
 
         playLayout.getChildren().addAll(topLayout, gridLayout, bottomLayout);
 
@@ -691,9 +698,6 @@ public class PuzzleGame extends Application {
                                 + "-fx-border-color: #420;" // very dark brown
                                 + "-fx-background-color: #640;"); // dark wood
                         currentLevel.getTiles()[i][j].setAlignment(Pos.CENTER);
-                        currentLevel.getTiles()[i][j].setOnAction(e -> {
-                            // TODO swapTile
-                        });
                 }
                 if(currentLevel.getTiles()[i][j].getValue()!=-1){
                     int finalI4 = i;
@@ -761,9 +765,16 @@ public class PuzzleGame extends Application {
                             if (event.getGestureSource() != this) {
                                 double offsetX = event.getSceneX() - mousePosX;
                                 double offsetY = event.getSceneY() - mousePosY;
+                                int colOffset;
+                                int rowOffset;
 
-                                int colOffset = (int) Math.round(offsetX / TILE_SIZE);
-                                int rowOffset = (int) Math.round(offsetY / TILE_SIZE);
+                                if(Math.abs(offsetX)>Math.abs(offsetY)){
+                                    colOffset= (int) (offsetX/Math.abs(offsetX));
+                                    rowOffset = 0;
+                                }else {
+                                    rowOffset= (int) (offsetY/Math.abs(offsetY));
+                                    colOffset = 0;
+                                }
                                 System.out.println("OnDragDropped");
                                 System.out.println("offsetX offsetY");
                                 System.out.println(offsetX+" "+offsetY);
@@ -777,6 +788,7 @@ public class PuzzleGame extends Application {
                                     System.out.println(finalJ1 +" "+ finalI1);
                                     System.out.println(originCol+" "+originRow);
                                     swapTiles(finalJ1, finalI1, originCol, originRow);
+
 
                                     event.setDropCompleted(true);
 
@@ -822,6 +834,8 @@ public class PuzzleGame extends Application {
             System.out.println("Grid disposition :");
             getCurrentLevel().print();
             tileGridConstuctor(gridLayout);
+            moveCount ++;
+            updateMoveCountLabel() ;
         }
     }
     private static Node getNodeByRowColumnIndex(final int row, final int col) {
@@ -841,18 +855,16 @@ public class PuzzleGame extends Application {
         for (Tile[] tiles: getLevel(getCurrentLevelNumber() - 1).getTiles()) {
             i = 0;
             for(Tile tile : tiles) {
+                tile.setPrefSize(50, 50);
                 switch(tile.getValue()) {
                     case -1:
-                        tile.setPrefSize(50, 50);
                         tile.setVisible(false);
                         break;
                     case 0:
-                        tile.setPrefSize(50, 50);
                         tile.setText("");
                         tile.setStyle("-fx-background-color: #fc6;"); // light wood
                         break;
                     default:
-                        tile.setPrefSize(50, 50);
                         tile.setText(Integer.toString(tile.getValue()));
                         tile.setStyle("-fx-font-size: 15;"
                                 + "-fx-text-fill: #fff;"
