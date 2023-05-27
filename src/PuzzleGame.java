@@ -14,6 +14,7 @@ import java.lang.Math;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
@@ -22,6 +23,7 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.Pair;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -112,6 +114,8 @@ public class PuzzleGame extends Application {
      */
     private Button redoButton;
 
+    private static Pair<Integer, Integer> selectedCell = null;
+
 	/**
      * Returns a list containing the levels.
      *
@@ -127,7 +131,6 @@ public class PuzzleGame extends Application {
      * @return The level list.
      */
     private boolean[] levelsWon;
-
 
     /**
      * Returns the current level in the game.
@@ -357,7 +360,27 @@ public class PuzzleGame extends Application {
         this.stepByStepShuffleButton = stepByStepShuffleButton;
     }
 
-    /**
+    public static Pair<Integer, Integer> getSelectedCell() {
+		return PuzzleGame.selectedCell;
+	}
+
+	public static void setSelectedCell(Pair<Integer, Integer> selectedCell, GridPane gridLayout) {
+		if(selectedCell == null) {
+			PuzzleGame.selectedCell = null;
+			tileGridConstuctor(gridLayout); // Reinitialize the tiles grid
+		}
+		else {
+			PuzzleGame.selectedCell = selectedCell;
+			getNodeByRowColumnIndex(selectedCell.getKey(), selectedCell.getValue(), gridLayout)
+				.setStyle("-fx-font-size: 38;"
+	        		+ "-fx-text-fill: #fff;"
+	        		+ "-fx-border-width: 3;"
+	        		+ "-fx-border-color: #000;" // black
+	        		+ "-fx-background-color: #640;"); // dark wood
+		}
+	}
+
+	/**
      * Starts the JavaFX application by setting up the primary stage and the home screen scene.
      *
      * @param primaryStage The primary stage.
@@ -390,7 +413,7 @@ public class PuzzleGame extends Application {
 		
 		List<Button> buttons = Arrays.asList(startButton, setDifficultyButton, showLeaderboardButton, exitButton);
 		for(Button button : buttons) {
-			button.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+			button.setStyle("-fx-text-fill:#e19116; -fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
 			button.setOnMousePressed(event -> {
 				button.setStyle("-fx-border-color: black; -fx-background-color: grey;"); // to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1)); // during 0.1 second
@@ -518,7 +541,8 @@ public class PuzzleGame extends Application {
         playLayout.getChildren().addAll(topLayout, gridLayout, bottomLayout);
 
     	Scene playScene = new Scene(playLayout, 1600, 900); // HD+ scene
-        playScene.setOnKeyPressed(event -> {
+    	
+/*        playScene.setOnKeyPressed(event -> {
             int emptyRow = currentLevel.getEmptyTiles()[0][0];
             int emptyCol = currentLevel.getEmptyTiles()[0][1];
             int tileRow = 0;
@@ -566,7 +590,7 @@ public class PuzzleGame extends Application {
                 }
             }
         });
-
+*/
 
         getPrimaryStage().setScene(playScene);
 
@@ -589,13 +613,25 @@ public class PuzzleGame extends Application {
         for (Tile[] tiles: getCurrentLevel().getTiles()) {
         	i = 0;
         	for(Tile tile : tiles) {
+        		final int innerI = i;
+        		final int innerJ = j;
         		switch(tile.getValue()) {
 	        		case -1:
 	        			tile.setVisible(false);
+	            		tile.setOnAction(e -> setSelectedCell(null, gridLayout));
 	        			break;
 	        		case 0:
 	        			tile.setText("");
 	        	        tile.setStyle("-fx-background-color: #fc6;"); // light wood
+	            		tile.setOnAction(e -> {
+	            			if(getSelectedCell() == null) { // No numbered tile selected for switch
+	            				System.out.println("");
+	            			}
+	            			else {
+		            			/*FIXME*/getCurrentLevel().swapTile(getSelectedCell().getKey(), getSelectedCell().getValue(), innerI, innerJ);
+		            			setSelectedCell(null, gridLayout);
+	            			}
+	            		});
 	        			break;
 	        		default:
 	        			tile.setText(Integer.toString(tile.getValue()));
@@ -606,7 +642,14 @@ public class PuzzleGame extends Application {
 	        	        		+ "-fx-background-color: #640;"); // dark wood
 	        	        tile.setAlignment(Pos.CENTER);
 	            		tile.setOnAction(e -> {
-	            			// TODO swapTile
+	            			if(getSelectedCell() == null) {
+	            				setSelectedCell(new Pair<Integer, Integer>(innerI, innerJ), gridLayout);
+	            			}
+	            			else { // User tries to switch 2 numbered tiles, which is not a slide.
+	            				// TODO
+	            				System.out.println("Forbidden move");
+	            				setSelectedCell(null, gridLayout);
+	            			}
 	            		});
         		}
         		gridLayout.add(tile, i++, j);
@@ -962,6 +1005,27 @@ public class PuzzleGame extends Application {
     	getUndoButton().setDisable(false);
     	
     	// TODO
+    }
+    
+    /**
+     * In the provided grid pane, get the node by the provided row and column.
+     * @param row the row of the node.
+     * @param column the column of the node.
+     * @param gridPane the grid pane in which to search.
+     * @return the found node.
+     */
+    // Explicit type path javafx.scene.Node to avoid ambiguity with src.Node
+    public static javafx.scene.Node getNodeByRowColumnIndex (final int row, final int column, GridPane gridPane) {
+        javafx.scene.Node result = null;
+        ObservableList<javafx.scene.Node> childrens = gridPane.getChildren();
+
+        for (javafx.scene.Node node : childrens) {
+            if(gridPane.getRowIndex(node) == row && gridPane.getColumnIndex(node) == column) {
+                result = node;
+                break;
+            }
+        }
+        return result;
     }
 
     /**
