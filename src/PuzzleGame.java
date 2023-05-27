@@ -86,6 +86,17 @@ public class PuzzleGame extends Application {
     private static Scene homeScene;
 
     /**
+     * The scene representing the difficultylayyout of the game.
+     */
+    private Scene difficultylayout;
+
+    /**
+     * The scene representing the leaderboardlayout of the game.
+     */
+    private Scene leaderboardlayout;
+
+
+    /**
      * The sequential transition used as a timer in the game.
      */
     private static SequentialTransition timer = null;
@@ -435,6 +446,7 @@ public class PuzzleGame extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         setPrimaryStage(primaryStage);
+        getPrimaryStage().setMaximized(true);
         String levelText = "level: " + getCurrentLevelNumber();
 
         Rectangle rectangle = new Rectangle(200, 30);
@@ -447,11 +459,26 @@ public class PuzzleGame extends Application {
 		Button startButton = new Button("New game");
 		startButton.setOnAction(e -> startGame());
 
-		Button setDifficultyButton = new Button("Difficulty settings");
-		setDifficultyButton.setOnAction(e -> openDifficultySettings());
+        Button setDifficultyButton = new Button("Difficulty settings");
+        setDifficultyButton.setOnAction(e -> {
+            setDifficultylayout();
 
-		Button showLeaderboardButton = new Button("Leaderboard");
-		showLeaderboardButton.setOnAction(e -> openLeaderboard());
+            Scene leaderboardScene = getDifficultylayout();
+
+            StackPane root = new StackPane();
+            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+            getPrimaryStage().setScene( new Scene(root));
+        });
+        Button showLeaderboardButton = new Button("Leaderboard");
+        showLeaderboardButton.setOnAction(e -> {
+            setLeaderboardlayout();
+
+            Scene leaderboardScene = getLeaderboardlayout();
+
+            StackPane root = new StackPane();
+            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+            getPrimaryStage().setScene( new Scene(root));
+        });
 
 		Button exitButton = new Button("Exit");
 		exitButton.setOnAction(e -> Platform.exit());
@@ -596,7 +623,10 @@ public class PuzzleGame extends Application {
         giveUpButton.setStyle("-fx-font-size:35");
         giveUpButton.setOnAction(e -> {
             getTimer().stop();
-            getPrimaryStage().setScene(getHomeScene());
+            Scene leaderboardScene = getHomeScene();
+            StackPane root = new StackPane();
+            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+            getPrimaryStage().setScene( new Scene(root));
         });
 
         GridPane grid = new GridPane();
@@ -859,7 +889,11 @@ public class PuzzleGame extends Application {
     /**
      * Opens the difficulty settings screen.
      */
-    public void openDifficultySettings() {
+    public Scene getDifficultylayout() {
+        return difficultylayout;
+    }
+
+    public void setDifficultylayout() {
         VBox difficultyLayout = new VBox(10);
         difficultyLayout.setAlignment(Pos.CENTER);
         difficultyLayout.setStyle("-fx-background-color: black;");
@@ -878,26 +912,43 @@ public class PuzzleGame extends Application {
                 PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
                 pauseTransition.setOnFinished(e -> levelButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'"));//to remove the transparent
                 pauseTransition.play();
-                getPrimaryStage().setScene(getHomeScene()); // return to home screen after selecting a level
+                Scene leaderboardScene = getHomeScene();
+
+                StackPane root = new StackPane();
+                root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+                getPrimaryStage().setScene( new Scene(root)); // return to home screen after selecting a level
             });
             difficultyLayout.getChildren().add(levelButton);
         }
 
 
+
         Button backButton = new Button("Return");
         backButton.setPrefSize(100,50);//set the button size
         backButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
-        backButton.setOnAction(event -> getPrimaryStage().setScene(getHomeScene()));
+        backButton.setOnAction(e -> {
+
+
+            Scene leaderboardScene = getHomeScene();
+
+            StackPane root = new StackPane();
+            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+            getPrimaryStage().setScene( new Scene(root));
+        });
         difficultyLayout.getChildren().add(backButton);
 
-        Scene difficultyscene = new Scene(difficultyLayout);
-        getPrimaryStage().setScene(difficultyscene);
+        this.difficultylayout = new Scene(difficultyLayout);
     }
 
     /**
      * Opens the leaderboard screen.
      */
-    public void openLeaderboard() {
+
+    public Scene getLeaderboardlayout() {
+        return leaderboardlayout;
+    }
+
+    public void setLeaderboardlayout() {
         VBox leaderboardLayout = new VBox(10);
 
         leaderboardLayout.setStyle("-fx-background-color: black;");
@@ -907,8 +958,13 @@ public class PuzzleGame extends Application {
         backButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
         backButton.setPrefWidth(100);
         backButton.setPrefHeight(50);
-        backButton.setOnAction(event -> getPrimaryStage().setScene(getHomeScene()));
+        backButton.setOnAction(e -> {
+            Scene leaderboardScene = getHomeScene();
 
+            StackPane root = new StackPane();
+            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+            getPrimaryStage().setScene( new Scene(root));
+        });
         for (int difficulty = 1; difficulty <= 10; difficulty++) { // to print the button
             Button levelButton = new Button("Level " + difficulty);
             levelButton.setPrefSize(100,50);
@@ -970,8 +1026,13 @@ public class PuzzleGame extends Application {
                     }
                     leaderboardLayout.getChildren().add(backButton);
 
-                    backButton.setOnAction(event1 -> openLeaderboard());
-
+                    backButton.setOnAction(e -> {
+                        setLeaderboardlayout();
+                        Scene leaderboardScene = getLeaderboardlayout();
+                        StackPane root = new StackPane();
+                        root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+                        getPrimaryStage().setScene(new Scene(root));
+                    });
 
 
 
@@ -988,9 +1049,9 @@ public class PuzzleGame extends Application {
 
         leaderboardLayout.getChildren().add(backButton); //add back button
 
-        Scene leaderboardScene = new Scene(leaderboardLayout,640,600);
-        getPrimaryStage().setScene(leaderboardScene);
+        this.leaderboardlayout = new Scene(leaderboardLayout);
     }
+
 
     /**
      * Shows the end screen.
@@ -1026,8 +1087,12 @@ public class PuzzleGame extends Application {
 
         //----------------------------------------- Create "Home" button----------------------------------------------------
         Button homeButton = new Button("Home");
-        homeButton.setOnAction(event -> getPrimaryStage().setScene(getHomeScene()));
-
+        homeButton.setOnAction(e -> {
+            Scene leaderboardScene = getHomeScene();
+            StackPane root = new StackPane();
+            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+            getPrimaryStage().setScene( new Scene(root));
+        });
         // Buttons formatting
 		List<Button> buttons = Arrays.asList(tryAgainButton, replayButton, saveScoreButton, homeButton);
 		for(Button button : buttons) {
