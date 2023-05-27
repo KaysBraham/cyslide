@@ -423,11 +423,11 @@ public class PuzzleGame extends Application {
 		
 		List<Button> buttons = Arrays.asList(startButton, setDifficultyButton, showLeaderboardButton, exitButton);
 		for(Button button : buttons) {
-            button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 30; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
+            button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
 			button.setOnMousePressed(event -> {
 				button.setStyle("-fx-border-color: black; -fx-background-color: #000000;"); // to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1)); // during 0.1 second
-	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:rgb(68,34,0) ;-fx-border-color: rgb(68,34,0); -fx-background-color: rgba(0,0,0,0);-fx-font-size: 30;-fx-font-family: 'Leoscar'"));//to remove the transparent
+	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'"));//to remove the transparent
 	            pauseTransition.play();
 	        });
 		}
@@ -509,10 +509,13 @@ public class PuzzleGame extends Application {
         Label titleLabel = new Label("Resolved \n level");
         titleLabel.setStyle("-fx-font-size: 15px ;");
 
+        Image backgroundImage = new Image("file:background2-min.jpg");
+        BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true, false);
+        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
 
         VBox playLayout = new VBox(32);
     	playLayout.setAlignment(Pos.CENTER);
-    	playLayout.setStyle("-fx-background-color: #00a8c4;");
+        playLayout.setBackground(new Background(background));
 
         
         HBox topLayout = new HBox(64);
