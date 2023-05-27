@@ -142,7 +142,7 @@ public class PuzzleGame extends Application {
      *
      * @return The boolean list.
      */
-    private boolean[] levelsWon;
+    private boolean[] completedLevels = new boolean[getLevels().size()];;
 
     /**
      * Returns the current level in the game.
@@ -183,6 +183,15 @@ public class PuzzleGame extends Application {
     }
 
     /**
+     * Returns the completed levels.
+     *
+     * @return The completed levels.
+     */
+    public boolean[] getCompletedLevels() {
+		return completedLevels;
+	}
+
+	/**
      * Get the move count of the current level.
      *
      * @return The move count.
@@ -327,7 +336,7 @@ public class PuzzleGame extends Application {
     }
 
     /**
-     * Sets the redi button.
+     * Sets the redo button.
      *
      * @param redoButton The redo button.
      */
@@ -335,8 +344,27 @@ public class PuzzleGame extends Application {
         this.redoButton = redoButton;
     }
 
+    /**
+     * Returns the grid layout. 
+     * 
+     * @return the grid layout.
+     */
+    public static GridPane getGridLayout() {
+		return gridLayout;
+	}
 
     /**
+     * Sets the grid layout.
+     * 
+     * @param gridLayout the grid layout.
+     */
+	public static void setGridLayout(GridPane gridLayout) {
+		PuzzleGame.gridLayout = gridLayout;
+	}
+
+
+
+	/**
      * Returns the random shuffle button.
      *
      * @return The random shuffle button.
@@ -440,7 +468,7 @@ public class PuzzleGame extends Application {
         homeLayout.getChildren().add(titleText);
 
 
-        StackPane circleStackPane = new StackPane(rectangle, levelLabel); //to superimpose circle and label
+        StackPane circleStackPane = new StackPane(rectangle, getLevelLabel()); //to superimpose circle and label
         circleStackPane.setAlignment(Pos.CENTER);
         homeLayout.getChildren().add(circleStackPane);
 
@@ -481,14 +509,9 @@ public class PuzzleGame extends Application {
      */
     public void startGame(){
 
-
-
-        levelsWon = new boolean[getLevels().size()];
-
-
         if (getCurrentLevelNumber() > 1) {
             for (int i = 0; i < getCurrentLevelNumber() - 1; i++) {
-                if (!levelsWon[i]) {
+                if (!getCompletedLevels()[i]) {
                     showMessage("You must win the previous levels before playing this one.");
                     return;
                 }
@@ -510,14 +533,6 @@ public class PuzzleGame extends Application {
         HBox topLayout = new HBox(64);
         topLayout.setAlignment(Pos.CENTER);
 
-
-        gridLayout.setAlignment(Pos.CENTER);
-
-        GridPane grid = new GridPane();
-        solvedLevelPreview(grid);
-
-
-
         setUndoButton(new Button("Undo"));
         getUndoButton().setStyle("-fx-font-size:32");
         getUndoButton().setDisable(true);
@@ -528,29 +543,32 @@ public class PuzzleGame extends Application {
         getRedoButton().setDisable(true);
         getRedoButton().setOnAction(e -> redoMove());
 
+        getGridLayout().setAlignment(Pos.CENTER);
+
         setCurrentLevel(getLevels().get(getCurrentLevelNumber() - 1).copy());
-        currentLevel.randomShuffleLevel();
-        tileGridConstuctor(gridLayout);
+        getCurrentLevel().randomShuffleLevel();
+        tileGridConstuctor(getGridLayout());
 
 
         setRandomShuffleButton(new Button("Random Shuffle"));
         getRandomShuffleButton().setStyle("-fx-font-size:25");
-        getRandomShuffleButton().setOnAction(e -> {currentLevel.randomShuffleLevel();
-            tileGridConstuctor(gridLayout); });
+        getRandomShuffleButton().setOnAction(e -> {
+        	getCurrentLevel().randomShuffleLevel();
+            tileGridConstuctor(getGridLayout());
+        });
 
         setStepByStepShuffleButton(new Button("Step by step Shuffle"));
         getStepByStepShuffleButton().setStyle("-fx-font-size:25");
-        getStepByStepShuffleButton().setOnAction(e -> {currentLevel.stepByStepShuffleLevel();
-                                                        tileGridConstuctor(gridLayout); });
+        getStepByStepShuffleButton().setOnAction(e -> {
+        	getCurrentLevel().stepByStepShuffleLevel();
+        	tileGridConstuctor(getGridLayout());
+        });
 
         topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton());
 
         HBox bottomLayout = new HBox(64);
         bottomLayout.setAlignment(Pos.CENTER);
 
-        HBox resolvedLevelLayout = new HBox();
-
-        resolvedLevelLayout.getChildren().addAll(titleLabel, grid) ;
 
         Chronometer chronometer = new Chronometer();
 
@@ -561,62 +579,18 @@ public class PuzzleGame extends Application {
             getPrimaryStage().setScene(getHomeScene());
         });
 
+        GridPane grid = new GridPane();
+        solvedLevelPreview(grid);
+        
+        HBox resolvedLevelLayout = new HBox();
+
+        resolvedLevelLayout.getChildren().addAll(titleLabel, grid) ;
 
         bottomLayout.getChildren().addAll(chronometer, giveUpButton, resolvedLevelLayout);
 
-        playLayout.getChildren().addAll(topLayout, gridLayout, bottomLayout);
+        playLayout.getChildren().addAll(topLayout, getGridLayout(), bottomLayout);
 
     	Scene playScene = new Scene(playLayout, 1600, 900); // HD+ scene
-
-/*        playScene.setOnKeyPressed(event -> {
-            int emptyRow = currentLevel.getEmptyTiles()[0][0];
-            int emptyCol = currentLevel.getEmptyTiles()[0][1];
-            int tileRow = 0;
-            int tileCol = 0;
-            switch (event.getCode()) {
-                case UP : {
-                    tileRow = emptyRow;
-                    tileCol = emptyCol - 1;
-                    currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
-                    tileGridConstuctor(gridLayout);
-                    break;
-                }
-                case DOWN : {
-                    tileRow = emptyRow;
-                    tileCol = emptyCol + 1;
-                    currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
-                    tileGridConstuctor(gridLayout);
-                    break;
-                }
-                case LEFT : {
-                    tileRow = emptyRow - 1;
-                    tileCol = emptyCol;
-                    currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
-                    tileGridConstuctor(gridLayout);
-                    break;
-                }
-                case RIGHT : {
-                    tileRow = emptyRow + 1;
-                    tileCol = emptyCol;
-                    currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
-                    tileGridConstuctor(gridLayout);
-                    break;
-                }
-                case ENTER : {
-                    if (emptyRow == currentLevel.getEmptyTiles()[0][0] && emptyCol == currentLevel.getEmptyTiles()[0][1]) {
-                        emptyRow = currentLevel.getEmptyTiles()[1][0];
-                        emptyCol = currentLevel.getEmptyTiles()[1][1];
-                    } else {
-                        emptyRow = currentLevel.getEmptyTiles()[0][0];
-                        emptyCol = currentLevel.getEmptyTiles()[0][1];
-                    }
-                    break;
-                }
-                default : {
-                }
-            }
-        });
-*/
 
         getPrimaryStage().setScene(playScene);
 
@@ -639,47 +613,47 @@ public class PuzzleGame extends Application {
     static final int TILE_SIZE = 200;
     private static void tileGridConstuctor(GridPane gridLayout) {
         gridLayout.getChildren().clear();
-        for (int i =0;i<currentLevel.getTiles().length;i++) {
-            for(int j =0;j<currentLevel.getTiles()[0].length;j++) {
+        for (int i =0;i<getCurrentLevel().getTiles().length;i++) {
+            for(int j =0;j<getCurrentLevel().getTiles()[0].length;j++) {
 
-                currentLevel.getTiles()[i][j].setPrefSize(TILE_SIZE,TILE_SIZE);
+            	getCurrentLevel().getTiles()[i][j].setPrefSize(TILE_SIZE,TILE_SIZE);
 
 
-                switch(currentLevel.getTiles()[i][j].getValue()) {
+                switch(getCurrentLevel().getTiles()[i][j].getValue()) {
                     case -1:
-                        currentLevel.getTiles()[i][j].setVisible(false);
+                    	getCurrentLevel().getTiles()[i][j].setVisible(false);
                         break;
                     case 0:
-                        currentLevel.getTiles()[i][j].setText("");
-                        currentLevel.getTiles()[i][j].setStyle("-fx-background-color: #fc6;"); // light wood
+                    	getCurrentLevel().getTiles()[i][j].setText("");
+                        getCurrentLevel().getTiles()[i][j].setStyle("-fx-background-color: #fc6;"); // light wood
                         break;
                     default:
-                        currentLevel.getTiles()[i][j].setText(Integer.toString(currentLevel.getTiles()[i][j].getValue()));
-                        currentLevel.getTiles()[i][j].setStyle("-fx-font-size: 38;"
+                    	getCurrentLevel().getTiles()[i][j].setText(Integer.toString(getCurrentLevel().getTiles()[i][j].getValue()));
+                        getCurrentLevel().getTiles()[i][j].setStyle("-fx-font-size: 38;"
                                 + "-fx-text-fill: #fff;"
                                 + "-fx-border-width: 2;"
                                 + "-fx-border-color: #420;" // very dark brown
                                 + "-fx-background-color: #640;"); // dark wood
-                        currentLevel.getTiles()[i][j].setAlignment(Pos.CENTER);
-                        currentLevel.getTiles()[i][j].setOnAction(e -> {
+                        getCurrentLevel().getTiles()[i][j].setAlignment(Pos.CENTER);
+                        getCurrentLevel().getTiles()[i][j].setOnAction(e -> {
                             // TODO swapTile
                         });
                 }
-                if(currentLevel.getTiles()[i][j].getValue()!=-1){
+                if(getCurrentLevel().getTiles()[i][j].getValue()!=-1){
                     int finalI4 = i;
                     int finalJ4 = j;
-                    currentLevel.getTiles()[i][j].setOnDragDetected(new EventHandler<MouseEvent>() {
+                    getCurrentLevel().getTiles()[i][j].setOnDragDetected(new EventHandler<MouseEvent>() {
                         public void handle(MouseEvent event) {
                             mousePosX = (int) event.getSceneX();
                             mousePosY = (int) event.getSceneY();
-                            initialTranslateX = (int) currentLevel.getTiles()[finalI4][finalJ4].getTranslateX();
-                            initialTranslateY = (int) currentLevel.getTiles()[finalI4][finalJ4].getTranslateY();
+                            initialTranslateX = (int) getCurrentLevel().getTiles()[finalI4][finalJ4].getTranslateX();
+                            initialTranslateY = (int) getCurrentLevel().getTiles()[finalI4][finalJ4].getTranslateY();
 
-                            currentLevel.getTiles()[finalI4][finalJ4].startDragAndDrop(TransferMode.MOVE);
+                            getCurrentLevel().getTiles()[finalI4][finalJ4].startDragAndDrop(TransferMode.MOVE);
 
                             ClipboardContent content = new ClipboardContent();
                             content.putString("");  // Ajoutez ici le contenu de l'objet tuile
-                            Dragboard dragboard = currentLevel.getTiles()[finalI4][finalJ4].startDragAndDrop(TransferMode.MOVE);
+                            Dragboard dragboard = getCurrentLevel().getTiles()[finalI4][finalJ4].startDragAndDrop(TransferMode.MOVE);
                             dragboard.setContent(content);
 
                             event.consume();
@@ -688,7 +662,7 @@ public class PuzzleGame extends Application {
                         }
                     });
 
-                    currentLevel.getTiles()[i][j].setOnDragOver(new EventHandler<DragEvent>() {
+                    getCurrentLevel().getTiles()[i][j].setOnDragOver(new EventHandler<DragEvent>() {
                         public void handle(DragEvent event) {
                             /* Accepte uniquement le glisser-déposer à l'intérieur du GridPane */
                             if (event.getGestureSource() != this && event.getDragboard().hasString()) {
@@ -700,11 +674,11 @@ public class PuzzleGame extends Application {
 
                     int finalI3 = i;
                     int finalJ3 = j;
-                    currentLevel.getTiles()[i][j].setOnDragEntered(new EventHandler<DragEvent>() {
+                    getCurrentLevel().getTiles()[i][j].setOnDragEntered(new EventHandler<DragEvent>() {
                         public void handle(DragEvent event) {
                             /* Change le style de la tuile survolée */
                             if (event.getGestureSource() != this && event.getDragboard().hasString()) {
-                                currentLevel.getTiles()[finalI3][finalJ3].setOpacity(0.7);
+                            	getCurrentLevel().getTiles()[finalI3][finalJ3].setOpacity(0.7);
                             }
                             event.consume();
                         }
@@ -712,11 +686,11 @@ public class PuzzleGame extends Application {
 
                     int finalI = i;
                     int finalJ = j;
-                    currentLevel.getTiles()[i][j].setOnDragExited(new EventHandler<DragEvent>() {
+                    getCurrentLevel().getTiles()[i][j].setOnDragExited(new EventHandler<DragEvent>() {
                         public void handle(DragEvent event) {
                             /* Rétablit le style de la tuile */
                             if (event.getGestureSource() != this && event.getDragboard().hasString()) {
-                                currentLevel.getTiles()[finalI][finalJ].setOpacity(1.0);
+                            	getCurrentLevel().getTiles()[finalI][finalJ].setOpacity(1.0);
                             }
                             event.consume();
 
@@ -725,7 +699,7 @@ public class PuzzleGame extends Application {
 
                     int finalI1 = i;
                     int finalJ1 = j;
-                    currentLevel.getTiles()[i][j].setOnDragDropped(new EventHandler<DragEvent>() {
+                    getCurrentLevel().getTiles()[i][j].setOnDragDropped(new EventHandler<DragEvent>() {
                         public void handle(DragEvent event) {
                             /* Échange les positions des tuiles si elles sont adjacentes */
                             if (event.getGestureSource() != this) {
@@ -740,7 +714,7 @@ public class PuzzleGame extends Application {
                                 System.out.println("colOffset rowOffset");
                                 System.out.println(colOffset+" "+rowOffset);
 
-                                if ((Math.abs(colOffset) + Math.abs(rowOffset) == 1) && currentLevel.getTiles()[finalI1][finalJ1].getValue()==0) {
+                                if ((Math.abs(colOffset) + Math.abs(rowOffset) == 1) && getCurrentLevel().getTiles()[finalI1][finalJ1].getValue()==0) {
                                     int originCol = finalJ1 - colOffset;
                                     int originRow = finalI1 - rowOffset;
                                     System.out.println("finalJ1 finalI1");
@@ -761,15 +735,15 @@ public class PuzzleGame extends Application {
 
                     int finalI2 = i;
                     int finalJ2 = j;
-                    currentLevel.getTiles()[i][j].setOnDragDone(new EventHandler<DragEvent>() {
+                    getCurrentLevel().getTiles()[i][j].setOnDragDone(new EventHandler<DragEvent>() {
                         public void handle(DragEvent event) {
                             /* Rétablit le style de la tuile une fois le glisser-déposer terminé */
-                            currentLevel.getTiles()[finalI2][finalJ2].setOpacity(1.0);
+                        	getCurrentLevel().getTiles()[finalI2][finalJ2].setOpacity(1.0);
                             event.consume();
                         }
                     });
                 }
-                gridLayout.add(currentLevel.getTiles()[i][j], j, i);
+                getGridLayout().add(getCurrentLevel().getTiles()[i][j], j, i);
             }
         }
     }
@@ -778,24 +752,24 @@ public class PuzzleGame extends Application {
         Node tile2 = getNodeByRowColumnIndex(row2, col2);
         System.out.println("swaptile1");
         if (tile1 != null && tile2 != null) {
-            currentLevel.swapTile(row1,col1,row2,col2);
-            int tile1Index = gridLayout.getChildren().indexOf(tile1);
-            int tile2Index = gridLayout.getChildren().indexOf(tile2);
+        	getCurrentLevel().swapTile(row1,col1,row2,col2);
+            int tile1Index = getGridLayout().getChildren().indexOf(tile1);
+            int tile2Index = getGridLayout().getChildren().indexOf(tile2);
             System.out.println("swaptile2");
             GridPane.setConstraints(tile1, col2, row2);
             GridPane.setConstraints(tile2, col1, row1);
             System.out.println("swaptile3");
-            gridLayout.getChildren().set(tile2Index, new Button());
-            gridLayout.getChildren().set(tile1Index, tile2);
+            getGridLayout().getChildren().set(tile2Index, new Button());
+            getGridLayout().getChildren().set(tile1Index, tile2);
             System.out.println("swaptile4");
-            gridLayout.getChildren().set(tile2Index, tile1);
+            getGridLayout().getChildren().set(tile2Index, tile1);
             System.out.println("Grid disposition :");
             getCurrentLevel().print();
-            tileGridConstuctor(gridLayout);
+            tileGridConstuctor(getGridLayout());
         }
     }
     private static Node getNodeByRowColumnIndex(final int row, final int col) {
-        for (Node node : gridLayout.getChildren()) {
+        for (Node node : getGridLayout().getChildren()) {
 
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
                 System.out.println("coucou1");
@@ -981,7 +955,7 @@ public class PuzzleGame extends Application {
         leaderboardLayout.getChildren().add(backButton); //add back button
 
         Scene leaderboardScene = new Scene(leaderboardLayout,640,600);
-        primaryStage.setScene(leaderboardScene);
+        getPrimaryStage().setScene(leaderboardScene);
     }
 
     /**
@@ -1041,7 +1015,7 @@ public class PuzzleGame extends Application {
 
         //---------------------------------------to define the scene-----------------------------------------------------------------
         Scene endScreenScene = new Scene(endScreenLayout, 640, 480);
-        primaryStage.setScene(endScreenScene);
+        getPrimaryStage().setScene(endScreenScene);
 
     }
 
@@ -1071,7 +1045,7 @@ public class PuzzleGame extends Application {
         Scanner scoreLastGame = new Scanner(file); // collect the score
         String[] data = scoreLastGame.next().split(";");
 
-        PuzzleGame.currentLevelNumber = Integer.parseInt(data[1]); // convert string to int
+        setCurrentLevelNumber(Integer.parseInt(data[1])); // convert string to int
         scoreLastGame.close();
 
     }
