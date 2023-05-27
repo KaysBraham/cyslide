@@ -18,6 +18,7 @@ import javafx.event.EventHandler;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -27,6 +28,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
@@ -525,7 +527,11 @@ public class PuzzleGame extends Application {
 
         root.getChildren().add(homeLayout);// to add homeLayout in order to superimpose
 
-        setHomeScene(new Scene(root, 640, 480));
+        // get screensize of monitor
+        Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+        
+        // set the scene size to fullscreen size
+        setHomeScene(new Scene(root, screenSize.getWidth(), screenSize.getHeight()));
 
         getPrimaryStage().setScene(getHomeScene());
         getPrimaryStage().show();
@@ -643,7 +649,11 @@ public class PuzzleGame extends Application {
 
         playLayout.getChildren().addAll(topLayout, getGridLayout(), bottomLayout);
 
-    	Scene playScene = new Scene(playLayout, 1600, 900); // HD+ scene
+        // get screensize of monitor
+        Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+        
+        // set the scene size to fullscreen size
+    	Scene playScene = new Scene(playLayout, screenSize.getWidth(), screenSize.getHeight()); // HD+ scene
 
         getPrimaryStage().setScene(playScene);
 
@@ -836,6 +846,7 @@ public class PuzzleGame extends Application {
             updateMoveCountLabel();
         }
     }
+    
     private static Node getNodeByRowColumnIndex(final int row, final int col) {
         for (Node node : getGridLayout().getChildren()) {
 
@@ -1115,7 +1126,11 @@ public class PuzzleGame extends Application {
         endScreenLayout.setStyle("-fx-background-color: black;");//
 
         //---------------------------------------to define the scene-----------------------------------------------------------------
-        Scene endScreenScene = new Scene(endScreenLayout, 640, 480);
+        // get screensize of monitor
+        Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+        
+        // set the scene size to fullscreen size
+        Scene endScreenScene = new Scene(endScreenLayout, screenSize.getWidth(), screenSize.getHeight());
         getPrimaryStage().setScene(endScreenScene);
 
     }
