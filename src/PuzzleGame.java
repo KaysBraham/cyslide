@@ -1210,6 +1210,7 @@ public class PuzzleGame extends Application {
     }
 
     /**
+     *
      * Loads the levels.
      */
     public void loadLevels(){
