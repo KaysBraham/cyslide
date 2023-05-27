@@ -478,7 +478,7 @@ public class PuzzleGame extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         setPrimaryStage(primaryStage);
-        getPrimaryStage().setMaximized(true);
+        getPrimaryStage().setMaximized(true);//to set the stage on fullscreen
         String levelText = "level: " + getCurrentLevelNumber();
 
         Rectangle rectangle = new Rectangle(200, 30);
@@ -493,22 +493,22 @@ public class PuzzleGame extends Application {
 
         Button setDifficultyButton = new Button("Difficulty settings");
         setDifficultyButton.setOnAction(e -> {
-            setDifficultylayout();
+            setDifficultylayout();//to configure difficultylayout scene
 
-            Scene leaderboardScene = getDifficultylayout();
+            Scene Scene = getDifficultylayout();
 
-            StackPane root = new StackPane();
-            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+            StackPane root = new StackPane();//to create a root in order to retrieve the containing of difficultylayout scene
+            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), Scene.getRoot());//to superimpose the actual scene from primarystage with the Scene
             getPrimaryStage().setScene( new Scene(root));
         });
         Button showLeaderboardButton = new Button("Leaderboard");
         showLeaderboardButton.setOnAction(e -> {
             setLeaderboardlayout();
 
-            Scene leaderboardScene = getLeaderboardlayout();
+            Scene Scene = getLeaderboardlayout();
 
-            StackPane root = new StackPane();
-            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+            StackPane root = new StackPane();//to create a root in order to retrieve the containing of leaderboard scene
+            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), Scene.getRoot());//to superimpose the actual scene from primarystage with the Scene
             getPrimaryStage().setScene( new Scene(root));
         });
 
@@ -663,7 +663,7 @@ public class PuzzleGame extends Application {
         giveUpButton.setOnAction(e -> {
             getTimer().stop();
             Scene leaderboardScene = getHomeScene();
-            StackPane root = new StackPane();
+            StackPane root = new StackPane();//to retrieve the containing of homescene
             root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
             getPrimaryStage().setScene( new Scene(root));
         });
@@ -950,15 +950,15 @@ public class PuzzleGame extends Application {
             levelButton.setOnMousePressed(event -> {
                 // TODO
                 setCurrentLevelNumber(finalDifficulty);
-                getLevelLabel().setText("level: " + finalDifficulty); // updating the label in home screen
-                levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
+                getLevelLabel().setText("level: " + finalDifficulty); //to update the label in home screen
+                levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent when the user push
                 PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
                 pauseTransition.setOnFinished(e -> levelButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'"));//to remove the transparent
                 pauseTransition.play();
-                Scene leaderboardScene = getHomeScene();
 
-                StackPane root = new StackPane();
-                root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+                Scene Scene = getHomeScene();
+                StackPane root = new StackPane();//to create a root in order to retrieve the containing of leaderboard scene
+                root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), Scene.getRoot());//to superimpose the actual scene from primarystage with the Scene
                 getPrimaryStage().setScene( new Scene(root)); // return to home screen after selecting a level
             });
             difficultyLayout.getChildren().add(levelButton);
@@ -971,11 +971,10 @@ public class PuzzleGame extends Application {
         backButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
         backButton.setOnAction(e -> {
 
+            Scene Scene = getHomeScene();
 
-            Scene leaderboardScene = getHomeScene();
-
-            StackPane root = new StackPane();
-            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+            StackPane root = new StackPane();//to create a root in order to retrieve the containing of leaderboard scene
+            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), Scene.getRoot());//to superimpose the actual scene from primarystage with the Scene
             getPrimaryStage().setScene( new Scene(root));
         });
         difficultyLayout.getChildren().add(backButton);
@@ -1002,10 +1001,9 @@ public class PuzzleGame extends Application {
         backButton.setPrefWidth(100);
         backButton.setPrefHeight(50);
         backButton.setOnAction(e -> {
-            Scene leaderboardScene = getHomeScene();
-
-            StackPane root = new StackPane();
-            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+            Scene Scene = getHomeScene();
+            StackPane root = new StackPane();//to create a root in order to retrieve the containing of leaderboard scene
+            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), Scene.getRoot());//to superimpose the actual scene from primarystage with the Scene
             getPrimaryStage().setScene( new Scene(root));
         });
         for (int difficulty = 1; difficulty <= 10; difficulty++) { // to print the button
@@ -1031,16 +1029,21 @@ public class PuzzleGame extends Application {
                     String[] data = pointlastgame.next().split(";");//to separate point and level according to ;
                     Label[] labelrank = new Label[10];
                     Integer[] listpoint = new Integer[10];
-                    Arrays.fill(listpoint, 0);//to initialize in zer0
+                    Arrays.fill(listpoint, 0);//to initialize in zero
                     int count = 0;
+                    //to retrieve the data concerning the points
                     do {
                         if (Integer.parseInt(data[1]) == finalDifficulty) {
                             listpoint[count]= Integer.parseInt(data[0]);
                             count++;
                         }
 
-                        if (pointlastgame.hasNextLine()) data = pointlastgame.nextLine().split(";");
-                        else break;
+                        if (pointlastgame.hasNextLine()) {//to verify the availability of point
+                            data = pointlastgame.nextLine().split(";");
+                        }
+                        else {
+                            break;
+                        }
                     } while (pointlastgame.hasNextLine());
 
                     count = 0;
@@ -1048,7 +1051,7 @@ public class PuzzleGame extends Application {
                     Arrays.sort(listpoint, Comparator.reverseOrder()); //to sort in reverse
                     for (Integer integer : listpoint) {
 
-                        if(count == 10) break;
+                        if(count == 10) break;//one need to print the top 10
                         else {
                             Label rankLabel = new Label((count + 1) + ".");
                             rankLabel.setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
@@ -1071,9 +1074,9 @@ public class PuzzleGame extends Application {
 
                     backButton.setOnAction(e -> {
                         setLeaderboardlayout();
-                        Scene leaderboardScene = getLeaderboardlayout();
-                        StackPane root = new StackPane();
-                        root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
+                        Scene Scene = getLeaderboardlayout();
+                        StackPane root = new StackPane();//to create a root in order to retrieve the containing of leaderboard scene
+                        root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), Scene.getRoot());//to superimpose the actual scene from primarystage with the Scene
                         getPrimaryStage().setScene(new Scene(root));
                     });
 
@@ -1103,6 +1106,7 @@ public class PuzzleGame extends Application {
      */
     public static void showEndScreen() throws FileNotFoundException{
 
+
         collectLevel();
         collectPoints();
 
@@ -1131,15 +1135,16 @@ public class PuzzleGame extends Application {
         //----------------------------------------- Create "Home" button----------------------------------------------------
         Button homeButton = new Button("Home");
         homeButton.setOnAction(e -> {
-            Scene leaderboardScene = getHomeScene();
-            StackPane root = new StackPane();
-            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
-            getPrimaryStage().setScene( new Scene(root));
+            Scene Scene = getHomeScene();
+            StackPane root = new StackPane();//to create a root in order to retrieve the containing of leaderboard scene
+            root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), Scene.getRoot());//to superimpose the actual scene from primarystage with the Scene
+            getPrimaryStage().setScene(new Scene(root));
+
         });
         // Buttons formatting
 		List<Button> buttons = Arrays.asList(tryAgainButton, replayButton, saveScoreButton, homeButton);
 		for(Button button : buttons) {
-			button.setStyle("-fx-text-fill:rgb(255,255,255) ;-fx-border-color: #e70000; -fx-background-color: #ffffff;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+			button.setStyle("-fx-text-fill:rgb(255,255,255) ;-fx-border-color: #e70000; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
 			button.setOnMousePressed(event -> {
 				button.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
