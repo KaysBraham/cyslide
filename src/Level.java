@@ -85,29 +85,34 @@ public class Level {
 
     public void randomShuffleLevel() {
         do {
-            List<Tile> tempList = new ArrayList<>();
-            int nLines = tiles.length;
-            int nColumns = tiles[0].length;
-            for (int i = 0; i <= nLines - 1; i++) {
-                for (int j = 0; j <= nColumns - 1; j++) {
-                    if (tiles[i][j].getValue() != -1) {
-                        tempList.add(tiles[i][j]);
+            do {
+                List<Tile> tempList = new ArrayList<>();
+                int nLines = tiles.length;
+                int nColumns = tiles[0].length;
+                for (int i = 0; i <= nLines - 1; i++) {
+                    for (int j = 0; j <= nColumns - 1; j++) {
+                       if (tiles[i][j].getValue() != -1) {
+                            tempList.add(tiles[i][j]);
+                        }
                     }
                 }
-            }
-            Collections.shuffle(tempList);
-            int p = 0;
-            for (int i = 0; i <= nLines - 1; i++) {
-                for (int j = 0; j <= nColumns - 1; j++) {
-                    if (tiles[i][j].getValue() != -1) {
-                        tiles[i][j] = tempList.get(p);
-                        p += 1;
+                Collections.shuffle(tempList);
+                int p = 0;
+                for (int i = 0; i <= nLines - 1; i++) {
+                    for (int j = 0; j <= nColumns - 1; j++) {
+                        if (tiles[i][j].getValue() != -1) {
+                            tiles[i][j] = tempList.get(p);
+                            p += 1;
+                        }
                     }
                 }
+                System.out.println("un melange de fait");
+                solved=false;
+            }while (!checkShuffle());
+            if (!PuzzleSolver.solve(this)) {
+                System.out.println("Ce melange n'est pas resoluble");
             }
-            System.out.println("un melange de fait");
-            solved=false;
-        }while (!checkShuffle());
+        }while (!PuzzleSolver.solve(this));
     }
 
     public void stepByStepShuffleLevel() {
