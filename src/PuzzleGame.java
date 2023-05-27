@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.Math;
 
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -31,6 +32,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 
 /**
@@ -436,6 +439,14 @@ public class PuzzleGame extends Application {
 		Platform.exit();
 	}
 
+    private void showMessage(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Message");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
     /**
      * Starts a new game by setting up the play screen scene and initializing the game components.
      */
@@ -447,9 +458,7 @@ public class PuzzleGame extends Application {
         if (getCurrentLevelNumber() > 1) {
             for (int i = 0; i < getCurrentLevelNumber() - 1; i++) {
                 if (!levelsWon[i]) {
-                    String message;
-                    Label messageLabel = new Label();
-                    messageLabel.setText("Vous devez gagner les niveaux précédent pour débloquer celui-ci");
+                    showMessage("You must win the previous levels before playing this one.");
                     return;
                 }
             }
