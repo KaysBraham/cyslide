@@ -106,7 +106,7 @@ public class PuzzleGame extends Application {
      */
     private Label levelLabel;
 
-    static Label moveCountLabel = new Label("Move count : " + moveCount );
+    static Label moveCountLabel = new Label("Move count : " + getMoveCount());
     public static int currentLevelNumber = 1;
 
     /**
@@ -217,7 +217,7 @@ public class PuzzleGame extends Application {
      * updates the move count label
      */
     private static void updateMoveCountLabel() {
-        moveCountLabel.setText("Move count : " + moveCount);
+        getMoveCountLabel().setText("Move count : " + getMoveCount());
     }
 
     /**
@@ -227,8 +227,8 @@ public class PuzzleGame extends Application {
      */
     public static void setMoveCount(int moveCount) {
         PuzzleGame.moveCount = moveCount;
+        updateMoveCountLabel();
     }
-
 
     /**
      * Returns the primary stage of the JavaFX application.
@@ -583,12 +583,12 @@ public class PuzzleGame extends Application {
         setUndoButton(new Button("Undo"));
         getUndoButton().setStyle("-fx-font-size:32");
         getUndoButton().setDisable(true);
-        getUndoButton().setOnAction(e -> {undoMove(); moveCount = 0 ;});
+        getUndoButton().setOnAction(e -> undoMove());
 
         setRedoButton(new Button("Redo"));
         getRedoButton().setStyle("-fx-font-size:32");
         getRedoButton().setDisable(true);
-        getRedoButton().setOnAction(e -> {redoMove(); moveCount -- ;});
+        getRedoButton().setOnAction(e -> redoMove());
 
         getGridLayout().setAlignment(Pos.CENTER);
 
@@ -616,6 +616,7 @@ public class PuzzleGame extends Application {
         HBox bottomLayout = new HBox(64);
         bottomLayout.setAlignment(Pos.CENTER);
 
+        setMoveCount(0);
 
         Chronometer chronometer = new Chronometer();
 
@@ -830,7 +831,6 @@ public class PuzzleGame extends Application {
             System.out.println("Grid disposition :");
             getCurrentLevel().print();
             tileGridConstuctor(getGridLayout());
-            setMoveCount(getMoveCount() + 1);
             updateMoveCountLabel();
         }
     }
