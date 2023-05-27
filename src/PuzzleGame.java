@@ -152,7 +152,10 @@ public class PuzzleGame extends Application {
     }
 
     /**
-     * The table of booleans representing the completed levels.
+    /**
+     * Returns a list of a booleans.
+     *
+     * @return The boolean list.
      */
     private static boolean[] completedLevels = new boolean[getLevels().size()];;
 
@@ -435,6 +438,7 @@ public class PuzzleGame extends Application {
 	}
 
 
+
 	/**
      * Starts the JavaFX application by setting up the primary stage and the home screen scene.
      *
@@ -712,6 +716,7 @@ public class PuzzleGame extends Application {
                             dragboard.setContent(content);
 
                             event.consume();
+                            System.out.println("OnDragDetected");
 
                         }
                     });
@@ -769,10 +774,18 @@ public class PuzzleGame extends Application {
                                     rowOffset= (int) (offsetY/Math.abs(offsetY));
                                     colOffset = 0;
                                 }
+                                System.out.println("OnDragDropped");
+                                System.out.println("offsetX offsetY");
+                                System.out.println(offsetX+" "+offsetY);
+                                System.out.println("colOffset rowOffset");
+                                System.out.println(colOffset+" "+rowOffset);
 
                                 if ((Math.abs(colOffset) + Math.abs(rowOffset) == 1) && getCurrentLevel().getTiles()[finalI1][finalJ1].getValue()==0) {
                                     int originCol = finalJ1 - colOffset;
                                     int originRow = finalI1 - rowOffset;
+                                    System.out.println("finalJ1 finalI1");
+                                    System.out.println(finalJ1 +" "+ finalI1);
+                                    System.out.println(originCol+" "+originRow);
                                     swapTiles(finalJ1, finalI1, originCol, originRow);
                                     getUndoButton().setDisable(false);
                                     setMoveCount(getMoveCount() + 1);
@@ -782,7 +795,6 @@ public class PuzzleGame extends Application {
                                     if(isGameFinished()) {
                             	        getTimer().stop();
                             	        try {
-                            	        	getCompletedLevels()[getCurrentLevelNumber() - 1] = true;
                             				showEndScreen();
                             			} catch (FileNotFoundException ex) {
                             				ex.printStackTrace();
@@ -811,19 +823,24 @@ public class PuzzleGame extends Application {
             }
         }
     }
-    
     private static void swapTiles(int col1, int row1, int col2, int row2) {
         Node tile1 = getNodeByRowColumnIndex(row1, col1);
         Node tile2 = getNodeByRowColumnIndex(row2, col2);
+        System.out.println("swaptile1");
         if (tile1 != null && tile2 != null) {
-        	getCurrentLevel().swapTile(row1, col1, row2, col2);
+        	getCurrentLevel().swapTile(row1,col1,row2,col2);
             int tile1Index = getGridLayout().getChildren().indexOf(tile1);
             int tile2Index = getGridLayout().getChildren().indexOf(tile2);
+            System.out.println("swaptile2");
             GridPane.setConstraints(tile1, col2, row2);
             GridPane.setConstraints(tile2, col1, row1);
-            getGridLayout().getChildren().set(tile2Index, new Button()); // buffer to avoid an exception for duplicate children
+            System.out.println("swaptile3");
+            getGridLayout().getChildren().set(tile2Index, new Button());
             getGridLayout().getChildren().set(tile1Index, tile2);
+            System.out.println("swaptile4");
             getGridLayout().getChildren().set(tile2Index, tile1);
+            System.out.println("Grid disposition :");
+            getCurrentLevel().print();
             tileGridConstuctor(getGridLayout());
             updateMoveCountLabel();
         }
@@ -831,7 +848,9 @@ public class PuzzleGame extends Application {
     
     private static Node getNodeByRowColumnIndex(final int row, final int col) {
         for (Node node : getGridLayout().getChildren()) {
+
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
+                System.out.println("coucou1");
                 return node;
             }
         }
@@ -874,7 +893,9 @@ public class PuzzleGame extends Application {
      * @return true if the game is finished, false otherwise.
      */
 	private static boolean isGameFinished() {
-		return getCurrentLevel().equals(getLevels().get(getCurrentLevelNumber() - 1));
+		// TODO
+        //levelsWon[levelNumber - 1] = true;
+		return false;
 	}
 
     /**
@@ -1055,14 +1076,13 @@ public class PuzzleGame extends Application {
         collectPoints();
 
         //-------------------------------------create point label----------------------------------------------------------------
-        Label scoreLabel = new Label("Score: " + getScore()); // to print point
-        // FIXME
-        scoreLabel.setStyle("-fx-text-fill:#2f2; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
-        Label levelLabel = new Label("Level: " + getCurrentLevelNumber()); // to print level
-        levelLabel.setStyle("-fx-text-fill:#ddd; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
+        Label pointLabel = new Label("Points: "+getScore()); // to print point
+        pointLabel.setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+        Label levelLabel = new Label("Level: "+getCurrentLevelNumber()); // to print level
+        levelLabel.setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
         HBox hbox = new HBox(5); // to create a vertical space 10px
         hbox.setAlignment(Pos.CENTER); // to center the buttons
-        hbox.getChildren().addAll(scoreLabel, levelLabel); // to align horizontally point+level
+        hbox.getChildren().addAll(pointLabel, levelLabel); // to align horizontally point+level
 
         // ------------------------------------Create "Try Again" button---------------------------------------------------------
         Button tryAgainButton = new Button("Try Again");
@@ -1088,7 +1108,7 @@ public class PuzzleGame extends Application {
         // Buttons formatting
 		List<Button> buttons = Arrays.asList(tryAgainButton, replayButton, saveScoreButton, homeButton);
 		for(Button button : buttons) {
-			button.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+			button.setStyle("-fx-text-fill:rgb(255,255,255) ;-fx-border-color: #e70000; -fx-background-color: #ffffff;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
 			button.setOnMousePressed(event -> {
 				button.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
