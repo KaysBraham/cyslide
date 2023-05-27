@@ -1045,13 +1045,14 @@ public class PuzzleGame extends Application {
         collectPoints();
 
         //-------------------------------------create point label----------------------------------------------------------------
-        Label pointLabel = new Label("Points: "+getScore()); // to print point
-        pointLabel.setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
-        Label levelLabel = new Label("Level: "+getCurrentLevelNumber()); // to print level
-        levelLabel.setStyle("-fx-text-fill: white;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+        Label scoreLabel = new Label("Score: " + getScore()); // to print point
+        // FIXME
+        scoreLabel.setStyle("-fx-text-fill:#2f2; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
+        Label levelLabel = new Label("Level: " + getCurrentLevelNumber()); // to print level
+        levelLabel.setStyle("-fx-text-fill:#ddd; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
         HBox hbox = new HBox(5); // to create a vertical space 10px
         hbox.setAlignment(Pos.CENTER); // to center the buttons
-        hbox.getChildren().addAll(pointLabel, levelLabel); // to align horizontally point+level
+        hbox.getChildren().addAll(scoreLabel, levelLabel); // to align horizontally point+level
 
         // ------------------------------------Create "Try Again" button---------------------------------------------------------
         Button tryAgainButton = new Button("Try Again");
@@ -1077,7 +1078,7 @@ public class PuzzleGame extends Application {
         // Buttons formatting
 		List<Button> buttons = Arrays.asList(tryAgainButton, replayButton, saveScoreButton, homeButton);
 		for(Button button : buttons) {
-			button.setStyle("-fx-text-fill:rgb(255,255,255) ;-fx-border-color: #e70000; -fx-background-color: #ffffff;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+			button.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
 			button.setOnMousePressed(event -> {
 				button.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
