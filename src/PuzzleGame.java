@@ -524,31 +524,35 @@ public class PuzzleGame extends Application {
             int tileRow = 0;
             int tileCol = 0;
             switch (event.getCode()) {
-                case UP -> {
+                case UP : {
                     tileRow = emptyRow;
                     tileCol = emptyCol - 1;
                     currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
                     tileGridConstuctor(gridLayout);
+                    break;
                 }
-                case DOWN -> {
+                case DOWN : {
                     tileRow = emptyRow;
                     tileCol = emptyCol + 1;
                     currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
                     tileGridConstuctor(gridLayout);
+                    break;
                 }
-                case LEFT -> {
+                case LEFT : {
                     tileRow = emptyRow - 1;
                     tileCol = emptyCol;
                     currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
                     tileGridConstuctor(gridLayout);
+                    break;
                 }
-                case RIGHT -> {
+                case RIGHT : {
                     tileRow = emptyRow + 1;
                     tileCol = emptyCol;
                     currentLevel.swapTile(tileRow, tileCol, emptyRow, emptyCol);
                     tileGridConstuctor(gridLayout);
+                    break;
                 }
-                case ENTER -> {
+                case ENTER : {
                     if (emptyRow == currentLevel.getEmptyTiles()[0][0] && emptyCol == currentLevel.getEmptyTiles()[0][1]) {
                         emptyRow = currentLevel.getEmptyTiles()[1][0];
                         emptyCol = currentLevel.getEmptyTiles()[1][1];
@@ -556,8 +560,9 @@ public class PuzzleGame extends Application {
                         emptyRow = currentLevel.getEmptyTiles()[0][0];
                         emptyCol = currentLevel.getEmptyTiles()[0][1];
                     }
+                    break;
                 }
-                default -> {
+                default : {
                 }
             }
         });
