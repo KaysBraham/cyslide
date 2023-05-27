@@ -427,7 +427,7 @@ public class PuzzleGame extends Application {
 			button.setOnMousePressed(event -> {
 				button.setStyle("-fx-border-color: black; -fx-background-color: #000000;"); // to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1)); // during 0.1 second
-	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:#000000 ;-fx-border-color: #af0000; -fx-background-color: #000000;-fx-font-size: 18;-fx-font-family: 'Leoscar'"));//to remove the transparent
+	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:rgb(68,34,0) ;-fx-border-color: rgb(68,34,0); -fx-background-color: rgba(0,0,0,0);-fx-font-size: 30;-fx-font-family: 'Leoscar'"));//to remove the transparent
 	            pauseTransition.play();
 	        });
 		}
