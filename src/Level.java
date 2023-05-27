@@ -16,8 +16,8 @@ public class Level {
 		return tiles;
 	}
 
-    public void setTiles(Tile[][] tiles) {
-        this.tiles = tiles;
+    public void setTiles(Tile[][] T) {
+        this.tiles = T;
     }
 
     public Tile getTile(int x, int y) {
@@ -265,6 +265,9 @@ public int[][] getEmptyTiles() {
         }
         return new Level(newTiles,levelNumber);
     }
+
+
+
 
     public int getLevelNumber() {
         return levelNumber;
