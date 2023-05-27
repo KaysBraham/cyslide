@@ -436,7 +436,6 @@ public class PuzzleGame extends Application {
 	}
 
 
-
 	/**
      * Starts the JavaFX application by setting up the primary stage and the home screen scene.
      *
@@ -570,7 +569,9 @@ public class PuzzleGame extends Application {
         titleLabel.setStyle("-fx-font-size: 15px ;");
 
         Image backgroundImage = new Image("file:background2-min.jpg");
-        BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true, false);
+        backgroundImage.widthProperty().add(primaryStage.widthProperty());
+        backgroundImage.heightProperty().add(primaryStage.heightProperty());
+        BackgroundSize backgroundSize = new BackgroundSize(1000, 1000, true, true, false, true);
         BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
 
         VBox playLayout = new VBox(32);
