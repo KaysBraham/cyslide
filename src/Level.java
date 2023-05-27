@@ -270,5 +270,15 @@ public int[][] getEmptyTiles() {
     public int getLevelNumber() {
         return levelNumber ;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj.getClass() != this.getClass()) return false;
+        
+        final Level otherLevel = (Level) obj;
+        
+        return Arrays.deepEquals(this.getTiles(), otherLevel.getTiles());
+    }
 }
 

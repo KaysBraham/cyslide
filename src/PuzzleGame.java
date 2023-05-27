@@ -150,10 +150,7 @@ public class PuzzleGame extends Application {
     }
 
     /**
-    /**
-     * Returns a list of a booleans.
-     *
-     * @return The boolean list.
+     * The table of booleans representing the completed levels.
      */
     private static boolean[] completedLevels = new boolean[getLevels().size()];;
 
@@ -784,6 +781,7 @@ public class PuzzleGame extends Application {
                                     if(isGameFinished()) {
                             	        getTimer().stop();
                             	        try {
+                            	        	getCompletedLevels()[getCurrentLevelNumber() - 1] = true;
                             				showEndScreen();
                             			} catch (FileNotFoundException ex) {
                             				ex.printStackTrace();
@@ -881,9 +879,12 @@ public class PuzzleGame extends Application {
      * @return true if the game is finished, false otherwise.
      */
 	private static boolean isGameFinished() {
-		// TODO
-        //levelsWon[levelNumber - 1] = true;
-		return false;
+		System.out.println("Current grid disposition");
+		getCurrentLevel().print();
+		System.out.println("Finished grid disposition");
+		getLevels().get(getCurrentLevelNumber() - 1).print();
+		System.out.println(getCurrentLevel().equals(getLevels().get(getCurrentLevelNumber() - 1)));
+		return getCurrentLevel().equals(getLevels().get(getCurrentLevelNumber() - 1));
 	}
 
     /**
