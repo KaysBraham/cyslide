@@ -731,9 +731,16 @@ public class PuzzleGame extends Application {
                             if (event.getGestureSource() != this) {
                                 double offsetX = event.getSceneX() - mousePosX;
                                 double offsetY = event.getSceneY() - mousePosY;
+                                int colOffset;
+                                int rowOffset;
 
-                                int colOffset = (int) Math.round(offsetX / TILE_SIZE);
-                                int rowOffset = (int) Math.round(offsetY / TILE_SIZE);
+                                if(Math.abs(offsetX)>Math.abs(offsetY)){
+                                    colOffset= (int) (offsetX/Math.abs(offsetX));
+                                    rowOffset = 0;
+                                }else {
+                                    rowOffset= (int) (offsetY/Math.abs(offsetY));
+                                    colOffset = 0;
+                                }
                                 System.out.println("OnDragDropped");
                                 System.out.println("offsetX offsetY");
                                 System.out.println(offsetX+" "+offsetY);
