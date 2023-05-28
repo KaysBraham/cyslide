@@ -119,25 +119,25 @@ public class Level {
     }
 
     public void stepByStepShuffleLevel() {
-        int nLines = tiles.length;
-        int nColumns = tiles[0].length;
-        int numberOfEmptyTiles=0;
-        for (Tile[] row : tiles) {
+        int nLines = getTiles().length;
+        int nColumns = getTiles()[0].length;
+        int numberOfEmptyTiles = 0;
+        for (Tile[] row : getTiles()) {
             for (Tile tile : row) {
-                if (tile.getValue()==0){
+                if (tile.getValue() == 0){
                     numberOfEmptyTiles++;
                 }
             }
         }
         int n = 0;
-        while(n<1000) {
+        while(n < 1000) {
             int[][] emptyTiles = new int[numberOfEmptyTiles][2];
             int c = 0;
-            for(int i = 0;i<nLines;i++){
-                for(int j = 0;j<nColumns;j++){
-                    if (tiles[i][j].getValue() == 0) {
-                        emptyTiles[c][0]=i;
-                        emptyTiles[c][1]=j;
+            for(int i = 0; i < nLines; i++){
+                for(int j = 0;j<nColumns; j++){
+                    if (getTiles()[i][j].getValue() == 0) {
+                        emptyTiles[c][0] = i;
+                        emptyTiles[c][1] = j;
                         c++;
                     }
                 }
@@ -151,23 +151,23 @@ public class Level {
             	int randomMove = random.nextInt(4);
                 switch (randomMove) {
                     case 0 :
-                        if (isMoveValid(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0]+1,emptyTiles[randomEmptyTile][1])){
-                            swapTile(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0]+1,emptyTiles[randomEmptyTile][1]);
+                        if (isMoveValid(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0]+1, emptyTiles[randomEmptyTile][1])){
+                            swapTile(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0]+1, emptyTiles[randomEmptyTile][1]);
                             isMoveDone=true;
                         }
                     case 1 :
-                        if (isMoveValid(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1]+1)){
-                            swapTile(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1]+1);
+                        if (isMoveValid(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1]+1)){
+                            swapTile(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1]+1);
                             isMoveDone=true;
                         }
                     case 2 :
-                        if (isMoveValid(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1]-1)){
-                            swapTile(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1]-1);
+                        if (isMoveValid(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1]-1)){
+                            swapTile(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1]-1);
                             isMoveDone=true;
                         }
                     case 3 :
-                        if (isMoveValid(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0]-1,emptyTiles[randomEmptyTile][1])){
-                            swapTile(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0]-1,emptyTiles[randomEmptyTile][1]);
+                        if (isMoveValid(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0]-1, emptyTiles[randomEmptyTile][1])){
+                            swapTile(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0]-1, emptyTiles[randomEmptyTile][1]);
                             isMoveDone=true;
                         }
                     default:
@@ -176,8 +176,7 @@ public class Level {
                 }
 
             } while (!isMoveDone);
-            print();
-            if (!(n==999 && !checkShuffle())){
+            if (!(n == 999 && checkShuffle())){
                 n++;
             }
         }
