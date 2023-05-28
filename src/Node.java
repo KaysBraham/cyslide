@@ -36,4 +36,20 @@ public class Node {
     public Node getParent() {
         return parent;
     }
+    
+    @Override
+	public int hashCode() {
+		return getState().hashCode();
+	}
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj.getClass() != this.getClass()) return false;
+        
+        final Node otherNode = (Node) obj;
+
+        return this.getState().equals(otherNode.getState());
+    }
+
 }

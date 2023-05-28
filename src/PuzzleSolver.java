@@ -1,4 +1,5 @@
 package src;
+
 import java.util.*;
 
 public class PuzzleSolver {
@@ -7,7 +8,7 @@ public class PuzzleSolver {
     public static List<Node> generateNeighbors(Node parent) {
         List<Node> neighbors = new ArrayList<>();
         for (int i = 0; i < parent.getState().getTiles().length; i++) {
-            for (int j = 0; j < parent.getState().getTiles()[0].length; j++) {
+            for (int j = 0; j < parent.getState().getTiles()[i].length; j++) {
                 if (parent.getState().getTiles()[i][j].getValue() == 0) {
                     if (parent.getState().isMoveValid(i, j, i + 1, j)) {
                         Level newLevel = parent.getState().copy();

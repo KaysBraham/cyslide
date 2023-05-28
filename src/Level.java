@@ -241,5 +241,15 @@ public int[][] getEmptyTiles() {
 
         return Arrays.deepEquals(this.getTiles(), otherLevel.getTiles());
     }
+    
+    @Override
+	public int hashCode() {
+    	final int primeNumber = 79;
+    	int result = 0;
+        for (Tile[] row : getTiles())
+            for (Tile tile : row)
+                result += tile.getValue();
+		return result * primeNumber;
+	}
 }
 
