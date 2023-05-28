@@ -2,29 +2,44 @@ package src;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Scanner;
-import java.util.* ;
+import java.util.Stack ;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.Math;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
-import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Group;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
-import javafx.scene.layout.*;
-import javafx.scene.shape.Circle;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.Node;
+import javafx.scene.paint.Color;
+import javafx.scene.Scene;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -32,20 +47,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
-import javafx.scene.Scene;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.text.Font;
 
 
 
@@ -57,117 +60,44 @@ public class PuzzleGame extends Application {
     private static final String folderPath = "data";
     private static final FileIO fileLoader = new FileIO(folderPath);
 
-    /**
-     * The array of available levels.
-     */
-    private static final List<Level> levels = fileLoader.loadLevels();
+    private static final List<Level> levels = fileLoader.loadLevels(); // The array of available levels.
+    private Level[] unlockedLevels; // The array of unlocked levels.
 
-    /**
-     * The currently selected level.
-     */
-    private static Level currentLevel;
+    private static int moveCount; // The count of moves made in the current level.
 
-    /**
-     * The array of unlocked levels.
-     */
-    private Level[] unlockedLevels;
+    private static Stage primaryStage; // The primary stage of the JavaFX application.
+    private static Scene homeScene; // The scene representing the home screen of the game.
+    static GridPane gridLayout = new GridPane(); // The grid pane in which the cells are displayed.
 
-    /**
-     * The count of moves made in the current level.
-     */
-    private static int moveCount;
+    private Scene difficultylayout; // The scene representing the difficultylayout of the game.
+    private Scene leaderboardlayout; // The scene representing the leaderboardlayout of the game.
 
-    /**
-     * The primary stage of the JavaFX application.
-     */
-    private static Stage primaryStage;
+    private static SequentialTransition timer = null; // The sequential transition used as a timer in the game.
 
-    private static int bestScore;
+    private static Level currentLevel; // The currently selected level.
+    private Label levelLabel; // The label displaying the current level.
+    static Label moveCountLabel = new Label("Move count : " + getMoveCount()); // The label displaying the current move count.
 
-    /**
-     * The scene representing the home screen of the game.
-     */
-    private static Scene homeScene;
+    public static int currentLevelNumber = 1; // The number of the current level.
+    private static int score; // The current score of the player.
+    private static int bestScore; // The best score of the player on the current level.
 
-    /**
-     * The scene representing the difficultylayyout of the game.
-     */
-    private Scene difficultylayout;
+    private static Button undoButton; // The undo Button.
+    private static Button redoButton; // The redo Button.
+    private static Button randomShuffleButton; // The random shuffle Button.
+    private static Button stepByStepShuffleButton; // The step by step shuffle Button.
+    private static Button solveButton; // The solve Button.
 
-    /**
-     * The scene representing the leaderboardlayout of the game.
-     */
-    private Scene leaderboardlayout;
+    private static boolean canPlay; // True if the user can play, false otherwise.
 
+    private static Pair<Integer, Integer> selectedCell = null; // The coordinates of the currently selected cell.
 
-    /**
-     * The sequential transition used as a timer in the game.
-     */
-    private static SequentialTransition timer = null;
+    private static boolean[] completedLevels = new boolean[getLevels().size()]; // The table of booleans representing the completed levels.
 
-    /**
-     * The label displaying the current level.
-     */
-    private Label levelLabel;
+    static Stack<Tile[][]> undoStack = new Stack<>(); // The stack of previous moves that the user is able to undo.
+    static Stack<Tile[][]> redoStack = new Stack<>(); // The stack of undid moves that the user is able to redo.
 
-    static Label moveCountLabel = new Label("Move count : " + getMoveCount());
-    public static int currentLevelNumber = 1;
-
-    /**
-     * The current score of the player.
-     */
-    private static int score;
-
-    /**
-     * The undo Button.
-     */
-    private static Button undoButton;
-
-    /**
-     * The random shuffle Button.
-     */
-
-    private static Button randomShuffleButton;
-
-
-    /**
-     * The step by step shuffle Button.
-     */
-
-    private static Button stepByStepShuffleButton;
-
-    /**
-     * The solve Button.
-     */
-
-    private static Button solveButton;
-    /**
-     * The redo Button.
-     */
-    private static Button redoButton;
-
-    private static Pair<Integer, Integer> selectedCell = null;
-
-    static GridPane gridLayout = new GridPane();
-
-    /**
-     * Returns a list containing the levels.
-     *
-     * @return The level list.
-     */
-    public static List<Level> getLevels() {
-        return levels;
-    }
-
-    /**
-    /**
-     * Returns a list of a booleans.
-     *
-     * @return The boolean list.
-     */
-    private static boolean[] completedLevels = new boolean[getLevels().size()];
-
-    public static LinkedHashSet<Tile[][]> solvingMoves= new LinkedHashSet<>();
+    public static LinkedHashSet<Tile[][]> solvingMoves= new LinkedHashSet<>(); // The solving moves.
 
     /**
      * Returns the current level in the game.
@@ -178,6 +108,15 @@ public class PuzzleGame extends Application {
         return currentLevel;
     }
 
+    /**
+     * Returns a list containing the levels.
+     *
+     * @return The level list.
+     */
+    public static List<Level> getLevels() {
+        return levels;
+    }
+
     public static  int getBestScore() {
         return bestScore;
     }
@@ -185,9 +124,6 @@ public class PuzzleGame extends Application {
     public static  void setBestScore(int n) {
         bestScore = n ;
     }
-
-
-
 
     /**
      * Sets the current level.
@@ -412,58 +348,94 @@ public class PuzzleGame extends Application {
 		PuzzleGame.gridLayout = gridLayout;
 	}
 
-    static Stack<Tile[][]> undoStack = new Stack<>();
-    static Stack<Tile[][]> redoStack = new Stack<>();
+    /**
+     * Returns the undo stack. 
+     * 
+     * @return the undo stack.
+     */
+    public static Stack<Tile[][]> getUndoStack() {
+		return undoStack;
+	}
 
+    /**
+     * Returns the redo stack. 
+     * 
+     * @return the redo stack.
+     */
+	public static Stack<Tile[][]> getRedoStack() {
+		return redoStack;
+	}
 
-    private static void undo() {
-        if (!undoStack.isEmpty()) {
-            getUndoButton().setDisable(false);
-            if (undoStack.size() == 1){
-            getUndoButton().setDisable(true);
-            }
-            redoStack.push(currentLevel.copy().getTiles());
-            Tile[][] previousState = undoStack.pop();
-            currentLevel.print() ;
-            currentLevel.setTiles(previousState);
-            currentLevel.print() ;
+    /**
+     * Undoes the last move.
+     */
+	private static void undo() {
 
+        if (getUndoStack().isEmpty()) return;
+
+    	setMoveCount(getMoveCount() - 1);
+    	getRedoButton().setDisable(false);
+
+        if (getUndoStack().size() == 1){
+        	getUndoButton().setDisable(true);
         }
+        getRedoStack().push(getCurrentLevel().copy().getTiles());
+        Tile[][] previousState = getUndoStack().pop();
+        getCurrentLevel().print() ;
+        getCurrentLevel().setTiles(previousState);
+        getCurrentLevel().print() ;
+
+    	tileGridConstuctor(getGridLayout());
     }
 
+    /**
+     * Redoes the last undid move.
+     */
     private static void redo() {
-        getRedoButton().setDisable(false);
-        if (!redoStack.isEmpty()) {
-            if (redoStack.size() == 1) {
-                getRedoButton().setDisable(true);
-            }
-            undoStack.push(currentLevel.copy().getTiles());
-            Tile[][] nextState = redoStack.pop();
-            currentLevel.print() ;
-            currentLevel.setTiles(nextState);
-            currentLevel.print() ;
+
+        if (getRedoStack().isEmpty()) return;
+
+    	setMoveCount(getMoveCount() + 1);
+    	getUndoButton().setDisable(false);
+
+        if (getRedoStack().size() == 1) {
+            getRedoButton().setDisable(true);
         }
+        getUndoStack().push(getCurrentLevel().copy().getTiles());
+        Tile[][] nextState = getRedoStack().pop();
+        getCurrentLevel().print() ;
+        getCurrentLevel().setTiles(nextState);
+        getCurrentLevel().print() ;
+
+    	tileGridConstuctor(getGridLayout());
     }
 
-    private static boolean canPlay;
+	/**
+     * Returns the solving moves.
+     *
+     * @return The solving moves.
+     */
+    public static LinkedHashSet<Tile[][]> getSolvingMoves() {
+		return solvingMoves;
+	}
 
+	/**
+     * Solves the current level.
+     */
     private static void solve(){
-        for(Tile[][] tiles : solvingMoves){
-            currentLevel.setTiles(tiles);
+        for(Tile[][] tiles : getSolvingMoves()){
+        	getCurrentLevel().setTiles(tiles);
             tileGridConstuctor(getGridLayout());
             PauseTransition pause = new PauseTransition(Duration.seconds(2));
             pause.play();
         }
     }
 
-
-
 	/**
      * Returns the random shuffle button.
      *
      * @return The random shuffle button.
      */
-
     public static Button getRandomShuffleButton() {
         return randomShuffleButton;
     }
@@ -498,6 +470,15 @@ public class PuzzleGame extends Application {
     }
 
     /**
+     * Returns the selected cell.
+     * 
+     * @return the selected cell.
+     */
+    public static Pair<Integer, Integer> getSelectedCell() {
+		return PuzzleGame.selectedCell;
+	}
+
+    /**
      * Returns the solve button.
      *
      * @return The solve button.
@@ -515,18 +496,6 @@ public class PuzzleGame extends Application {
     public static void setsolveButton(Button solveButton) {
         PuzzleGame.solveButton = solveButton;
     }
-
-    public static Pair<Integer, Integer> getSelectedCell() {
-		return PuzzleGame.selectedCell;
-	}
-
-    static PauseTransition pause1 = new PauseTransition(Duration.seconds(3));
-
-    static PauseTransition pause2 = new PauseTransition(Duration.seconds(1));
-
-
-
-
 
 	/**
      * Starts the JavaFX application by setting up the primary stage and the home screen scene.
@@ -548,15 +517,15 @@ public class PuzzleGame extends Application {
         setLevelLabel(new Label(levelText)); //to print level
 		getLevelLabel().setStyle("-fx-text-fill: #442200;-fx-font-size: 25;-fx-font-family: 'Rockwell'");//to configure levellabel
 
+        PauseTransition pause1 = new PauseTransition(Duration.seconds(3));
         pause1.setOnFinished(event -> {
             currentLevel.stepByStepShuffleLevel();
             tileGridConstuctor(getGridLayout());
         });
 
+        PauseTransition pause2 = new PauseTransition(Duration.seconds(1));
         pause2.setOnFinished(event -> {
             canPlay = true;});
-
-
 
 		Button startButton = new Button("New game");
 		startButton.setOnAction(e -> {canPlay = false; startGame(); pause1.play(); pause2.play();});
@@ -589,7 +558,7 @@ public class PuzzleGame extends Application {
 		for(Button button : buttons) {
             button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
 			button.setOnMousePressed(event -> {
-				button.setStyle("-fx-border-color: rgba(0,0,0,0); -fx-background-color: rgba(0,0,0,0);"); // to make grey transparent
+				button.setStyle("-fx-border-color: black; -fx-background-color: #000000;"); // to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1)); // during 0.1 second
 	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'"));//to remove the transparent
 	            pauseTransition.play();
@@ -692,12 +661,12 @@ public class PuzzleGame extends Application {
         setUndoButton(new Button("Undo"));
         getUndoButton().setStyle("-fx-font-size:32");
         getUndoButton().setDisable(true);
-        getUndoButton().setOnAction(e -> {undo(); getRedoButton().setDisable(false); moveCount -- ; updateMoveCountLabel(); tileGridConstuctor(gridLayout);});
+        getUndoButton().setOnAction(e -> undo());
 
         setRedoButton(new Button("Redo"));
         getRedoButton().setStyle("-fx-font-size:32");
         getRedoButton().setDisable(true);
-        getRedoButton().setOnAction(e -> {redo(); moveCount ++ ;updateMoveCountLabel(); tileGridConstuctor(gridLayout);});
+        getRedoButton().setOnAction(e -> redo());
 
         getGridLayout().setAlignment(Pos.CENTER);
 
@@ -723,9 +692,7 @@ public class PuzzleGame extends Application {
 
         setsolveButton(new Button("Solve Shuffle"));
         getsolveButton().setStyle("-fx-font-size:25");
-        getsolveButton().setOnAction(e -> {
-            solve();
-        });
+        getsolveButton().setOnAction(e -> solve());
 
         topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton(),getsolveButton());
 
@@ -777,17 +744,24 @@ public class PuzzleGame extends Application {
         getTimer().setCycleCount(PauseTransition.INDEFINITE);
         getTimer().play();
     }
-    static int mousePosX;
-    static int mousePosY;
-    static int initialTranslateX;
-    static int initialTranslateY;
-    static final int TILE_SIZE = 200;
+
+    static int mousePosX; // The x-coordinate of the mouse position.
+    static int mousePosY; // The y-coordinate of the mouse position.
+    static int initialTranslateX; // TODO comment
+    static int initialTranslateY; // TODO comment
+    static final int TILE_SIZE = 200; // The size of the tiles.
+
+    /**
+     * Constructs the grid layout with the tiles.
+     * 
+     * @param gridLayout the grid pane.
+     */
     private static void tileGridConstuctor(GridPane gridLayout) {
         gridLayout.getChildren().clear();
 
 
-        for (int i =0;i<getCurrentLevel().getTiles().length;i++) {
-            for(int j =0;j<getCurrentLevel().getTiles()[0].length;j++) {
+        for (int i = 0; i<getCurrentLevel().getTiles().length; i++) {
+            for(int j = 0; j<getCurrentLevel().getTiles()[0].length; j++) {
 
             	getCurrentLevel().getTiles()[i][j].setPrefSize(TILE_SIZE,TILE_SIZE);
 
@@ -809,6 +783,7 @@ public class PuzzleGame extends Application {
                                 + "-fx-background-color: #640;"); // dark wood
                         getCurrentLevel().getTiles()[i][j].setAlignment(Pos.CENTER);
                 }
+
                 if(getCurrentLevel().getTiles()[i][j].getValue()!=-1){
                     int finalI4 = i;
                     int finalJ4 = j;
@@ -827,8 +802,6 @@ public class PuzzleGame extends Application {
                             dragboard.setContent(content);
 
                             event.consume();
-                            System.out.println("OnDragDetected");
-
                         }
                     });
 
@@ -885,29 +858,21 @@ public class PuzzleGame extends Application {
                                     rowOffset= (int) (offsetY/Math.abs(offsetY));
                                     colOffset = 0;
                                 }
-                                System.out.println("OnDragDropped");
-                                System.out.println("offsetX offsetY");
-                                System.out.println(offsetX+" "+offsetY);
-                                System.out.println("colOffset rowOffset");
-                                System.out.println(colOffset+" "+rowOffset);
 
                                 if ((Math.abs(colOffset) + Math.abs(rowOffset) == 1) && getCurrentLevel().getTiles()[finalI1][finalJ1].getValue()==0 && canPlay) {
                                     int originCol = finalJ1 - colOffset;
                                     int originRow = finalI1 - rowOffset;
-                                    System.out.println("finalJ1 finalI1");
-                                    System.out.println(finalJ1 +" "+ finalI1);
-                                    System.out.println(originCol+" "+originRow);
-                                    undoStack.push(currentLevel.copy().getTiles());
+                                    getUndoStack().push(getCurrentLevel().copy().getTiles());
                                     swapTiles(finalJ1, finalI1, originCol, originRow);
-                                    redoStack.clear();
+                                    getRedoStack().clear();
                                     getRedoButton().setDisable(true);
                                     getUndoButton().setDisable(false);
                                     setMoveCount(getMoveCount() + 1);
                                     event.setDropCompleted(true);
 
                                     if(isGameFinished()) {
-                                        getCompletedLevels()[getCurrentLevelNumber()  - 1] =  true ;
                             	        getTimer().stop();
+                        	        	getCompletedLevels()[getCurrentLevelNumber() - 1] = true;
                             	        try {
                             				showEndScreen();
                             			} catch (FileNotFoundException ex) {
@@ -937,40 +902,54 @@ public class PuzzleGame extends Application {
             }
         }
     }
+
+    /**
+     * Swaps 2 tiles in the grid layout.
+     * 
+     * @param col1 the column of the first tile.
+     * @param row1 the row of the first tile.
+     * @param col2 the column of the second tile.
+     * @param row2 the row of the second tile.
+     */
     private static void swapTiles(int col1, int row1, int col2, int row2) {
         Node tile1 = getNodeByRowColumnIndex(row1, col1);
         Node tile2 = getNodeByRowColumnIndex(row2, col2);
-        System.out.println("swaptile1");
         if (tile1 != null && tile2 != null) {
-        	getCurrentLevel().swapTile(row1,col1,row2,col2);
+        	getCurrentLevel().swapTile(row1, col1, row2, col2);
             int tile1Index = getGridLayout().getChildren().indexOf(tile1);
             int tile2Index = getGridLayout().getChildren().indexOf(tile2);
-            System.out.println("swaptile2");
             GridPane.setConstraints(tile1, col2, row2);
             GridPane.setConstraints(tile2, col1, row1);
-            System.out.println("swaptile3");
-            getGridLayout().getChildren().set(tile2Index, new Button());
+            getGridLayout().getChildren().set(tile2Index, new Button()); // buffer to avoid an exception for duplicate children
             getGridLayout().getChildren().set(tile1Index, tile2);
-            System.out.println("swaptile4");
             getGridLayout().getChildren().set(tile2Index, tile1);
-            System.out.println("Grid disposition :");
-            getCurrentLevel().print();
             tileGridConstuctor(getGridLayout());
-            updateMoveCountLabel();
         }
     }
-    
+
+    /**
+     * Gets the Node at the provided row and column
+     * in the grid layout.
+     * 
+     * @param row the row to search for.
+     * @param col the column to search for.
+     * @return the found node, or null if none.
+     */
     private static Node getNodeByRowColumnIndex(final int row, final int col) {
         for (Node node : getGridLayout().getChildren()) {
-
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
-                System.out.println("coucou1");
                 return node;
             }
         }
         return null;
     }
 
+    /**
+     * Displays a preview of the solved level
+     * on the bottom-right corner of the screen.
+     * 
+     * @param gridLayout the grid pane in which the preview will be displayed.
+     */
     private static void solvedLevelPreview(GridPane gridLayout) {
         gridLayout.getChildren().clear();
         int i, j = 0;
@@ -1011,36 +990,34 @@ public class PuzzleGame extends Application {
 	}
 
     /**
-     * Opens the difficulty settings screen.
+     * Returns the difficulty layout.
+     * 
+     * @return the difficulty layout.
      */
     public Scene getDifficultylayout() {
         return difficultylayout;
     }
 
+    /**
+     * TODO comment
+     */
     public void setDifficultylayout() {
         VBox difficultyLayout = new VBox(10);
-
-        Image backgroundImage = new Image("file:background2-min.jpg");
-        backgroundImage.widthProperty().add(primaryStage.widthProperty());
-        backgroundImage.heightProperty().add(primaryStage.heightProperty());
-        BackgroundSize backgroundSize = new BackgroundSize(1000, 1000, true, true, false, true);
-        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
-
         difficultyLayout.setAlignment(Pos.CENTER);
-        difficultyLayout.setBackground(new Background(background));
+        difficultyLayout.setStyle("-fx-background-color: black;");
 
         for (int difficulty = 1; difficulty <= 10; difficulty++) {
             Button levelButton = new Button("Level " + difficulty);
             levelButton.setPrefSize(100,50); //set the button size
 
-            levelButton.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");//set the style of the button
+            levelButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
             int finalDifficulty = difficulty;
             levelButton.setOnMousePressed(event -> {
                 setCurrentLevelNumber(finalDifficulty);
                 getLevelLabel().setText("level: " + finalDifficulty); // updating the label in home screen
                 levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
                 PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
-                pauseTransition.setOnFinished(e -> levelButton.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-size: 3; -fx-background-color: rgba(37,20,12,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'"));//to remove the transparent
+                pauseTransition.setOnFinished(e -> levelButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'"));//to remove the transparent
                 pauseTransition.play();
                 Scene leaderboardScene = getHomeScene();
 
@@ -1055,7 +1032,7 @@ public class PuzzleGame extends Application {
 
         Button backButton = new Button("Return");
         backButton.setPrefSize(100,50);//set the button size
-        backButton.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 20;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");//set the style of the button
+        backButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
         backButton.setOnAction(e -> {
 
 
@@ -1071,9 +1048,10 @@ public class PuzzleGame extends Application {
     }
 
     /**
-     * Opens the leaderboard screen.
+     * Returns the leaderboard layout.
+     * 
+     * @return the leaderboard layout.
      */
-
     public Scene getLeaderboardlayout() {
         return leaderboardlayout;
     }
@@ -1081,17 +1059,11 @@ public class PuzzleGame extends Application {
     public void setLeaderboardlayout() {
         VBox leaderboardLayout = new VBox(10);
 
-        Image backgroundImage = new Image("file:background2-min.jpg");
-        backgroundImage.widthProperty().add(primaryStage.widthProperty());
-        backgroundImage.heightProperty().add(primaryStage.heightProperty());
-        BackgroundSize backgroundSize = new BackgroundSize(1000, 1000, true, true, false, true);
-        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
-
-       leaderboardLayout.setAlignment(Pos.CENTER);
-        leaderboardLayout.setBackground(new Background(background));
-
+        leaderboardLayout.setStyle("-fx-background-color: black;");
+        leaderboardLayout.setAlignment(Pos.CENTER); //to set all the button on the center
+        //create back button
         Button backButton = new Button("Return");
-        backButton.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");//set the style of the button
+        backButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
         backButton.setPrefWidth(100);
         backButton.setPrefHeight(50);
         backButton.setOnAction(e -> {
@@ -1103,14 +1075,14 @@ public class PuzzleGame extends Application {
         });
         for (int difficulty = 1; difficulty <= 10; difficulty++) { // to print the button
             Button levelButton = new Button("Level " + difficulty);
-            levelButton.setPrefSize(100,50);
+            levelButton.setPrefSize(100, 50);
 
-            levelButton.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");//set the style of the button
+            levelButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
             int finalDifficulty = difficulty;
             levelButton.setOnMousePressed(event -> {
                 leaderboardLayout.getChildren().clear(); // to remove all the button in order to print th ranking
 
-                levelButton.setStyle("-fx-border-color: rgba(37,20,12,0); -fx-background-color: rgba(128,128,128,0);"); // to make grey transparent
+                levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); // to make grey transparent
 
                 File file = new File("scoreLastGame.txt"); // to retrieve point
 
@@ -1146,7 +1118,7 @@ public class PuzzleGame extends Application {
                         if(count == 10) break;
                         else {
                             Label rankLabel = new Label((count + 1) + ".");
-                            rankLabel.setStyle("-fx-text-fill: #442200;-fx-font-size: 18;-fx-font-family: 'Rockwell'");
+                            rankLabel.setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
                             rankLabel.setMinWidth(35);//to avoid the points to move when the ranking is ten
                             labelrank[count] = new Label("Point: " + integer); // to set the rank
                             labelrank[count].setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
@@ -1200,13 +1172,6 @@ public class PuzzleGame extends Application {
 
         collectLevel();
         collectPoints();
-        pause1.setOnFinished(event -> {
-            currentLevel.stepByStepShuffleLevel();
-            tileGridConstuctor(getGridLayout());
-        });
-
-        pause2.setOnFinished(event -> {
-            canPlay = true;});
 
         //-------------------------------------create point label----------------------------------------------------------------
         if (getMoveCount() < getBestScore() || getBestScore() == 0 ){
@@ -1224,7 +1189,7 @@ public class PuzzleGame extends Application {
 
         // ------------------------------------Create "Next Level" button---------------------------------------------------------
         Button nextLevelButton = new Button("Next Level");
-        nextLevelButton.setOnAction(event -> {setCurrentLevelNumber(getCurrentLevelNumber()+1); canPlay = false ; startGame(); pause1.play(); pause2.play();});
+        nextLevelButton.setOnAction(event -> {setCurrentLevelNumber(getCurrentLevelNumber()+1); canPlay = false ; startGame();});
 
         //---------------------------------------- Create "Replay" button------------------------------------------------------
         Button replayButton = new Button("Replay");
@@ -1338,45 +1303,6 @@ public class PuzzleGame extends Application {
         }
     }
 
-    /**
-     *
-     * Loads the levels.
-     */
-    public void loadLevels(){
-    	// TODO
-    }
-
-    /**
-     * Selects the current level.
-     *
-     * @param currentLevel The level to select.
-     */
-    public void selectLevel(int currentLevel){
-    	// TODO
-    }
-
-    /**
-     * Checks if the current level is solvable.
-     */
-    public void checkSolvable(){
-    	// TODO
-    }
-
-    /**
-     * Unlocks the next level.
-     */
-    public void unlockNextLevel(){
-    	// TODO
-    }
-
-    /**
-     * Displays a message indicating that the level is solved.
-     */
-    public void displayLevelSolved(){
-    	// TODO
-    }
-
-
     public static void main(String[] args) {
         launch(args);
 
@@ -1393,7 +1319,6 @@ public class PuzzleGame extends Application {
         }else {
             System.out.println("noooo");
         }
-
 
         /*
         src.Node node = new src.Node(currentLevel,null,0,PuzzleSolver.calculateManhattanDistance(currentLevel));
