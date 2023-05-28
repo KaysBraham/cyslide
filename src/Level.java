@@ -172,7 +172,6 @@ public class Level {
                         }
                     default:
                         break;
-
                 }
 
             } while (!isMoveDone);

@@ -781,8 +781,6 @@ public class PuzzleGame extends Application {
                             dragboard.setContent(content);
 
                             event.consume();
-                            System.out.println("OnDragDetected");
-
                         }
                     });
 
@@ -903,7 +901,6 @@ public class PuzzleGame extends Application {
         for (Node node : getGridLayout().getChildren()) {
 
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
-                System.out.println("coucou1");
                 return node;
             }
         }
