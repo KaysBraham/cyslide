@@ -7,9 +7,17 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+/**
+ * Represents a puzzle solver for a game.
+ */
 public class PuzzleSolver {
 
-    // method to generate nodes
+    /**
+     * Generates the neighbor nodes for a given parent node.
+     *
+     * @param parent The parent node.
+     * @return The list of neighbor nodes.
+     */
     public static List<Node> generateNeighbors(Node parent) {
         List<Node> neighbors = new ArrayList<>();
         for (int i = 0; i < parent.getState().getTiles().length; i++) {
@@ -45,7 +53,12 @@ public class PuzzleSolver {
         return neighbors;
     }
 
-    // method of solving the  game
+    /**
+     * Solves the puzzle given an initial state.
+     *
+     * @param initialState The initial state of the puzzle.
+     * @return True if a solution is found, false otherwise.
+     */
     public static boolean solvePuzzle(Level initialState) {
         Node initialNode = new Node(initialState, null, 0, calculateManhattanDistance(initialState));
         PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingInt(n -> n.getCostSoFar() + n.getEstimatedCost()));
@@ -93,7 +106,12 @@ public class PuzzleSolver {
         return false;
     }
 
-    // Method to check if the given state corresponds to the desired final state
+    /**
+     * Checks if the given state corresponds to the desired final state.
+     *
+     * @param state The state to check.
+     * @return True if the state is the goal state, false otherwise.
+     */
     public static boolean isGoalState(Level state) {
         Level solvedLevel = PuzzleGame.getLevel(state.getLevelNumber());
         for (int i = 0; i < state.getTiles().length; i++) {
@@ -106,7 +124,12 @@ public class PuzzleSolver {
         return true;
     }
 
-    // Calculation of the estimated cost through the Manhattan distance
+    /**
+     * Calculates the estimated cost of a level using the Manhattan distance heuristic.
+     *
+     * @param stateLevel The level to calculate the estimated cost for.
+     * @return The estimated cost based on the Manhattan distance.
+     */
     public static int calculateManhattanDistance(Level stateLevel) {
         Tile[][] stateTile = stateLevel.getTiles();
         int sum = 0;

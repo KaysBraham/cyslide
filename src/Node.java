@@ -4,10 +4,10 @@ package src;
  * Represents a node in a search algorithm.
  */
 public class Node {
-    private final Level state;
-    private final Node parent;
-    private int costSoFar;
-    private int estimatedCost;
+    private final Level state; // The state of the node, which is the specific arrangement of the level.
+    private final Node parent; // The parent node.
+    private int costSoFar; // The cost so far.
+    private int estimatedCost; // The estimated cost.
 
     /**
      * Constructs a new node with the specified state, parent node, cost so far, and estimated cost.
