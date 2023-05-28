@@ -82,6 +82,8 @@ public class PuzzleGame extends Application {
      */
     private static Stage primaryStage;
 
+    private static int bestScore;
+
     /**
      * The scene representing the home screen of the game.
      */
@@ -167,6 +169,15 @@ public class PuzzleGame extends Application {
     public static Level getCurrentLevel() {
         return currentLevel;
     }
+
+    public static  int getBestScore() {
+        return bestScore;
+    }
+
+    public static  void setBestScore(int n) {
+        bestScore = n ;
+    }
+
 
 
 
@@ -1115,18 +1126,18 @@ public class PuzzleGame extends Application {
         collectPoints();
 
         //-------------------------------------create point label----------------------------------------------------------------
-        if (getMoveCount() < getScore()) {
-            setScore(getMoveCount());
+        if (getMoveCount() < getBestScore() || getBestScore() == 0 ){
+            setBestScore(getMoveCount());
         }
-        Label bestScoreLabel = new Label("Best Score: " + getScore());
-        Label scoreLabel = new Label("Score: " + getMoveCount()); // to print point
-        // FIXME
+        Label bestScoreLabel = new Label("Best Score : " + getBestScore());
+        Label scoreLabel = new Label("Score : " + getMoveCount());
         scoreLabel.setStyle("-fx-text-fill:#2f2; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
-        Label levelLabel = new Label("Level: " + getCurrentLevelNumber()); // to print level
+        bestScoreLabel.setStyle("-fx-text-fill:#f8ff22; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
+        Label levelLabel = new Label("Level: " + getCurrentLevelNumber());
         levelLabel.setStyle("-fx-text-fill:#ddd; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
-        HBox hbox = new HBox(5); // to create a vertical space 10px
-        hbox.setAlignment(Pos.CENTER); // to center the buttons
-        hbox.getChildren().addAll(scoreLabel, levelLabel); // to align horizontally point+level
+        HBox hbox = new HBox(5);
+        hbox.setAlignment(Pos.CENTER);
+        hbox.getChildren().addAll(levelLabel, scoreLabel);
 
         // ------------------------------------Create "Try Again" button---------------------------------------------------------
         Button tryAgainButton = new Button("Try Again");
@@ -1165,6 +1176,9 @@ public class PuzzleGame extends Application {
         VBox endScreenLayout = new VBox(10); // to create a vertical space 10px
         endScreenLayout.setAlignment(Pos.CENTER); // to center the buttons
         endScreenLayout.getChildren().add(hbox); // to add the hbox
+        if (getBestScore() != 0 ) {
+            endScreenLayout.getChildren().add(bestScoreLabel);
+        }
         endScreenLayout.getChildren().addAll(buttons); // to add the buttons
         endScreenLayout.setStyle("-fx-background-color: black;");//
 
@@ -1216,7 +1230,7 @@ public class PuzzleGame extends Application {
      */
     public static void saveScore(int score) {
 
-        try { // to check the availability of score
+        try {
             FileWriter writer = new FileWriter("score.txt");
             writer.write("Score: " + score); // to register the score in score.txt
             writer.close();
