@@ -484,12 +484,15 @@ public class PuzzleGame extends Application {
 
 
     static void firstShuffle(){
+        System.out.println(canPlay);
         pause1.play() ;
         pause2.setOnFinished(event -> {
             currentLevel.stepByStepShuffleLevel();
             tileGridConstuctor(getGridLayout());});
         pause2.play();
+        System.out.println(canPlay);
         canPlay = true ;
+        System.out.println(canPlay);
     }
 
     /**
@@ -532,7 +535,7 @@ public class PuzzleGame extends Application {
 		getLevelLabel().setStyle("-fx-text-fill: #442200;-fx-font-size: 25;-fx-font-family: 'Rockwell'");//to configure levellabel
 
 		Button startButton = new Button("New game");
-		startButton.setOnAction(e -> {startGame(); firstShuffle();});
+		startButton.setOnAction(e -> {canPlay= false; startGame(); firstShuffle();});
 
 
         Button setDifficultyButton = new Button("Difficulty settings");
@@ -633,7 +636,6 @@ public class PuzzleGame extends Application {
      * Starts a new game by setting up the play screen scene and initializing the game components.
      */
     public static void startGame(){
-
         getMoveCountLabel().setStyle("-fx-font-size: 25px ; -fx-font-family: 'Rockwell'; -fx-text-fill: #420");
 
         if (getCurrentLevelNumber() > 1) {
@@ -798,13 +800,11 @@ public class PuzzleGame extends Application {
                 }
 
 
-                if(getCurrentLevel().getTiles()[i][j].getValue()!=-1){
+                if(getCurrentLevel().getTiles()[i][j].getValue()!=-1 && canPlay){
                     int finalI4 = i;
                     int finalJ4 = j;
                     getCurrentLevel().getTiles()[i][j].setOnDragDetected(new EventHandler<MouseEvent>() {
                         public void handle(MouseEvent event) {
-                            if (!canPlay){
-                                return;}
                             mousePosX = (int) event.getSceneX();
                             mousePosY = (int) event.getSceneY();
                             initialTranslateX = (int) getCurrentLevel().getTiles()[finalI4][finalJ4].getTranslateX();
@@ -823,7 +823,6 @@ public class PuzzleGame extends Application {
 
                     getCurrentLevel().getTiles()[i][j].setOnDragOver(new EventHandler<DragEvent>() {
                         public void handle(DragEvent event) {
-                            /* Accepte uniquement le glisser-déposer à l'intérieur du GridPane */
                             if (event.getGestureSource() != this && event.getDragboard().hasString()) {
                                 event.acceptTransferModes(TransferMode.MOVE);
                             }
@@ -835,7 +834,6 @@ public class PuzzleGame extends Application {
                     int finalJ3 = j;
                     getCurrentLevel().getTiles()[i][j].setOnDragEntered(new EventHandler<DragEvent>() {
                         public void handle(DragEvent event) {
-                            /* Change le style de la tuile survolée */
                             if (event.getGestureSource() != this && event.getDragboard().hasString()) {
                             	getCurrentLevel().getTiles()[finalI3][finalJ3].setOpacity(0.7);
                             }
@@ -847,7 +845,6 @@ public class PuzzleGame extends Application {
                     int finalJ = j;
                     getCurrentLevel().getTiles()[i][j].setOnDragExited(new EventHandler<DragEvent>() {
                         public void handle(DragEvent event) {
-                            /* Rétablit le style de la tuile */
                             if (event.getGestureSource() != this && event.getDragboard().hasString()) {
                             	getCurrentLevel().getTiles()[finalI][finalJ].setOpacity(1.0);
                             }
@@ -860,7 +857,6 @@ public class PuzzleGame extends Application {
                     int finalJ1 = j;
                     getCurrentLevel().getTiles()[i][j].setOnDragDropped(new EventHandler<DragEvent>() {
                         public void handle(DragEvent event) {
-                            /* Échange les positions des tuiles si elles sont adjacentes */
                             if (event.getGestureSource() != this) {
                                 double offsetX = event.getSceneX() - mousePosX;
                                 double offsetY = event.getSceneY() - mousePosY;
@@ -908,7 +904,6 @@ public class PuzzleGame extends Application {
                     int finalJ2 = j;
                     getCurrentLevel().getTiles()[i][j].setOnDragDone(new EventHandler<DragEvent>() {
                         public void handle(DragEvent event) {
-                            /* Rétablit le style de la tuile une fois le glisser-déposer terminé */
                         	getCurrentLevel().getTiles()[finalI2][finalJ2].setOpacity(1.0);
                             event.consume();
                         }
@@ -1211,11 +1206,11 @@ public class PuzzleGame extends Application {
 
         // ------------------------------------Create "Next Level" button---------------------------------------------------------
         Button nextLevelButton = new Button("Next Level");
-        nextLevelButton.setOnAction(event -> {setCurrentLevelNumber(getCurrentLevelNumber()+1);startGame(); firstShuffle();});
+        nextLevelButton.setOnAction(event -> {canPlay= false; setCurrentLevelNumber(getCurrentLevelNumber()+1);startGame(); firstShuffle();});
 
         //---------------------------------------- Create "Replay" button------------------------------------------------------
         Button replayButton = new Button("Replay");
-        replayButton.setOnAction(event -> {startGame(); firstShuffle();});
+        replayButton.setOnAction(event -> {canPlay = false; startGame(); firstShuffle();});
 
         //--------------------------------------- Create "Save score" button--------------------------------------------------
         Button saveScoreButton = new Button("Save score");
