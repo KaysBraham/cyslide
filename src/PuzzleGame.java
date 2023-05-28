@@ -1038,10 +1038,6 @@ public class PuzzleGame extends Application {
             levelButton.setOnMousePressed(event -> {
                 setCurrentLevelNumber(finalDifficulty);
                 getLevelLabel().setText("level: " + finalDifficulty); // updating the label in home screen
-                levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
-                PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
-                pauseTransition.setOnFinished(e -> levelButton.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-size: 3; -fx-background-color: rgba(37,20,12,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'"));//to remove the transparent
-                pauseTransition.play();
                 Scene leaderboardScene = getHomeScene();
 
                 StackPane root = new StackPane();
