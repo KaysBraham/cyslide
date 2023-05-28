@@ -3,10 +3,8 @@ package src;
 import java.util.Arrays;
 import java.util.List;
 
-import javafx.animation.PauseTransition;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import javafx.util.Duration;
 
 /**
  * The Chronometer class represents a chronometer that can measure elapsed time.
@@ -14,32 +12,32 @@ import javafx.util.Duration;
  * It is a HBox on its own, allowing the 3 fields to display properly.
  */
 public class Chronometer extends HBox{
-	
+
 	/**
 	 * Holds the starting time in seconds.
 	 */
 	private int startTime;
-	
+
 	/**
 	 * Holds the elapsed time in seconds. Initialized to 0.
 	 */
     private int elapsedTime = 0;
-    
+
     /**
      * Indicates whether the chronometer is running or not.
      */
     private boolean running = false;
-    
+
     /**
      * Label for displaying hours.
      */
     private Label hoursLabel = new Label("");
-    
+
     /**
      * Label for displaying minutes.
      */
     private Label minutesLabel = new Label("00 : ");
-    
+
     /**
      * Label for displaying seconds.
      */
@@ -49,6 +47,7 @@ public class Chronometer extends HBox{
      * Constructs a Chronometer object.
      * Initializes the labels for hours, minutes, and seconds.
      */
+
 	public Chronometer() {
 		List<Label> labels = Arrays.asList(hoursLabel, minutesLabel, secondsLabel);
 		for(Label label : labels)
