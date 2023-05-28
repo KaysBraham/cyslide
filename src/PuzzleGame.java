@@ -152,10 +152,7 @@ public class PuzzleGame extends Application {
     }
 
     /**
-    /**
-     * Returns a list of a booleans.
-     *
-     * @return The boolean list.
+     * The table of booleans representing the completed levels.
      */
     private static boolean[] completedLevels = new boolean[getLevels().size()];;
 
@@ -396,37 +393,70 @@ public class PuzzleGame extends Application {
     static Stack<Tile[][]> undoStack = new Stack<>();
     static Stack<Tile[][]> redoStack = new Stack<>();
 
+    /**
+     * Returns the undo stack. 
+     * 
+     * @return the undo stack.
+     */
+    public static Stack<Tile[][]> getUndoStack() {
+		return undoStack;
+	}
 
-    private static void undo() {
-        if (!undoStack.isEmpty()) {
+    /**
+     * Returns the redo stack. 
+     * 
+     * @return the redo stack.
+     */
+	public static Stack<Tile[][]> getRedoStack() {
+		return redoStack;
+	}
+
+    /**
+     * Undoes the last move.
+     * Decrements the move count.
+     */
+	private static void undo() {
+    	
+    	getRedoButton().setDisable(false);
+    	setMoveCount(getMoveCount() - 1);
+    	
+        if (!getUndoStack().isEmpty()) {
             getUndoButton().setDisable(false);
-            if (undoStack.size() == 1){
-            getUndoButton().setDisable(true);
+            if (getUndoStack().size() == 1){
+            	getUndoButton().setDisable(true);
             }
-            redoStack.push(currentLevel.copy().getTiles());
-            Tile[][] previousState = undoStack.pop();
-            currentLevel.print() ;
-            currentLevel.setTiles(previousState);
-            currentLevel.print() ;
-
+            getRedoStack().push(getCurrentLevel().copy().getTiles());
+            Tile[][] previousState = getUndoStack().pop();
+            getCurrentLevel().print() ;
+            getCurrentLevel().setTiles(previousState);
+            getCurrentLevel().print() ;
         }
+        
+    	tileGridConstuctor(getGridLayout());
     }
 
+    /**
+     * Redoes the undid move.
+     * Increments the move count.
+     */
     private static void redo() {
-        getRedoButton().setDisable(false);
-        if (!redoStack.isEmpty()) {
-            if (redoStack.size() == 1) {
+
+    	getUndoButton().setDisable(false);
+    	setMoveCount(getMoveCount() + 1);
+    	
+        if (!getRedoStack().isEmpty()) {
+            if (getRedoStack().size() == 1) {
                 getRedoButton().setDisable(true);
             }
-            undoStack.push(currentLevel.copy().getTiles());
-            Tile[][] nextState = redoStack.pop();
-            currentLevel.print() ;
-            currentLevel.setTiles(nextState);
-            currentLevel.print() ;
+            getUndoStack().push(getCurrentLevel().copy().getTiles());
+            Tile[][] nextState = getRedoStack().pop();
+            getCurrentLevel().print() ;
+            getCurrentLevel().setTiles(nextState);
+            getCurrentLevel().print() ;
         }
+        
+    	tileGridConstuctor(getGridLayout());
     }
-
-
 
 	/**
      * Returns the random shuffle button.
@@ -624,12 +654,12 @@ public class PuzzleGame extends Application {
         setUndoButton(new Button("Undo"));
         getUndoButton().setStyle("-fx-font-size:32");
         getUndoButton().setDisable(true);
-        getUndoButton().setOnAction(e -> {undo(); getRedoButton().setDisable(false); moveCount -- ; updateMoveCountLabel(); tileGridConstuctor(gridLayout);});
+        getUndoButton().setOnAction(e -> undo());
 
         setRedoButton(new Button("Redo"));
         getRedoButton().setStyle("-fx-font-size:32");
         getRedoButton().setDisable(true);
-        getRedoButton().setOnAction(e -> {redo(); moveCount ++ ;updateMoveCountLabel(); tileGridConstuctor(gridLayout);});
+        getRedoButton().setOnAction(e -> redo());
 
         getGridLayout().setAlignment(Pos.CENTER);
 
@@ -702,6 +732,7 @@ public class PuzzleGame extends Application {
         getTimer().setCycleCount(PauseTransition.INDEFINITE);
         getTimer().play();
     }
+    
     static int mousePosX;
     static int mousePosY;
     static int initialTranslateX;
@@ -709,8 +740,8 @@ public class PuzzleGame extends Application {
     static final int TILE_SIZE = 200;
     private static void tileGridConstuctor(GridPane gridLayout) {
         gridLayout.getChildren().clear();
-        for (int i =0;i<getCurrentLevel().getTiles().length;i++) {
-            for(int j =0;j<getCurrentLevel().getTiles()[0].length;j++) {
+        for (int i = 0; i<getCurrentLevel().getTiles().length; i++) {
+            for(int j = 0; j<getCurrentLevel().getTiles()[0].length; j++) {
 
             	getCurrentLevel().getTiles()[i][j].setPrefSize(TILE_SIZE,TILE_SIZE);
 
@@ -808,18 +839,10 @@ public class PuzzleGame extends Application {
                                     rowOffset= (int) (offsetY/Math.abs(offsetY));
                                     colOffset = 0;
                                 }
-                                System.out.println("OnDragDropped");
-                                System.out.println("offsetX offsetY");
-                                System.out.println(offsetX+" "+offsetY);
-                                System.out.println("colOffset rowOffset");
-                                System.out.println(colOffset+" "+rowOffset);
 
                                 if ((Math.abs(colOffset) + Math.abs(rowOffset) == 1) && getCurrentLevel().getTiles()[finalI1][finalJ1].getValue()==0) {
                                     int originCol = finalJ1 - colOffset;
                                     int originRow = finalI1 - rowOffset;
-                                    System.out.println("finalJ1 finalI1");
-                                    System.out.println(finalJ1 +" "+ finalI1);
-                                    System.out.println(originCol+" "+originRow);
                                     undoStack.push(currentLevel.copy().getTiles());
                                     swapTiles(finalJ1, finalI1, originCol, originRow);
                                     redoStack.clear();
@@ -831,6 +854,7 @@ public class PuzzleGame extends Application {
                                     if(isGameFinished()) {
                             	        getTimer().stop();
                             	        try {
+                            	        	getCompletedLevels()[getCurrentLevelNumber() - 1] = true;
                             				showEndScreen();
                             			} catch (FileNotFoundException ex) {
                             				ex.printStackTrace();
@@ -862,23 +886,16 @@ public class PuzzleGame extends Application {
     private static void swapTiles(int col1, int row1, int col2, int row2) {
         Node tile1 = getNodeByRowColumnIndex(row1, col1);
         Node tile2 = getNodeByRowColumnIndex(row2, col2);
-        System.out.println("swaptile1");
         if (tile1 != null && tile2 != null) {
-        	getCurrentLevel().swapTile(row1,col1,row2,col2);
+        	getCurrentLevel().swapTile(row1, col1, row2, col2);
             int tile1Index = getGridLayout().getChildren().indexOf(tile1);
             int tile2Index = getGridLayout().getChildren().indexOf(tile2);
-            System.out.println("swaptile2");
             GridPane.setConstraints(tile1, col2, row2);
             GridPane.setConstraints(tile2, col1, row1);
-            System.out.println("swaptile3");
-            getGridLayout().getChildren().set(tile2Index, new Button());
+            getGridLayout().getChildren().set(tile2Index, new Button()); // buffer to avoid an exception for duplicate children
             getGridLayout().getChildren().set(tile1Index, tile2);
-            System.out.println("swaptile4");
             getGridLayout().getChildren().set(tile2Index, tile1);
-            System.out.println("Grid disposition :");
-            getCurrentLevel().print();
             tileGridConstuctor(getGridLayout());
-            updateMoveCountLabel();
         }
     }
     
@@ -1110,8 +1127,7 @@ public class PuzzleGame extends Application {
         collectPoints();
 
         //-------------------------------------create point label----------------------------------------------------------------
-        Label scoreLabel = new Label("Score: " + getMoveCountLabel()); // to print point
-        // FIXME
+        Label scoreLabel = new Label("Score: " + getMoveCount()); // to print point
         scoreLabel.setStyle("-fx-text-fill:#2f2; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
         Label levelLabel = new Label("Level: " + getCurrentLevelNumber()); // to print level
         levelLabel.setStyle("-fx-text-fill:#ddd; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
@@ -1244,39 +1260,6 @@ public class PuzzleGame extends Application {
      * Unlocks the next level.
      */
     public void unlockNextLevel(){
-    	// TODO
-    }
-
-    /**
-     * Displays a message indicating that the level is solved.
-     */
-    public void displayLevelSolved(){
-    	// TODO
-    }
-
-    /**
-     * Undoes the last move.
-     * Decrements the move count.
-     */
-    public static void undoMove(){
-    	setMoveCount(getMoveCount() - 1);
-    	
-    	getRedoButton().setDisable(false);
-    	getUndoButton().setDisable(true);
-    	
-    	// TODO
-    }
-
-    /**
-     * Redoes the undid move.
-     * Increments the move count.
-     */
-    public static void redoMove(){
-    	setMoveCount(getMoveCount() + 1);
-
-    	getRedoButton().setDisable(true);
-    	getUndoButton().setDisable(false);
-    	
     	// TODO
     }
 

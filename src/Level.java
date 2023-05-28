@@ -1,6 +1,10 @@
 package src;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class Level {
     private final int levelNumber ;
@@ -24,10 +28,10 @@ public class Level {
         return tiles[x][y];
     }
 
-
     public void setSolved(boolean solved) {
         this.solved = solved;
     }
+    
     public boolean isMoveValid(int x1, int y1, int x2, int y2){
         // ensure the two chosen tiles are adjacent
         if (!(x1 == x2 && Math.abs(y1 - y2) == 1) && !(y1 == y2 && Math.abs(x1 - x2) == 1)){
@@ -86,7 +90,7 @@ public class Level {
     public void randomShuffleLevel() {
         do {
             do {
-                List<Tile> tempList = new ArrayList<>();
+                List<Tile> tempList = new ArrayList<Tile>();
                 int nLines = tiles.length;
                 int nColumns = tiles[0].length;
                 for (int i = 0; i <= nLines - 1; i++) {
@@ -126,7 +130,7 @@ public class Level {
             }
         }
         int n = 0;
-        while(n<1000){
+        while(n<1000) {
             int[][] emptyTiles = new int[numberOfEmptyTiles][2];
             int c = 0;
             for(int i = 0;i<nLines;i++){
@@ -143,8 +147,9 @@ public class Level {
             Random random = new Random();
             int randomEmptyTile = random.nextInt(numberOfEmptyTiles);
             boolean isMoveDone = false;
-            do {int randomMove = random.nextInt(4);
-                switch (randomMove){
+            do {
+            	int randomMove = random.nextInt(4);
+                switch (randomMove) {
                     case 0 :
                         if (isMoveValid(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0]+1,emptyTiles[randomEmptyTile][1])){
                             swapTile(emptyTiles[randomEmptyTile][0],emptyTiles[randomEmptyTile][1],emptyTiles[randomEmptyTile][0]+1,emptyTiles[randomEmptyTile][1]);
@@ -170,7 +175,7 @@ public class Level {
 
                 }
 
-            }while (!isMoveDone);
+            } while (!isMoveDone);
             print();
             if (!(n==999 && !checkShuffle())){
                 n++;
@@ -269,9 +274,6 @@ public int[][] getEmptyTiles() {
         }
         return new Level(newTiles,levelNumber);
     }
-
-
-
 
     public int getLevelNumber() {
         return levelNumber;

@@ -1,7 +1,5 @@
 package src;
 
-import java.util.Arrays;
-
 import javafx.scene.control.Button;
 
 public class Tile extends Button {
