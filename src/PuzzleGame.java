@@ -437,6 +437,8 @@ public class PuzzleGame extends Application {
         }
     }
 
+    private static boolean canPlay;
+
 
 
 	/**
@@ -482,6 +484,8 @@ public class PuzzleGame extends Application {
 	}
 
 
+
+
 	/**
      * Starts the JavaFX application by setting up the primary stage and the home screen scene.
      *
@@ -502,8 +506,14 @@ public class PuzzleGame extends Application {
         setLevelLabel(new Label(levelText)); //to print level
 		getLevelLabel().setStyle("-fx-text-fill: #442200;-fx-font-size: 25;-fx-font-family: 'Rockwell'");//to configure levellabel
 
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(event -> {
+            currentLevel.stepByStepShuffleLevel();
+            tileGridConstuctor(getGridLayout());
+        canPlay = true;});
+
 		Button startButton = new Button("New game");
-		startButton.setOnAction(e -> startGame());
+		startButton.setOnAction(e -> {canPlay = false; startGame(); pause.play();});
 
         Button setDifficultyButton = new Button("Difficulty settings");
         setDifficultyButton.setOnAction(e -> {
@@ -615,6 +625,7 @@ public class PuzzleGame extends Application {
             }
         }
 
+
         Label titleLabel = new Label("Resolved \n level");
         titleLabel.setStyle("-fx-font-size: 15px ;");
 
@@ -644,8 +655,9 @@ public class PuzzleGame extends Application {
 
         getGridLayout().setAlignment(Pos.CENTER);
 
+
         setCurrentLevel(getLevels().get(getCurrentLevelNumber() - 1).copy());
-        getCurrentLevel().randomShuffleLevel();
+        getCurrentLevel();
         tileGridConstuctor(getGridLayout());
 
 
@@ -720,6 +732,7 @@ public class PuzzleGame extends Application {
     static final int TILE_SIZE = 200;
     private static void tileGridConstuctor(GridPane gridLayout) {
         gridLayout.getChildren().clear();
+
 
         for (int i =0;i<getCurrentLevel().getTiles().length;i++) {
             for(int j =0;j<getCurrentLevel().getTiles()[0].length;j++) {
@@ -826,7 +839,7 @@ public class PuzzleGame extends Application {
                                 System.out.println("colOffset rowOffset");
                                 System.out.println(colOffset+" "+rowOffset);
 
-                                if ((Math.abs(colOffset) + Math.abs(rowOffset) == 1) && getCurrentLevel().getTiles()[finalI1][finalJ1].getValue()==0) {
+                                if ((Math.abs(colOffset) + Math.abs(rowOffset) == 1) && getCurrentLevel().getTiles()[finalI1][finalJ1].getValue()==0 && canPlay) {
                                     int originCol = finalJ1 - colOffset;
                                     int originRow = finalI1 - rowOffset;
                                     System.out.println("finalJ1 finalI1");
@@ -849,7 +862,7 @@ public class PuzzleGame extends Application {
                             				ex.printStackTrace();
                             			}
                                     }
-                                    
+
                                     return;
                                 }
                             }
@@ -1139,7 +1152,7 @@ public class PuzzleGame extends Application {
 
         // ------------------------------------Create "Next Level" button---------------------------------------------------------
         Button nextLevelButton = new Button("Next Level");
-        nextLevelButton.setOnAction(event -> {setCurrentLevelNumber(getCurrentLevelNumber()+1); startGame();});
+        nextLevelButton.setOnAction(event -> {setCurrentLevelNumber(getCurrentLevelNumber()+1); canPlay = false ; startGame();});
 
         //---------------------------------------- Create "Replay" button------------------------------------------------------
         Button replayButton = new Button("Replay");
