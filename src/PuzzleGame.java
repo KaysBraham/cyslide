@@ -1031,18 +1031,18 @@ public class PuzzleGame extends Application {
                 try {
                     pointlastgame = new Scanner(file);
 
-                    String[] data = pointlastgame.next().split(";");//to separate point and level according to ;
+                    String[] data = pointlastgame.next().split(";");//to separate point and level according to
                     Label[] labelrank = new Label[10];
                     Integer[] listpoint = new Integer[10];
                     Arrays.fill(listpoint, 0);//to initialize in zer0
                     int count = 0;
                     do {
-                        if (data.length == 2 && Integer.parseInt(data[1]) == finalDifficulty) {
+                        if (data.length >= 2 && Integer.parseInt(data[1]) == finalDifficulty) {
                             listpoint[count] = Integer.parseInt(data[0]);
                             count++;
                         }
 
-                        if (pointlastgame.hasNextLine())
+                        if (pointlastgame.hasNextLine() && count<10)
                         {
                             data = pointlastgame.nextLine().split(";");
                         }
