@@ -106,11 +106,12 @@ public class PuzzleGame extends Application {
     private static SequentialTransition timer = null;
 
     /**
-     * The label displaying the current level.
+     * The label displaying the current level
      */
     private Label levelLabel;
 
     static Label moveCountLabel = new Label("Move count : " + getMoveCount());
+
     public static int currentLevelNumber = 1;
 
     /**
@@ -561,6 +562,7 @@ public class PuzzleGame extends Application {
 		Button startButton = new Button("New game");
 		startButton.setOnAction(e -> {canPlay = false; startGame(); pause1.play(); pause2.play();});
 
+
         Button setDifficultyButton = new Button("Difficulty settings");
         setDifficultyButton.setOnAction(e -> {
             setDifficultylayout();
@@ -587,11 +589,11 @@ public class PuzzleGame extends Application {
 
 		List<Button> buttons = Arrays.asList(startButton, setDifficultyButton, showLeaderboardButton, exitButton);
 		for(Button button : buttons) {
-            button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
+            button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
 			button.setOnMousePressed(event -> {
 				button.setStyle("-fx-border-color: rgba(0,0,0,0); -fx-background-color: rgba(0,0,0,0);"); // to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1)); // during 0.1 second
-	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'"));//to remove the transparent
+	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'"));//to remove the transparent
 	            pauseTransition.play();
 	        });
 		}
@@ -660,7 +662,7 @@ public class PuzzleGame extends Application {
      */
     public static void startGame(){
 
-        getMoveCountLabel().setStyle("-fx-font-size: 25px ; -fx-font-family: 'Rockwell'");
+        getMoveCountLabel().setStyle("-fx-font-size: 25px ; -fx-font-family: 'Rockwell'; -fx-text-fill: #420");
 
         if (getCurrentLevelNumber() > 1) {
             for (int i = 0; i < getCurrentLevelNumber() - 1; i++) {
@@ -693,11 +695,13 @@ public class PuzzleGame extends Application {
         getUndoButton().setStyle("-fx-font-size:32");
         getUndoButton().setDisable(true);
         getUndoButton().setOnAction(e -> {undo(); getRedoButton().setDisable(false); moveCount -- ; updateMoveCountLabel(); tileGridConstuctor(gridLayout);});
+        getUndoButton().setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
 
         setRedoButton(new Button("Redo"));
         getRedoButton().setStyle("-fx-font-size:32");
         getRedoButton().setDisable(true);
         getRedoButton().setOnAction(e -> {redo(); moveCount ++ ;updateMoveCountLabel(); tileGridConstuctor(gridLayout);});
+        getRedoButton().setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
 
         getGridLayout().setAlignment(Pos.CENTER);
 
@@ -713,6 +717,7 @@ public class PuzzleGame extends Application {
         	getCurrentLevel().randomShuffleLevel();
             tileGridConstuctor(getGridLayout());
         });
+        getRandomShuffleButton().setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
 
         setStepByStepShuffleButton(new Button("Step by step Shuffle"));
         getStepByStepShuffleButton().setStyle("-fx-font-size:25");
@@ -720,12 +725,15 @@ public class PuzzleGame extends Application {
         	getCurrentLevel().stepByStepShuffleLevel();
         	tileGridConstuctor(getGridLayout());
         });
+        getStepByStepShuffleButton().setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
 
         setsolveButton(new Button("Solve Shuffle"));
         getsolveButton().setStyle("-fx-font-size:25");
         getsolveButton().setOnAction(e -> {
             solve();
         });
+        getsolveButton().setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
+
 
         topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton(),getsolveButton());
 
@@ -746,6 +754,8 @@ public class PuzzleGame extends Application {
             getPrimaryStage().setScene( new Scene(root));
         });
 
+        giveUpButton.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
+
         GridPane grid = new GridPane();
         solvedLevelPreview(grid);
         
@@ -754,6 +764,7 @@ public class PuzzleGame extends Application {
         resolvedLevelLayout.getChildren().addAll(titleLabel, grid) ;
 
         bottomLayout.getChildren().addAll(getMoveCountLabel(),chronometer, giveUpButton, resolvedLevelLayout);
+
 
         playLayout.getChildren().addAll(topLayout, getGridLayout(), bottomLayout);
 
@@ -798,15 +809,15 @@ public class PuzzleGame extends Application {
                         break;
                     case 0:
                     	getCurrentLevel().getTiles()[i][j].setText("");
-                        getCurrentLevel().getTiles()[i][j].setStyle("-fx-background-color: #fc6;"); // light wood
+                        getCurrentLevel().getTiles()[i][j].setStyle("-fx-background-color: #442200; -fx-border-width: 4;"); // light wood
                         break;
                     default:
                     	getCurrentLevel().getTiles()[i][j].setText(Integer.toString(getCurrentLevel().getTiles()[i][j].getValue()));
-                        getCurrentLevel().getTiles()[i][j].setStyle("-fx-font-size: 38;"
-                                + "-fx-text-fill: #fff;"
-                                + "-fx-border-width: 2;"
+                        getCurrentLevel().getTiles()[i][j].setStyle("-fx-font-size: 45;"
+                                + "-fx-text-fill: #420;"
+                                + "-fx-border-width: 4;"
                                 + "-fx-border-color: #420;" // very dark brown
-                                + "-fx-background-color: #640;"); // dark wood
+                                + "-fx-background-color: rgba(102,68,0,0);"); // dark wood
                         getCurrentLevel().getTiles()[i][j].setAlignment(Pos.CENTER);
                 }
                 if(getCurrentLevel().getTiles()[i][j].getValue()!=-1){
@@ -1214,10 +1225,10 @@ public class PuzzleGame extends Application {
         }
         Label bestScoreLabel = new Label("Best Score : " + getBestScore());
         Label scoreLabel = new Label("Score : " + getMoveCount());
-        scoreLabel.setStyle("-fx-text-fill:#2f2; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
-        bestScoreLabel.setStyle("-fx-text-fill:#f8ff22; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
+        scoreLabel.setStyle("-fx-text-fill:#2f2; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
+        bestScoreLabel.setStyle("-fx-text-fill:#f8ff22; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
         Label levelLabel = new Label("Level: " + getCurrentLevelNumber());
-        levelLabel.setStyle("-fx-text-fill:#ddd; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
+        levelLabel.setStyle("-fx-text-fill:#ddd; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
         HBox hbox = new HBox(5);
         hbox.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(levelLabel, scoreLabel);

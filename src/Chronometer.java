@@ -50,7 +50,7 @@ public class Chronometer extends HBox{
 	public Chronometer() {
 		List<Label> labels = Arrays.asList(hoursLabel, minutesLabel, secondsLabel);
 		for(Label label : labels)
-			label.setStyle("-fx-text-fill: white; -fx-background-color: black;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+			label.setStyle("-fx-text-fill: #420; -fx-background-color: rgba(37,20,12,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold';");
 		
 		this.getChildren().addAll(labels);
 	}
