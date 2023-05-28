@@ -45,9 +45,9 @@ public class Level {
             return false;
         }
         */
-        if (!(x1<tiles.length && x1>=0 && y1<tiles[0].length && y1>=0
-                && x2<tiles.length && x2>=0 && y2<tiles[0].length && y2>=0
-                && ((tiles[x1][y1].getValue()==0 && tiles[x2][y2].getValue()!=-1) || (tiles[x1][y1].getValue()!=-1 && tiles[x2][y2].getValue()==0)))){
+        if (!(x1<getTiles().length && x1>=0 && y1<getTiles()[0].length && y1>=0
+                && x2<getTiles().length && x2>=0 && y2<getTiles()[0].length && y2>=0
+                && ((getTiles()[x1][y1].getValue()==0 && getTiles()[x2][y2].getValue()!=-1) || (getTiles()[x1][y1].getValue()!=-1 && getTiles()[x2][y2].getValue()==0)))){
             System.out.println("Invalid movement");
             return false;
         }
@@ -66,18 +66,18 @@ public class Level {
         int temp;
         if(isMoveValid(x1, y1, x2, y2)){
             temp = tiles[x1][y1].getValue();
-            tiles[x1][y1].setValue(tiles[x2][y2].getValue()) ;
-            tiles[x2][y2].setValue(temp);
+            getTiles()[x1][y1].setValue(tiles[x2][y2].getValue()) ;
+            getTiles()[x2][y2].setValue(temp);
         }
     }
 
     public boolean checkShuffle() { // checks if all tiles are in a new place after mixing
-        int nLines = tiles.length ;
-        int nColumns = tiles[0].length ;
+        int nLines = getTiles().length ;
+        int nColumns = getTiles()[0].length ;
         Level solvedLevel = PuzzleGame.getLevel(this.getLevelNumber());
         for (int i = 0; i <= nLines - 1; i++) {
             for (int j = 0; j <= nColumns - 1; j++) {
-                if (tiles[i][j].getValue() == solvedLevel.getTiles()[i][j].getValue() && tiles[i][j].getValue() !=-1) {
+                if (getTiles()[i][j].getValue() == solvedLevel.getTiles()[i][j].getValue() && getTiles()[i][j].getValue() !=-1) {
                     System.out.println("un melange mauvais");
                     return false;
                 }
@@ -91,12 +91,12 @@ public class Level {
         do {
             do {
                 List<Tile> tempList = new ArrayList<Tile>();
-                int nLines = tiles.length;
-                int nColumns = tiles[0].length;
+                int nLines = getTiles().length;
+                int nColumns = getTiles()[0].length;
                 for (int i = 0; i <= nLines - 1; i++) {
                     for (int j = 0; j <= nColumns - 1; j++) {
-                       if (tiles[i][j].getValue() != -1) {
-                            tempList.add(tiles[i][j]);
+                       if (getTiles()[i][j].getValue() != -1) {
+                            tempList.add(getTiles()[i][j]);
                         }
                     }
                 }
@@ -104,8 +104,8 @@ public class Level {
                 int p = 0;
                 for (int i = 0; i <= nLines - 1; i++) {
                     for (int j = 0; j <= nColumns - 1; j++) {
-                        if (tiles[i][j].getValue() != -1) {
-                            tiles[i][j] = tempList.get(p);
+                        if (getTiles()[i][j].getValue() != -1) {
+                        	getTiles()[i][j] = tempList.get(p);
                             p += 1;
                         }
                     }
@@ -142,7 +142,6 @@ public class Level {
                     }
                 }
             }
-
 
             Random random = new Random();
             int randomEmptyTile = random.nextInt(numberOfEmptyTiles);
@@ -181,57 +180,11 @@ public class Level {
         }
     }
 
-
-/*
-    public void stepByStepShuffleLevel() {
-        int nLines = tiles.length;
-        int nColumns = tiles[0].length;
-        for(int n = 0;n<1000;n++){
-            for(int i = 0;i<nLines;i++){
-                for(int j = 0;j<nColumns;j++){
-                    if (tiles[i][j].getValue() == 0) {
-                        Random random = new Random();
-                        int randomNumber;
-                        int verif = 0;
-                        do {
-                            randomNumber = random.nextInt(4);
-                            if (randomNumber == 0) {
-                                if (i != 0 && tiles[i - 1][j].getValue() != -1) //check if the exchanged tile exists
-                                {
-                                    swapTile(i, j, i - 1, j);
-                                    verif = 1;
-                                }
-                            } else if (randomNumber == 1) {
-                                if (j != nColumns - 1 && tiles[i][j + 1].getValue() != -1) //check if the exchanged tile exists
-                                {
-                                    swapTile(i, j, i, j + 1);
-                                    verif = 1;
-                                }
-                            } else if (randomNumber == 2) {
-                                if (i != nLines - 1 && tiles[i + 1][j].getValue() != -1) //check if the exchanged tile exists
-                                {
-                                    swapTile(i, j, i + 1, j);
-                                    verif = 1;
-                                }
-                            } else if (randomNumber == 3) {
-                                if (j != 0 && tiles[i][j - 1].getValue() != -1) //check if the exchanged tile exists
-                                {
-                                    swapTile(i, j, i, j - 1);
-                                    verif = 1;
-                                }
-                            }
-                        } while (verif == 0);
-                    }
-                }
-            }
-        }
-    }
-*/
 public int[][] getEmptyTiles() {
-    int nLines = tiles.length;
-    int nColumns = tiles[0].length;
+    int nLines = getTiles().length;
+    int nColumns = getTiles()[0].length;
     int numberOfEmptyTiles = 0;
-    for (Tile[] row : tiles) {
+    for (Tile[] row : getTiles()) {
         for (Tile tile : row) {
             if (tile.getValue() == 0) {
                 numberOfEmptyTiles++;
@@ -242,7 +195,7 @@ public int[][] getEmptyTiles() {
     int c = 0;
     for (int i = 0; i < nLines; i++) {
         for (int j = 0; j < nColumns; j++){
-            if (tiles[i][j].getValue() == 0) {
+            if (getTiles()[i][j].getValue() == 0) {
                 emptyTiles[c][0] = i;
                 emptyTiles[c][1] = j;
                 c++;
@@ -255,7 +208,7 @@ public int[][] getEmptyTiles() {
 
 
     public void print(){
-        for (Tile[] row : tiles) {
+        for (Tile[] row : getTiles()) {
             for (Tile tile : row) {
                 System.out.print(tile.getValue() + " ");
             }
@@ -264,10 +217,10 @@ public int[][] getEmptyTiles() {
     }
 
     public Level copy() {
-        Tile[][] newTiles = new Tile[tiles.length][tiles[0].length];
-        for (int i = 0; i < tiles.length; i++){
-            for (int j = 0; j < tiles[0].length; j++){
-                newTiles[i][j] = new Tile(tiles[i][j].getValue());
+        Tile[][] newTiles = new Tile[getTiles().length][getTiles()[0].length];
+        for (int i = 0; i < getTiles().length; i++){
+            for (int j = 0; j < getTiles()[0].length; j++){
+                newTiles[i][j] = new Tile(getTiles()[i][j].getValue());
             }
         }
         return new Level(newTiles,levelNumber);
