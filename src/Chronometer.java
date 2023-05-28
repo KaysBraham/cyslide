@@ -47,7 +47,6 @@ public class Chronometer extends HBox{
      * Constructs a Chronometer object.
      * Initializes the labels for hours, minutes, and seconds.
      */
-
 	public Chronometer() {
 		List<Label> labels = Arrays.asList(hoursLabel, minutesLabel, secondsLabel);
 		for(Label label : labels)
