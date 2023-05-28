@@ -425,10 +425,11 @@ public class PuzzleGame extends Application {
      * Solves the current level.
      */
     private static void solve(){
-        int i = 0;
-        for(Tile[][] tiles : getSolvingMoves()) {
-            getCurrentLevel().setTiles(tiles);
+        for(Tile[][] tiles : getSolvingMoves()){
+        	getCurrentLevel().setTiles(tiles);
             tileGridConstuctor(getGridLayout());
+            PauseTransition pause = new PauseTransition(Duration.seconds(2));
+            pause.play();
         }
     }
 
@@ -472,7 +473,7 @@ public class PuzzleGame extends Application {
 
     /**
      * Returns the selected cell.
-     * 
+     *
      * @return the selected cell.
      */
     public static Pair<Integer, Integer> getSelectedCell() {
@@ -506,9 +507,7 @@ public class PuzzleGame extends Application {
             currentLevel.stepByStepShuffleLevel();
             tileGridConstuctor(getGridLayout());});
         pause2.play();
-        System.out.println(canPlay);
         canPlay = true ;
-        System.out.println(canPlay);
     }
 
     /**
@@ -622,7 +621,7 @@ public class PuzzleGame extends Application {
 
         // get screensize of monitor
         Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
-        
+
         // set the scene size to fullscreen size
         setHomeScene(new Scene(root, screenSize.getWidth(), screenSize.getHeight()));
 
@@ -652,6 +651,7 @@ public class PuzzleGame extends Application {
      * Starts a new game by setting up the play screen scene and initializing the game components.
      */
     public static void startGame(){
+
         getMoveCountLabel().setStyle("-fx-font-size: 25px ; -fx-font-family: 'Rockwell'; -fx-text-fill: #420");
 
         if (getCurrentLevelNumber() > 1) {
@@ -677,7 +677,7 @@ public class PuzzleGame extends Application {
     	playLayout.setAlignment(Pos.CENTER);
         playLayout.setBackground(new Background(background));
 
-        
+
         HBox topLayout = new HBox(64);
         topLayout.setAlignment(Pos.CENTER);
 
@@ -705,6 +705,8 @@ public class PuzzleGame extends Application {
         getRandomShuffleButton().setStyle("-fx-font-size:25");
         getRandomShuffleButton().setOnAction(e -> {
         	getCurrentLevel().randomShuffleLevel();
+            redoStack.clear();
+            undoStack.clear();
             tileGridConstuctor(getGridLayout());
         });
         getRandomShuffleButton().setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
@@ -713,13 +715,19 @@ public class PuzzleGame extends Application {
         getStepByStepShuffleButton().setStyle("-fx-font-size:25");
         getStepByStepShuffleButton().setOnAction(e -> {
         	getCurrentLevel().stepByStepShuffleLevel();
+            redoStack.clear();
+            undoStack.clear();
         	tileGridConstuctor(getGridLayout());
         });
         getStepByStepShuffleButton().setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
 
         setsolveButton(new Button("Solve Shuffle"));
         getsolveButton().setStyle("-fx-font-size:25");
-        getsolveButton().setOnAction(e -> {solve(); loss=true; loss();});
+        getsolveButton().setOnAction(e -> {solve();
+        redoStack.clear();
+        undoStack.clear();
+        canPlay=false;
+        });
         getsolveButton().setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
 
         topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton(),getsolveButton());
@@ -735,6 +743,9 @@ public class PuzzleGame extends Application {
         giveUpButton.setStyle("-fx-font-size:35");
         giveUpButton.setOnAction(e -> {
             getTimer().stop();
+            redoStack.clear();
+            undoStack.clear();
+            canPlay=false;
             Scene leaderboardScene = getHomeScene();
             StackPane root = new StackPane();
             root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
@@ -745,7 +756,7 @@ public class PuzzleGame extends Application {
 
         GridPane grid = new GridPane();
         solvedLevelPreview(grid);
-        
+
         HBox resolvedLevelLayout = new HBox();
 
         resolvedLevelLayout.getChildren().addAll(titleLabel, grid) ;
@@ -757,7 +768,7 @@ public class PuzzleGame extends Application {
 
         // get screensize of monitor
         Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
-        
+
         // set the scene size to fullscreen size
     	Scene playScene = new Scene(playLayout, screenSize.getWidth(), screenSize.getHeight()); // HD+ scene
 
@@ -784,7 +795,7 @@ public class PuzzleGame extends Application {
 
     /**
      * Constructs the grid layout with the tiles.
-     * 
+     *
      * @param gridLayout the grid pane.
      */
     private static void tileGridConstuctor(GridPane gridLayout) {
@@ -815,82 +826,104 @@ public class PuzzleGame extends Application {
                         getCurrentLevel().getTiles()[i][j].setAlignment(Pos.CENTER);
                 }
 
+                if (canPlay){
+                    if(getCurrentLevel().getTiles()[i][j].getValue()!=-1){
+                        int finalI4 = i;
+                        int finalJ4 = j;
+                        getCurrentLevel().getTiles()[i][j].setOnDragDetected(new EventHandler<MouseEvent>() {
+                            public void handle(MouseEvent event) {
+                                if (!canPlay){
+                                    return;}
+                                mousePosX = (int) event.getSceneX();
+                                mousePosY = (int) event.getSceneY();
+                                initialTranslateX = (int) getCurrentLevel().getTiles()[finalI4][finalJ4].getTranslateX();
+                                initialTranslateY = (int) getCurrentLevel().getTiles()[finalI4][finalJ4].getTranslateY();
 
-                if(getCurrentLevel().getTiles()[i][j].getValue()!=-1 && canPlay){
-                    int finalI4 = i;
-                    int finalJ4 = j;
-                    getCurrentLevel().getTiles()[i][j].setOnDragDetected(new EventHandler<MouseEvent>() {
-                        public void handle(MouseEvent event) {
-                            mousePosX = (int) event.getSceneX();
-                            mousePosY = (int) event.getSceneY();
-                            initialTranslateX = (int) getCurrentLevel().getTiles()[finalI4][finalJ4].getTranslateX();
-                            initialTranslateY = (int) getCurrentLevel().getTiles()[finalI4][finalJ4].getTranslateY();
+                                getCurrentLevel().getTiles()[finalI4][finalJ4].startDragAndDrop(TransferMode.MOVE);
 
-                            getCurrentLevel().getTiles()[finalI4][finalJ4].startDragAndDrop(TransferMode.MOVE);
+                                ClipboardContent content = new ClipboardContent();
+                                content.putString("");  // Ajoutez ici le contenu de l'objet tuile
+                                Dragboard dragboard = getCurrentLevel().getTiles()[finalI4][finalJ4].startDragAndDrop(TransferMode.MOVE);
+                                dragboard.setContent(content);
 
-                            ClipboardContent content = new ClipboardContent();
-                            content.putString("");  // Ajoutez ici le contenu de l'objet tuile
-                            Dragboard dragboard = getCurrentLevel().getTiles()[finalI4][finalJ4].startDragAndDrop(TransferMode.MOVE);
-                            dragboard.setContent(content);
-
-                            event.consume();
-                        }
-                    });
-
-                    getCurrentLevel().getTiles()[i][j].setOnDragOver(new EventHandler<DragEvent>() {
-                        public void handle(DragEvent event) {
-                            if (event.getGestureSource() != this && event.getDragboard().hasString()) {
-                                event.acceptTransferModes(TransferMode.MOVE);
+                                event.consume();
                             }
-                            event.consume();
-                        }
-                    });
+                        });
 
-                    int finalI3 = i;
-                    int finalJ3 = j;
-                    getCurrentLevel().getTiles()[i][j].setOnDragEntered(new EventHandler<DragEvent>() {
-                        public void handle(DragEvent event) {
-                            if (event.getGestureSource() != this && event.getDragboard().hasString()) {
-                            	getCurrentLevel().getTiles()[finalI3][finalJ3].setOpacity(0.7);
-                            }
-                            event.consume();
-                        }
-                    });
-
-                    int finalI = i;
-                    int finalJ = j;
-                    getCurrentLevel().getTiles()[i][j].setOnDragExited(new EventHandler<DragEvent>() {
-                        public void handle(DragEvent event) {
-                            if (event.getGestureSource() != this && event.getDragboard().hasString()) {
-                            	getCurrentLevel().getTiles()[finalI][finalJ].setOpacity(1.0);
-                            }
-                            event.consume();
-
-                        }
-                    });
-
-                    int finalI1 = i;
-                    int finalJ1 = j;
-                    getCurrentLevel().getTiles()[i][j].setOnDragDropped(new EventHandler<DragEvent>() {
-                        public void handle(DragEvent event) {
-                            if (event.getGestureSource() != this) {
-                                double offsetX = event.getSceneX() - mousePosX;
-                                double offsetY = event.getSceneY() - mousePosY;
-                                int colOffset;
-                                int rowOffset;
-
-                                if(Math.abs(offsetX)>Math.abs(offsetY)){
-                                    colOffset= (int) (offsetX/Math.abs(offsetX));
-                                    rowOffset = 0;
-                                }else {
-                                    rowOffset= (int) (offsetY/Math.abs(offsetY));
-                                    colOffset = 0;
+                        getCurrentLevel().getTiles()[i][j].setOnDragOver(new EventHandler<DragEvent>() {
+                            public void handle(DragEvent event) {
+                                /* Accepte uniquement le glisser-déposer à l'intérieur du GridPane */
+                                if (event.getGestureSource() != this && event.getDragboard().hasString()) {
+                                    event.acceptTransferModes(TransferMode.MOVE);
                                 }
+                                event.consume();
+                            }
+                        });
 
-                                if ((Math.abs(colOffset) + Math.abs(rowOffset) == 1) && getCurrentLevel().getTiles()[finalI1][finalJ1].getValue()==0) {
-                                    int originCol = finalJ1 - colOffset;
-                                    int originRow = finalI1 - rowOffset;
-                                    getUndoStack().push(getCurrentLevel().copy().getTiles());
+                        int finalI3 = i;
+                        int finalJ3 = j;
+                        getCurrentLevel().getTiles()[i][j].setOnDragEntered(new EventHandler<DragEvent>() {
+                            public void handle(DragEvent event) {
+                                /* Change le style de la tuile survolée */
+                                if (event.getGestureSource() != this && event.getDragboard().hasString()) {
+                                    getCurrentLevel().getTiles()[finalI3][finalJ3].setOpacity(0.7);
+                                }
+                                event.consume();
+                            }
+                        });
+
+
+
+                        int finalI = i;
+                        int finalJ = j;
+                        getCurrentLevel().getTiles()[i][j].setOnDragExited(new EventHandler<DragEvent>() {
+                            public void handle(DragEvent event) {
+                                /* Rétablit le style de la tuile */
+                                if (event.getGestureSource() != this && event.getDragboard().hasString()) {
+                                    getCurrentLevel().getTiles()[finalI][finalJ].setOpacity(1.0);
+                                }
+                                event.consume();
+
+                            }
+                        });
+
+                        int finalI2 = i;
+                        int finalJ2 = j;
+                        getCurrentLevel().getTiles()[i][j].setOnDragDone(new EventHandler<DragEvent>() {
+                            public void handle(DragEvent event) {
+                                /* Rétablit le style de la tuile une fois le glisser-déposer terminé */
+                                getCurrentLevel().getTiles()[finalI2][finalJ2].setOpacity(1.0);
+                                event.consume();
+                            }
+                        });
+                    }
+                    if(getCurrentLevel().getTiles()[i][j].getValue()==0){
+
+                        int finalI1 = i;
+                        int finalJ1 = j;
+                        getCurrentLevel().getTiles()[i][j].setOnDragDropped(new EventHandler<DragEvent>() {
+                            public void handle(DragEvent event) {
+                                /* Échange les positions des tuiles si elles sont adjacentes */
+                                if (event.getGestureSource() != this) {
+                                    double offsetX = event.getSceneX() - mousePosX;
+                                    double offsetY = event.getSceneY() - mousePosY;
+                                    int colOffset;
+                                    int rowOffset;
+
+
+                                    if(Math.abs(offsetX)>Math.abs(offsetY)){
+                                        colOffset= (int) (offsetX/Math.abs(offsetX));
+                                        rowOffset = 0;
+                                    }else {
+                                        rowOffset= (int) (offsetY/Math.abs(offsetY));
+                                        colOffset = 0;
+                                    }
+
+
+                                    if ((Math.abs(colOffset) + Math.abs(rowOffset) == 1) && getCurrentLevel().getTiles()[finalI1][finalJ1].getValue()==0) {
+                                        int originCol = finalJ1 - colOffset;
+                                        int originRow = finalI1 - rowOffset;
+                                        getUndoStack().push(getCurrentLevel().copy().getTiles());
                                         swapTiles(finalJ1, finalI1, originCol, originRow);
                                         getRedoStack().clear();
                                         getRedoButton().setDisable(true);
@@ -898,32 +931,27 @@ public class PuzzleGame extends Application {
                                         setMoveCount(getMoveCount() + 1);
                                         event.setDropCompleted(true);
 
-                                    if(isGameFinished()) {
-                            	        getTimer().stop();
-                        	        	getCompletedLevels()[getCurrentLevelNumber() - 1] = true;
-                            	        try {
-                            				showEndScreen();
-                            			} catch (FileNotFoundException ex) {
-                            				ex.printStackTrace();
-                            			}
+
+                                        if(isGameFinished()) {
+                                            getTimer().stop();
+                                            getCompletedLevels()[getCurrentLevelNumber() - 1] = true;
+                                            try {
+                                                showEndScreen();
+                                            } catch (FileNotFoundException ex) {
+                                                ex.printStackTrace();
+                                            }
+                                        }
+
+
+                                        return;
                                     }
-
-                                    return;
                                 }
+                                event.setDropCompleted(false);
+                                event.consume();
                             }
-                            event.setDropCompleted(false);
-                            event.consume();
-                        }
-                    });
+                        });
 
-                    int finalI2 = i;
-                    int finalJ2 = j;
-                    getCurrentLevel().getTiles()[i][j].setOnDragDone(new EventHandler<DragEvent>() {
-                        public void handle(DragEvent event) {
-                        	getCurrentLevel().getTiles()[finalI2][finalJ2].setOpacity(1.0);
-                            event.consume();
-                        }
-                    });
+                    }
                 }
                 getGridLayout().add(getCurrentLevel().getTiles()[i][j], j, i);
             }
@@ -932,7 +960,7 @@ public class PuzzleGame extends Application {
 
     /**
      * Swaps 2 tiles in the grid layout.
-     * 
+     *
      * @param col1 the column of the first tile.
      * @param row1 the row of the first tile.
      * @param col2 the column of the second tile.
@@ -947,6 +975,7 @@ public class PuzzleGame extends Application {
             int tile2Index = getGridLayout().getChildren().indexOf(tile2);
             GridPane.setConstraints(tile1, col2, row2);
             GridPane.setConstraints(tile2, col1, row1);
+
             getGridLayout().getChildren().set(tile2Index, new Button()); // buffer to avoid an exception for duplicate children
             getGridLayout().getChildren().set(tile1Index, tile2);
             getGridLayout().getChildren().set(tile2Index, tile1);
@@ -957,7 +986,7 @@ public class PuzzleGame extends Application {
     /**
      * Gets the Node at the provided row and column
      * in the grid layout.
-     * 
+     *
      * @param row the row to search for.
      * @param col the column to search for.
      * @return the found node, or null if none.
@@ -974,7 +1003,7 @@ public class PuzzleGame extends Application {
     /**
      * Displays a preview of the solved level
      * on the bottom-right corner of the screen.
-     * 
+     *
      * @param gridLayout the grid pane in which the preview will be displayed.
      */
     private static void solvedLevelPreview(GridPane gridLayout) {
@@ -1018,7 +1047,7 @@ public class PuzzleGame extends Application {
 
     /**
      * Returns the difficulty layout.
-     * 
+     *
      * @return the difficulty layout.
      */
     public Scene getDifficultylayout() {
@@ -1076,7 +1105,7 @@ public class PuzzleGame extends Application {
 
     /**
      * Returns the leaderboard layout.
-     * 
+     *
      * @return the leaderboard layout.
      */
     public Scene getLeaderboardlayout() {
@@ -1242,11 +1271,11 @@ public class PuzzleGame extends Application {
 
         // ------------------------------------Create "Next Level" button---------------------------------------------------------
         Button nextLevelButton = new Button("Next Level");
-        nextLevelButton.setOnAction(event -> {canPlay= false; setCurrentLevelNumber(getCurrentLevelNumber()+1);startGame(); firstShuffle();});
+        nextLevelButton.setOnAction(event -> {setCurrentLevelNumber(getCurrentLevelNumber()+1);startGame();canPlay=false; firstShuffle();redoStack.clear();undoStack.clear();});
 
         //---------------------------------------- Create "Replay" button------------------------------------------------------
         Button replayButton = new Button("Replay");
-        replayButton.setOnAction(event -> {canPlay = false; startGame(); firstShuffle();});
+        replayButton.setOnAction(event -> {startGame(); firstShuffle();redoStack.clear();undoStack.clear();canPlay=false;});
 
         //--------------------------------------- Create "Save score" button--------------------------------------------------
         Button saveScoreButton = new Button("Save score");
@@ -1261,6 +1290,9 @@ public class PuzzleGame extends Application {
             StackPane root = new StackPane();
             root.getChildren().addAll(getPrimaryStage().getScene().getRoot(), leaderboardScene.getRoot());
             getPrimaryStage().setScene( new Scene(root));
+            redoStack.clear();
+            undoStack.clear();
+            canPlay=false;
         });
         // Buttons formatting
 
@@ -1281,7 +1313,6 @@ public class PuzzleGame extends Application {
 		}
 
         // ----------------------------Create VBox to set label and button with space--------------------------------------
-
 
         Image backgroundImage = new Image("file:background2-min.jpg");
         backgroundImage.widthProperty().add(primaryStage.widthProperty());
