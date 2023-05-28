@@ -88,7 +88,7 @@ public class PuzzleGame extends Application {
     private static Button stepByStepShuffleButton; // The step by step shuffle Button.
     private static Button solveButton; // The solve Button.
 
-    private static boolean canPlay; // True if the user can play, false otherwise.
+    private static boolean canPlay = false; // True if the user can play, false otherwise.
 
     private static Pair<Integer, Integer> selectedCell = null; // The coordinates of the currently selected cell.
 
@@ -478,9 +478,19 @@ public class PuzzleGame extends Application {
 		return PuzzleGame.selectedCell;
 	}
 
-    static PauseTransition pause1 = new PauseTransition(Duration.seconds(3));
+    static PauseTransition pause1 = new PauseTransition(Duration.seconds(1));
 
-    static PauseTransition pause2 = new PauseTransition(Duration.seconds(1));
+    static PauseTransition pause2 = new PauseTransition(Duration.seconds(2));
+
+
+    static void firstShuffle(){
+        pause1.play() ;
+        pause2.setOnFinished(event -> {
+            currentLevel.stepByStepShuffleLevel();
+            tileGridConstuctor(getGridLayout());});
+        pause2.play();
+        canPlay = true ;
+    }
 
     /**
      * Returns the solve button.
@@ -521,16 +531,8 @@ public class PuzzleGame extends Application {
         setLevelLabel(new Label(levelText)); //to print level
 		getLevelLabel().setStyle("-fx-text-fill: #442200;-fx-font-size: 25;-fx-font-family: 'Rockwell'");//to configure levellabel
 
-        pause1.setOnFinished(event -> {
-            currentLevel.stepByStepShuffleLevel();
-            tileGridConstuctor(getGridLayout());
-        });
-
-        pause2.setOnFinished(event -> {
-            canPlay = true;});
-
 		Button startButton = new Button("New game");
-		startButton.setOnAction(e -> {canPlay = false; startGame(); pause1.play(); pause2.play();});
+		startButton.setOnAction(e -> {startGame(); firstShuffle();});
 
 
         Button setDifficultyButton = new Button("Difficulty settings");
@@ -795,11 +797,14 @@ public class PuzzleGame extends Application {
                         getCurrentLevel().getTiles()[i][j].setAlignment(Pos.CENTER);
                 }
 
+
                 if(getCurrentLevel().getTiles()[i][j].getValue()!=-1){
                     int finalI4 = i;
                     int finalJ4 = j;
                     getCurrentLevel().getTiles()[i][j].setOnDragDetected(new EventHandler<MouseEvent>() {
                         public void handle(MouseEvent event) {
+                            if (!canPlay){
+                                return;}
                             mousePosX = (int) event.getSceneX();
                             mousePosY = (int) event.getSceneY();
                             initialTranslateX = (int) getCurrentLevel().getTiles()[finalI4][finalJ4].getTranslateX();
@@ -870,16 +875,16 @@ public class PuzzleGame extends Application {
                                     colOffset = 0;
                                 }
 
-                                if ((Math.abs(colOffset) + Math.abs(rowOffset) == 1) && getCurrentLevel().getTiles()[finalI1][finalJ1].getValue()==0 && canPlay) {
+                                if ((Math.abs(colOffset) + Math.abs(rowOffset) == 1) && getCurrentLevel().getTiles()[finalI1][finalJ1].getValue()==0) {
                                     int originCol = finalJ1 - colOffset;
                                     int originRow = finalI1 - rowOffset;
                                     getUndoStack().push(getCurrentLevel().copy().getTiles());
-                                    swapTiles(finalJ1, finalI1, originCol, originRow);
-                                    getRedoStack().clear();
-                                    getRedoButton().setDisable(true);
-                                    getUndoButton().setDisable(false);
-                                    setMoveCount(getMoveCount() + 1);
-                                    event.setDropCompleted(true);
+                                        swapTiles(finalJ1, finalI1, originCol, originRow);
+                                        getRedoStack().clear();
+                                        getRedoButton().setDisable(true);
+                                        getUndoButton().setDisable(false);
+                                        setMoveCount(getMoveCount() + 1);
+                                        event.setDropCompleted(true);
 
                                     if(isGameFinished()) {
                             	        getTimer().stop();
@@ -1183,6 +1188,7 @@ public class PuzzleGame extends Application {
     }
 
 
+
     /**
      * Shows the end screen.
      *
@@ -1192,13 +1198,6 @@ public class PuzzleGame extends Application {
 
         collectLevel();
         collectPoints();
-        pause1.setOnFinished(event -> {
-            currentLevel.stepByStepShuffleLevel();
-            tileGridConstuctor(getGridLayout());
-        });
-
-        pause2.setOnFinished(event -> {
-            canPlay = true;});
 
         //-------------------------------------create point label----------------------------------------------------------------
         if (getMoveCount() < getBestScore() || getBestScore() == 0 ){
@@ -1216,11 +1215,11 @@ public class PuzzleGame extends Application {
 
         // ------------------------------------Create "Next Level" button---------------------------------------------------------
         Button nextLevelButton = new Button("Next Level");
-        nextLevelButton.setOnAction(event -> {setCurrentLevelNumber(getCurrentLevelNumber()+1); canPlay = false ; startGame(); pause1.play(); pause2.play();});
+        nextLevelButton.setOnAction(event -> {setCurrentLevelNumber(getCurrentLevelNumber()+1);startGame(); firstShuffle();});
 
         //---------------------------------------- Create "Replay" button------------------------------------------------------
         Button replayButton = new Button("Replay");
-        replayButton.setOnAction(event -> startGame());
+        replayButton.setOnAction(event -> {startGame(); firstShuffle();});
 
         //--------------------------------------- Create "Save score" button--------------------------------------------------
         Button saveScoreButton = new Button("Save score");
