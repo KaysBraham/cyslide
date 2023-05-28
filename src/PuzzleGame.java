@@ -1,6 +1,8 @@
 package src;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -1137,7 +1139,7 @@ public class PuzzleGame extends Application {
 
                     count = 0;
 
-                    Arrays.sort(listpoint, Comparator.reverseOrder()); //to sort in reverse
+                    listpoint=sortPointsWithoutZeros(listpoint); //to sort listpoint in excluding zero
                     for (Integer integer : listpoint) {
 
                         if(count == 10) break;
@@ -1335,6 +1337,36 @@ public class PuzzleGame extends Application {
         } catch (IOException e) {
             System.out.println("Error  : " + e.getMessage());
         }
+    }
+
+    public Integer[] sortPointsWithoutZeros(Integer[] points) {
+        //To exclude zero
+        List<Integer> notZeroPoints = new ArrayList<>();
+
+        for (int point : points) {
+            if (point != 0) {
+                notZeroPoints.add(point);
+            }
+        }
+
+        // To sort without zero
+        Collections.sort(notZeroPoints);
+
+        // to insert zero at the end
+        List<Integer> sortedPoints = new ArrayList<>(notZeroPoints);
+        for (int point : points) {
+            if (point == 0) {
+                sortedPoints.add(point);
+            }
+        }
+
+        //to register the points with zero on sortedaway
+        Integer[] sortedArray = new Integer[sortedPoints.size()];
+        for (int i = 0; i < sortedPoints.size(); i++) {
+            sortedArray[i] = sortedPoints.get(i);
+        }
+
+        return sortedArray;
     }
 
     public static void main(String[] args) {
