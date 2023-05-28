@@ -75,8 +75,8 @@ public class PuzzleSolver {
                 // Solution trouvée, afficher le chemin ou effectuer les actions nécessaires
                 // selon votre implémentation spécifique
                 System.out.println("Solution found!");
+                PuzzleGame.solvingMoves.clear();
                 for (Node node : closedSet){
-                    PuzzleGame.solvingMoves.clear();
                     PuzzleGame.solvingMoves.add(node.getState().getTiles());
                     System.out.println("Etape");
                     node.getState().print();
