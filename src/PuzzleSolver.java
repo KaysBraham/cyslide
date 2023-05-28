@@ -1,6 +1,12 @@
 package src;
 
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Represents a puzzle solver for a game.
