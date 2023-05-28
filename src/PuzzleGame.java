@@ -520,6 +520,11 @@ public class PuzzleGame extends Application {
 		return PuzzleGame.selectedCell;
 	}
 
+    static PauseTransition pause1 = new PauseTransition(Duration.seconds(3));
+
+    static PauseTransition pause2 = new PauseTransition(Duration.seconds(1));
+
+
 
 
 
@@ -543,15 +548,15 @@ public class PuzzleGame extends Application {
         setLevelLabel(new Label(levelText)); //to print level
 		getLevelLabel().setStyle("-fx-text-fill: #442200;-fx-font-size: 25;-fx-font-family: 'Rockwell'");//to configure levellabel
 
-        PauseTransition pause1 = new PauseTransition(Duration.seconds(3));
         pause1.setOnFinished(event -> {
             currentLevel.stepByStepShuffleLevel();
             tileGridConstuctor(getGridLayout());
         });
 
-        PauseTransition pause2 = new PauseTransition(Duration.seconds(1));
         pause2.setOnFinished(event -> {
             canPlay = true;});
+
+
 
 		Button startButton = new Button("New game");
 		startButton.setOnAction(e -> {canPlay = false; startGame(); pause1.play(); pause2.play();});
@@ -584,7 +589,7 @@ public class PuzzleGame extends Application {
 		for(Button button : buttons) {
             button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
 			button.setOnMousePressed(event -> {
-				button.setStyle("-fx-border-color: black; -fx-background-color: #000000;"); // to make grey transparent
+				button.setStyle("-fx-border-color: rgba(0,0,0,0); -fx-background-color: rgba(0,0,0,0);"); // to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1)); // during 0.1 second
 	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'"));//to remove the transparent
 	            pauseTransition.play();
@@ -1182,6 +1187,13 @@ public class PuzzleGame extends Application {
 
         collectLevel();
         collectPoints();
+        pause1.setOnFinished(event -> {
+            currentLevel.stepByStepShuffleLevel();
+            tileGridConstuctor(getGridLayout());
+        });
+
+        pause2.setOnFinished(event -> {
+            canPlay = true;});
 
         //-------------------------------------create point label----------------------------------------------------------------
         if (getMoveCount() < getBestScore() || getBestScore() == 0 ){
@@ -1199,7 +1211,7 @@ public class PuzzleGame extends Application {
 
         // ------------------------------------Create "Next Level" button---------------------------------------------------------
         Button nextLevelButton = new Button("Next Level");
-        nextLevelButton.setOnAction(event -> {setCurrentLevelNumber(getCurrentLevelNumber()+1); canPlay = false ; startGame();});
+        nextLevelButton.setOnAction(event -> {setCurrentLevelNumber(getCurrentLevelNumber()+1); canPlay = false ; startGame(); pause1.play(); pause2.play();});
 
         //---------------------------------------- Create "Replay" button------------------------------------------------------
         Button replayButton = new Button("Replay");
