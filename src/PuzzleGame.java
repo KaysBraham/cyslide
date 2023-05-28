@@ -720,6 +720,7 @@ public class PuzzleGame extends Application {
     static final int TILE_SIZE = 200;
     private static void tileGridConstuctor(GridPane gridLayout) {
         gridLayout.getChildren().clear();
+
         for (int i =0;i<getCurrentLevel().getTiles().length;i++) {
             for(int j =0;j<getCurrentLevel().getTiles()[0].length;j++) {
 
@@ -840,6 +841,7 @@ public class PuzzleGame extends Application {
                                     event.setDropCompleted(true);
 
                                     if(isGameFinished()) {
+                                        getCompletedLevels()[getCurrentLevelNumber()  - 1] =  true ;
                             	        getTimer().stop();
                             	        try {
                             				showEndScreen();
@@ -962,7 +964,6 @@ public class PuzzleGame extends Application {
             levelButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
             int finalDifficulty = difficulty;
             levelButton.setOnMousePressed(event -> {
-                // TODO
                 setCurrentLevelNumber(finalDifficulty);
                 getLevelLabel().setText("level: " + finalDifficulty); // updating the label in home screen
                 levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
@@ -1139,8 +1140,9 @@ public class PuzzleGame extends Application {
         hbox.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(levelLabel, scoreLabel);
 
-        // ------------------------------------Create "Try Again" button---------------------------------------------------------
-        Button tryAgainButton = new Button("Try Again");
+        // ------------------------------------Create "Next Level" button---------------------------------------------------------
+        Button nextLevelButton = new Button("Next Level");
+        nextLevelButton.setOnAction(event -> {setCurrentLevelNumber(getCurrentLevelNumber()+1); startGame();});
 
         //---------------------------------------- Create "Replay" button------------------------------------------------------
         Button replayButton = new Button("Replay");
@@ -1161,7 +1163,7 @@ public class PuzzleGame extends Application {
             getPrimaryStage().setScene( new Scene(root));
         });
         // Buttons formatting
-		List<Button> buttons = Arrays.asList(tryAgainButton, replayButton, saveScoreButton, homeButton);
+		List<Button> buttons = Arrays.asList(nextLevelButton, replayButton, saveScoreButton, homeButton);
 		for(Button button : buttons) {
 			button.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
 			button.setOnMousePressed(event -> {
@@ -1171,16 +1173,22 @@ public class PuzzleGame extends Application {
 	            pauseTransition.play();
 	        });
 		}
-        
+
         // ----------------------------Create VBox to set label and button with space--------------------------------------
         VBox endScreenLayout = new VBox(10); // to create a vertical space 10px
         endScreenLayout.setAlignment(Pos.CENTER); // to center the buttons
         endScreenLayout.getChildren().add(hbox); // to add the hbox
+        endScreenLayout.setStyle("-fx-background-color: black;");
         if (getBestScore() != 0 ) {
             endScreenLayout.getChildren().add(bestScoreLabel);
         }
-        endScreenLayout.getChildren().addAll(buttons); // to add the buttons
-        endScreenLayout.setStyle("-fx-background-color: black;");//
+        if (finishGame()) {
+            endScreenLayout.getChildren().addAll(replayButton, saveScoreButton, homeButton) ;
+        }
+        else {
+            endScreenLayout.getChildren().addAll(buttons); // to add the buttons
+        }
+
 
         //---------------------------------------to define the scene-----------------------------------------------------------------
         // get screensize of monitor
@@ -1207,6 +1215,15 @@ public class PuzzleGame extends Application {
 
     }
 
+    public static boolean finishGame() {
+        int n = levels.size() ;
+        if (getCurrentLevelNumber() == n + 1 ){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     /**
      * Collects the current level from the "scoreLastGame.txt" file.
      *
@@ -1246,7 +1263,7 @@ public class PuzzleGame extends Application {
     public void loadLevels(){
     	// TODO
     }
-    
+
     /**
      * Selects the current level.
      *
@@ -1277,37 +1294,7 @@ public class PuzzleGame extends Application {
     	// TODO
     }
 
-    /**
-     * Undoes the last move.
-     * Decrements the move count.
-     */
-    public static void undoMove(){
-    	setMoveCount(getMoveCount() - 1);
-    	
-    	getRedoButton().setDisable(false);
-    	getUndoButton().setDisable(true);
-    	
-    	// TODO
-    }
 
-    /**
-     * Redoes the undid move.
-     * Increments the move count.
-     */
-    public static void redoMove(){
-    	setMoveCount(getMoveCount() + 1);
-
-    	getRedoButton().setDisable(true);
-    	getUndoButton().setDisable(false);
-    	
-    	// TODO
-    }
-
-    /**
-     * The main method to launch the application.
-     *
-     * @param args The command-line arguments.
-     */
     public static void main(String[] args) {
         launch(args);
 /*
