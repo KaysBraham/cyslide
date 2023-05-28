@@ -506,14 +506,18 @@ public class PuzzleGame extends Application {
         setLevelLabel(new Label(levelText)); //to print level
 		getLevelLabel().setStyle("-fx-text-fill: #442200;-fx-font-size: 25;-fx-font-family: 'Rockwell'");//to configure levellabel
 
-        PauseTransition pause = new PauseTransition(Duration.seconds(3));
-        pause.setOnFinished(event -> {
+        PauseTransition pause1 = new PauseTransition(Duration.seconds(3));
+        pause1.setOnFinished(event -> {
             currentLevel.stepByStepShuffleLevel();
             tileGridConstuctor(getGridLayout());
-        canPlay = true;});
+        });
+
+        PauseTransition pause2 = new PauseTransition(Duration.seconds(1));
+        pause2.setOnFinished(event -> {
+            canPlay = true;});
 
 		Button startButton = new Button("New game");
-		startButton.setOnAction(e -> {canPlay = false; startGame(); pause.play();});
+		startButton.setOnAction(e -> {canPlay = false; startGame(); pause1.play(); pause2.play();});
 
         Button setDifficultyButton = new Button("Difficulty settings");
         setDifficultyButton.setOnAction(e -> {
