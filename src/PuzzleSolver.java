@@ -75,6 +75,7 @@ public class PuzzleSolver {
                 // selon votre implémentation spécifique
                 System.out.println("Solution found!");
                 for (Node node : closedSet){
+                    PuzzleGame.solvingMoves.add(node.getState().getTiles());
                     System.out.println("Etape");
                     node.getState().print();
                 }
@@ -114,14 +115,7 @@ public class PuzzleSolver {
      */
     public static boolean isGoalState(Level state) {
         Level solvedLevel = PuzzleGame.getLevel(state.getLevelNumber());
-        for (int i = 0; i < state.getTiles().length; i++) {
-            for (int j = 0; j < state.getTiles()[0].length; j++) {
-                if(!(state.getTiles()[i][j].getValue()==solvedLevel.getTiles()[i][j].getValue())){
-                    return false;
-                }
-            }
-        }
-        return true;
+        return state.equals(solvedLevel);
     }
 
     /**

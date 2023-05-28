@@ -13,7 +13,6 @@ import java.util.Random;
 public class Level {
     private final int levelNumber ;
     private Tile[][] tiles;
-    private boolean solved = true;
 
     /**
      * Constructs a Level object with the specified tiles and level number.
@@ -56,15 +55,6 @@ public class Level {
     }
 
     /**
-     * Sets the solved state of the level.
-     *
-     * @param solved The new solved state.
-     */
-    public void setSolved(boolean solved) {
-        this.solved = solved;
-    }
-
-    /**
      * Checks if a move from the first tile to the second tile is valid.
      *
      * @param x1 The x-coordinate of the first tile.
@@ -74,22 +64,12 @@ public class Level {
      * @return True if the move is valid, false otherwise.
      */
     public boolean isMoveValid(int x1, int y1, int x2, int y2){
-        // ensure the two chosen tiles are adjacent
         if (!(x1 == x2 && Math.abs(y1 - y2) == 1) && !(y1 == y2 && Math.abs(x1 - x2) == 1)){
-            System.out.println("The two chosen tiles are not adjacent");
             return false;
         }
-        // ensure the tile is valid to move (at least one of its neighboring squares is empty)
-        /*
-        if (!(tiles[x2][y2].getValue() == 0) || !((tiles[x1][y1].getValue() != -1) && (tiles[x1][y1].getValue() != 0))){
-            System.out.println("Invalid movement");
-            return false;
-        }
-        */
         if (!(x1<getTiles().length && x1>=0 && y1<getTiles()[0].length && y1>=0
                 && x2<getTiles().length && x2>=0 && y2<getTiles()[0].length && y2>=0
                 && ((getTiles()[x1][y1].getValue()==0 && getTiles()[x2][y2].getValue()!=-1) || (getTiles()[x1][y1].getValue()!=-1 && getTiles()[x2][y2].getValue()==0)))){
-            System.out.println("Invalid movement");
             return false;
         }
         return true;
@@ -124,12 +104,10 @@ public class Level {
         for (int i = 0; i <= nLines - 1; i++) {
             for (int j = 0; j <= nColumns - 1; j++) {
                 if (getTiles()[i][j].getValue() == solvedLevel.getTiles()[i][j].getValue() && getTiles()[i][j].getValue() !=-1) {
-                    System.out.println("un melange mauvais");
                     return false;
                 }
             }
         }
-        System.out.println("Bon melange");
         return true;
     }
 
@@ -159,42 +137,22 @@ public class Level {
                         }
                     }
                 }
-                solved=false;
             }while (!checkShuffle());
             if (!PuzzleSolver.solvePuzzle(this)) {
-                System.out.println("Unsolvable shuffle");
+                System.out.println("Unsolvable level");
             }
         } while (!PuzzleSolver.solvePuzzle(this));
     }
+
 
     /**
      * Shuffles the tiles in the level step by step.
      */
     public void stepByStepShuffleLevel() {
-        int nLines = getTiles().length;
-        int nColumns = getTiles()[0].length;
-        int numberOfEmptyTiles = 0;
-        for (Tile[] row : getTiles()) {
-            for (Tile tile : row) {
-                if (tile.getValue() == 0){
-                    numberOfEmptyTiles++;
-                }
-            }
-        }
         int n = 0;
         while(n < 1000) {
-            int[][] emptyTiles = new int[numberOfEmptyTiles][2];
-            int c = 0;
-            for(int i = 0; i < nLines; i++){
-                for(int j = 0;j<nColumns; j++){
-                    if (getTiles()[i][j].getValue() == 0) {
-                        emptyTiles[c][0] = i;
-                        emptyTiles[c][1] = j;
-                        c++;
-                    }
-                }
-            }
-
+            int[][] emptyTiles = getEmptyTiles();
+            int numberOfEmptyTiles = emptyTiles.length;
             Random random = new Random();
             int randomEmptyTile = random.nextInt(numberOfEmptyTiles);
             boolean isMoveDone = false;
@@ -232,6 +190,7 @@ public class Level {
                 n++;
             }
         }
+        PuzzleSolver.solvePuzzle(this);
     }
 
     /**
@@ -245,7 +204,7 @@ public class Level {
 	    int numberOfEmptyTiles = 0;
 	    for (Tile[] row : getTiles()) {
 	        for (Tile tile : row) {
-	            if (tile.getValue() == 0) {
+	            if (tile.getValue() == 0){
 	                numberOfEmptyTiles++;
 	            }
 	        }

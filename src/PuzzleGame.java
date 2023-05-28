@@ -129,12 +129,18 @@ public class PuzzleGame extends Application {
 
     private static Button randomShuffleButton;
 
+
     /**
      * The step by step shuffle Button.
      */
 
     private static Button stepByStepShuffleButton;
 
+    /**
+     * The solve Button.
+     */
+
+    private static Button solveButton;
     /**
      * The redo Button.
      */
@@ -159,7 +165,9 @@ public class PuzzleGame extends Application {
      *
      * @return The boolean list.
      */
-    private static boolean[] completedLevels = new boolean[getLevels().size()];;
+    private static boolean[] completedLevels = new boolean[getLevels().size()];
+
+    public static LinkedHashSet<Tile[][]> solvingMoves= new LinkedHashSet<>();
 
     /**
      * Returns the current level in the game.
@@ -439,6 +447,15 @@ public class PuzzleGame extends Application {
 
     private static boolean canPlay;
 
+    private static void solve(){
+        for(Tile[][] tiles : solvingMoves){
+            currentLevel.setTiles(tiles);
+            tileGridConstuctor(getGridLayout());
+            PauseTransition pause = new PauseTransition(Duration.seconds(2));
+            pause.play();
+        }
+    }
+
 
 
 	/**
@@ -475,8 +492,28 @@ public class PuzzleGame extends Application {
      *
      * @param stepByStepShuffleButton The shuffle button.
      */
+
     public static void setStepByStepShuffleButton(Button stepByStepShuffleButton) {
         PuzzleGame.stepByStepShuffleButton = stepByStepShuffleButton;
+    }
+
+    /**
+     * Returns the solve button.
+     *
+     * @return The solve button.
+     */
+
+    public static Button getsolveButton() {
+        return solveButton;
+    }
+
+    /**
+     * Sets the solve button.
+     *
+     * @param solveButton The shuffle button.
+     */
+    public static void setsolveButton(Button solveButton) {
+        PuzzleGame.solveButton = solveButton;
     }
 
     public static Pair<Integer, Integer> getSelectedCell() {
@@ -679,7 +716,13 @@ public class PuzzleGame extends Application {
         	tileGridConstuctor(getGridLayout());
         });
 
-        topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton());
+        setsolveButton(new Button("Solve Shuffle"));
+        getsolveButton().setStyle("-fx-font-size:25");
+        getsolveButton().setOnAction(e -> {
+            solve();
+        });
+
+        topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton(),getsolveButton());
 
         HBox bottomLayout = new HBox(64);
         bottomLayout.setAlignment(Pos.CENTER);
@@ -1311,13 +1354,26 @@ public class PuzzleGame extends Application {
 
     public static void main(String[] args) {
         launch(args);
-/*
+
         currentLevel=levels.get(8).copy();
+        if(Arrays.deepEquals(currentLevel.getTiles(),levels.get(8).getTiles())){
+            System.out.println("youpi");
+        }else {
+            System.out.println("noooo");
+        }
         currentLevel.print();
         currentLevel.stepByStepShuffleLevel();
+        if(Arrays.deepEquals(currentLevel.getTiles(),levels.get(8).getTiles())){
+            System.out.println("youpi");
+        }else {
+            System.out.println("noooo");
+        }
+
+
+        /*
         src.Node node = new src.Node(currentLevel,null,0,PuzzleSolver.calculateManhattanDistance(currentLevel));
         PuzzleSolver.solvePuzzle(currentLevel);
-        */
+*/
 
     }
 }
