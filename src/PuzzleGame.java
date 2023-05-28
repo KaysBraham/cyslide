@@ -478,6 +478,10 @@ public class PuzzleGame extends Application {
 		return PuzzleGame.selectedCell;
 	}
 
+    static PauseTransition pause1 = new PauseTransition(Duration.seconds(3));
+
+    static PauseTransition pause2 = new PauseTransition(Duration.seconds(1));
+
     /**
      * Returns the solve button.
      *
@@ -517,13 +521,11 @@ public class PuzzleGame extends Application {
         setLevelLabel(new Label(levelText)); //to print level
 		getLevelLabel().setStyle("-fx-text-fill: #442200;-fx-font-size: 25;-fx-font-family: 'Rockwell'");//to configure levellabel
 
-        PauseTransition pause1 = new PauseTransition(Duration.seconds(3));
         pause1.setOnFinished(event -> {
             currentLevel.stepByStepShuffleLevel();
             tileGridConstuctor(getGridLayout());
         });
 
-        PauseTransition pause2 = new PauseTransition(Duration.seconds(1));
         pause2.setOnFinished(event -> {
             canPlay = true;});
 
@@ -559,7 +561,7 @@ public class PuzzleGame extends Application {
 		for(Button button : buttons) {
             button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
 			button.setOnMousePressed(event -> {
-				button.setStyle("-fx-border-color: black; -fx-background-color: #000000;"); // to make grey transparent
+				button.setStyle("-fx-border-color: rgba(0,0,0,0); -fx-background-color: rgba(0,0,0,0);"); // to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1)); // during 0.1 second
 	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:#420; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'"));//to remove the transparent
 	            pauseTransition.play();
@@ -1012,21 +1014,28 @@ public class PuzzleGame extends Application {
      */
     public void setDifficultylayout() {
         VBox difficultyLayout = new VBox(10);
+
+        Image backgroundImage = new Image("file:background2-min.jpg");
+        backgroundImage.widthProperty().add(primaryStage.widthProperty());
+        backgroundImage.heightProperty().add(primaryStage.heightProperty());
+        BackgroundSize backgroundSize = new BackgroundSize(1000, 1000, true, true, false, true);
+        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
+
         difficultyLayout.setAlignment(Pos.CENTER);
-        difficultyLayout.setStyle("-fx-background-color: black;");
+        difficultyLayout.setBackground(new Background(background));
 
         for (int difficulty = 1; difficulty <= 10; difficulty++) {
             Button levelButton = new Button("Level " + difficulty);
-            levelButton.setPrefSize(100,50); //set the button size
+            levelButton.setPrefSize(100, 50); //set the button size
 
-            levelButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
+            levelButton.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");//set the style of the button
             int finalDifficulty = difficulty;
             levelButton.setOnMousePressed(event -> {
                 setCurrentLevelNumber(finalDifficulty);
                 getLevelLabel().setText("level: " + finalDifficulty); // updating the label in home screen
                 levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
                 PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
-                pauseTransition.setOnFinished(e -> levelButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'"));//to remove the transparent
+                pauseTransition.setOnFinished(e -> levelButton.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-size: 3; -fx-background-color: rgba(37,20,12,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'"));//to remove the transparent
                 pauseTransition.play();
                 Scene leaderboardScene = getHomeScene();
 
@@ -1037,13 +1046,10 @@ public class PuzzleGame extends Application {
             difficultyLayout.getChildren().add(levelButton);
         }
 
-
-
         Button backButton = new Button("Return");
         backButton.setPrefSize(100,50);//set the button size
-        backButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
+        backButton.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");//set the style of the button
         backButton.setOnAction(e -> {
-
 
             Scene leaderboardScene = getHomeScene();
 
@@ -1068,11 +1074,16 @@ public class PuzzleGame extends Application {
     public void setLeaderboardlayout() {
         VBox leaderboardLayout = new VBox(10);
 
-        leaderboardLayout.setStyle("-fx-background-color: black;");
-        leaderboardLayout.setAlignment(Pos.CENTER); //to set all the button on the center
-        //create back button
+        Image backgroundImage = new Image("file:background2-min.jpg");
+        backgroundImage.widthProperty().add(primaryStage.widthProperty());
+        backgroundImage.heightProperty().add(primaryStage.heightProperty());
+        BackgroundSize backgroundSize = new BackgroundSize(1000, 1000, true, true, false, true);
+        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
+
+        leaderboardLayout.setAlignment(Pos.CENTER);
+        leaderboardLayout.setBackground(new Background(background));
         Button backButton = new Button("Return");
-        backButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
+        backButton.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 20;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");//set the style of the button
         backButton.setPrefWidth(100);
         backButton.setPrefHeight(50);
         backButton.setOnAction(e -> {
@@ -1086,12 +1097,12 @@ public class PuzzleGame extends Application {
             Button levelButton = new Button("Level " + difficulty);
             levelButton.setPrefSize(100, 50);
 
-            levelButton.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");//set the style of the button
+            levelButton.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");//set the style of the button
             int finalDifficulty = difficulty;
             levelButton.setOnMousePressed(event -> {
                 leaderboardLayout.getChildren().clear(); // to remove all the button in order to print th ranking
 
-                levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); // to make grey transparent
+                levelButton.setStyle("-fx-border-color: rgba(37,20,12,0); -fx-background-color: rgba(128,128,128,0);"); // to make grey transparent
 
                 File file = new File("scoreLastGame.txt"); // to retrieve point
 
@@ -1127,7 +1138,7 @@ public class PuzzleGame extends Application {
                         if(count == 10) break;
                         else {
                             Label rankLabel = new Label((count + 1) + ".");
-                            rankLabel.setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
+                            rankLabel.setStyle("-fx-text-fill: #442200;-fx-font-size: 18;-fx-font-family: 'Rockwell'");
                             rankLabel.setMinWidth(35);//to avoid the points to move when the ranking is ten
                             labelrank[count] = new Label("Point: " + integer); // to set the rank
                             labelrank[count].setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
@@ -1181,6 +1192,13 @@ public class PuzzleGame extends Application {
 
         collectLevel();
         collectPoints();
+        pause1.setOnFinished(event -> {
+            currentLevel.stepByStepShuffleLevel();
+            tileGridConstuctor(getGridLayout());
+        });
+
+        pause2.setOnFinished(event -> {
+            canPlay = true;});
 
         //-------------------------------------create point label----------------------------------------------------------------
         if (getMoveCount() < getBestScore() || getBestScore() == 0 ){
@@ -1198,7 +1216,7 @@ public class PuzzleGame extends Application {
 
         // ------------------------------------Create "Next Level" button---------------------------------------------------------
         Button nextLevelButton = new Button("Next Level");
-        nextLevelButton.setOnAction(event -> {setCurrentLevelNumber(getCurrentLevelNumber()+1); canPlay = false ; startGame();});
+        nextLevelButton.setOnAction(event -> {setCurrentLevelNumber(getCurrentLevelNumber()+1); canPlay = false ; startGame(); pause1.play(); pause2.play();});
 
         //---------------------------------------- Create "Replay" button------------------------------------------------------
         Button replayButton = new Button("Replay");
