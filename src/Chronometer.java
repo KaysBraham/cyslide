@@ -14,12 +14,35 @@ import javafx.util.Duration;
  * It is a HBox on its own, allowing the 3 fields to display properly.
  */
 public class Chronometer extends HBox{
-
-	private int startTime; // Holds the starting time in seconds
-    private int elapsedTime = 0; // Holds the elapsed time in seconds
-    private boolean running = false; // Indicates whether the chronometer is running or not
-    private Label hoursLabel = new Label("");;
+	
+	/**
+	 * Holds the starting time in seconds.
+	 */
+	private int startTime;
+	
+	/**
+	 * Holds the elapsed time in seconds. Initialized to 0.
+	 */
+    private int elapsedTime = 0;
+    
+    /**
+     * Indicates whether the chronometer is running or not.
+     */
+    private boolean running = false;
+    
+    /**
+     * Label for displaying hours.
+     */
+    private Label hoursLabel = new Label("");
+    
+    /**
+     * Label for displaying minutes.
+     */
     private Label minutesLabel = new Label("00 : ");
+    
+    /**
+     * Label for displaying seconds.
+     */
     private Label secondsLabel = new Label("00");
 
     /**
