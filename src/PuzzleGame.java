@@ -49,8 +49,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 
-
-
 /**
  * The PuzzleGame class represents a puzzle game application.
  * It uses JavaFX and extends the JavaFX Application class.
@@ -59,104 +57,39 @@ public class PuzzleGame extends Application {
     private static final String folderPath = "data";
     private static final FileIO fileLoader = new FileIO(folderPath);
 
-    /**
-     * The array of available levels.
-     */
-    private static final List<Level> levels = fileLoader.loadLevels();
+    private static final List<Level> levels = fileLoader.loadLevels(); // The array of available levels.
 
-    /**
-     * The currently selected level.
-     */
-    private static Level currentLevel;
+    private Level[] unlockedLevels; // The array of unlocked levels.
 
-    /**
-     * The array of unlocked levels.
-     */
-    private Level[] unlockedLevels;
+    private static int moveCount; // The count of moves made in the current level.
 
-    /**
-     * The count of moves made in the current level.
-     */
-    private static int moveCount;
+    private static Stage primaryStage; // The primary stage of the JavaFX application.
+    private static Scene homeScene; // The scene representing the home screen of the game.
+    static GridPane gridLayout = new GridPane(); // The grid pane in which the cells are displayed.
 
-    /**
-     * The primary stage of the JavaFX application.
-     */
-    private static Stage primaryStage;
+    private Scene difficultylayout; // FIXME
+    private Scene leaderboardlayout; // FIXME
 
-    /**
-     * The scene representing the home screen of the game.
-     */
-    private static Scene homeScene;
+    private static SequentialTransition timer = null; // The sequential transition used as a timer in the game.
 
-    /**
-     * The scene representing the difficultylayyout of the game.
-     */
-    private Scene difficultylayout;
+    private static Level currentLevel; // The currently selected level.
+    private Label levelLabel; // The label displaying the current level.
+    static Label moveCountLabel = new Label("Move count : " + getMoveCount()); // The label displaying the current move count.
 
-    /**
-     * The scene representing the leaderboardlayout of the game.
-     */
-    private Scene leaderboardlayout;
+    public static int currentLevelNumber = 1; // The number of the current level.
+    private static int score; // The current score of the player.
 
+    private static Button undoButton; // The undo Button.
+    private static Button redoButton; // The redo Button.
+    private static Button randomShuffleButton; // The random shuffle Button.
+    private static Button stepByStepShuffleButton; // The step by step shuffle Button.
 
-    /**
-     * The sequential transition used as a timer in the game.
-     */
-    private static SequentialTransition timer = null;
+    private static Pair<Integer, Integer> selectedCell = null; // The coordinates of the currently selected cell.
 
-    /**
-     * The label displaying the current level.
-     */
-    private Label levelLabel;
+    private static boolean[] completedLevels = new boolean[getLevels().size()]; // The table of booleans representing the completed levels.
 
-    static Label moveCountLabel = new Label("Move count : " + getMoveCount());
-    public static int currentLevelNumber = 1;
-
-    /**
-     * The current score of the player.
-     */
-    private static int score;
-
-    /**
-     * The undo Button.
-     */
-    private static Button undoButton;
-
-    /**
-     * The random shuffle Button.
-     */
-
-    private static Button randomShuffleButton;
-
-    /**
-     * The step by step shuffle Button.
-     */
-
-    private static Button stepByStepShuffleButton;
-
-    /**
-     * The redo Button.
-     */
-    private static Button redoButton;
-
-    private static Pair<Integer, Integer> selectedCell = null;
-
-    static GridPane gridLayout = new GridPane();
-
-    /**
-     * Returns a list containing the levels.
-     *
-     * @return The level list.
-     */
-    public static List<Level> getLevels() {
-        return levels;
-    }
-
-    /**
-     * The table of booleans representing the completed levels.
-     */
-    private static boolean[] completedLevels = new boolean[getLevels().size()];;
+    static Stack<Tile[][]> undoStack = new Stack<>(); // The stack of previous moves that the user is able to undo.
+    static Stack<Tile[][]> redoStack = new Stack<>(); // The stack of undid moves that the user is able to redo.
 
     /**
      * Returns the current level in the game.
@@ -166,8 +99,15 @@ public class PuzzleGame extends Application {
     public static Level getCurrentLevel() {
         return currentLevel;
     }
-
-
+    
+    /**
+     * Returns a list containing the levels.
+     *
+     * @return The level list.
+     */
+    public static List<Level> getLevels() {
+        return levels;
+    }
 
     /**
      * Sets the current level.
@@ -392,9 +332,6 @@ public class PuzzleGame extends Application {
 		PuzzleGame.gridLayout = gridLayout;
 	}
 
-    static Stack<Tile[][]> undoStack = new Stack<>();
-    static Stack<Tile[][]> redoStack = new Stack<>();
-
     /**
      * Returns the undo stack. 
      * 
@@ -498,6 +435,11 @@ public class PuzzleGame extends Application {
         PuzzleGame.stepByStepShuffleButton = stepByStepShuffleButton;
     }
 
+    /**
+     * Returns the selected cell.
+     * 
+     * @return the selected cell.
+     */
     public static Pair<Integer, Integer> getSelectedCell() {
 		return PuzzleGame.selectedCell;
 	}
@@ -740,6 +682,11 @@ public class PuzzleGame extends Application {
     static int initialTranslateX;
     static int initialTranslateY;
     static final int TILE_SIZE = 200;
+    /**
+     * Constructs the grid layout with the tiles.
+     * 
+     * @param gridLayout the grid pane.
+     */
     private static void tileGridConstuctor(GridPane gridLayout) {
         gridLayout.getChildren().clear();
         for (int i = 0; i<getCurrentLevel().getTiles().length; i++) {
@@ -765,6 +712,7 @@ public class PuzzleGame extends Application {
                                 + "-fx-background-color: #640;"); // dark wood
                         getCurrentLevel().getTiles()[i][j].setAlignment(Pos.CENTER);
                 }
+                
                 if(getCurrentLevel().getTiles()[i][j].getValue()!=-1){
                     int finalI4 = i;
                     int finalJ4 = j;
@@ -883,6 +831,15 @@ public class PuzzleGame extends Application {
             }
         }
     }
+
+    /**
+     * Swaps 2 tiles in the grid layout.
+     * 
+     * @param col1 the column of the first tile.
+     * @param row1 the row of the first tile.
+     * @param col2 the column of the second tile.
+     * @param row2 the row of the second tile.
+     */
     private static void swapTiles(int col1, int row1, int col2, int row2) {
         Node tile1 = getNodeByRowColumnIndex(row1, col1);
         Node tile2 = getNodeByRowColumnIndex(row2, col2);
@@ -898,10 +855,17 @@ public class PuzzleGame extends Application {
             tileGridConstuctor(getGridLayout());
         }
     }
-    
+
+    /**
+     * Gets the Node at the provided row and column
+     * in the grid layout.
+     * 
+     * @param row the row to search for.
+     * @param col the column to search for.
+     * @return the found node, or null if none.
+     */
     private static Node getNodeByRowColumnIndex(final int row, final int col) {
         for (Node node : getGridLayout().getChildren()) {
-
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
                 return node;
             }
@@ -909,6 +873,12 @@ public class PuzzleGame extends Application {
         return null;
     }
 
+    /**
+     * Displays a preview of the solved level
+     * on the bottom-right corner of the screen.
+     * 
+     * @param gridLayout the grid pane in which the preview will be displayed.
+     */
     private static void solvedLevelPreview(GridPane gridLayout) {
         gridLayout.getChildren().clear();
         int i, j = 0;
@@ -948,9 +918,6 @@ public class PuzzleGame extends Application {
 		return getCurrentLevel().equals(getLevels().get(getCurrentLevelNumber() - 1));
 	}
 
-    /**
-     * Opens the difficulty settings screen.
-     */
     public Scene getDifficultylayout() {
         return difficultylayout;
     }
@@ -1001,10 +968,6 @@ public class PuzzleGame extends Application {
 
         this.difficultylayout = new Scene(difficultyLayout);
     }
-
-    /**
-     * Opens the leaderboard screen.
-     */
 
     public Scene getLeaderboardlayout() {
         return leaderboardlayout;
