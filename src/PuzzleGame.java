@@ -119,11 +119,22 @@ public class PuzzleGame extends Application {
         return levels;
     }
 
+    /**
+     * Returns the best score
+     *
+     * @return The bestScore.
+     */
     public static  int getBestScore() {
         return bestScore;
     }
 
-    public static  void setBestScore(int n) {
+
+    /**
+     * Sets the best score.
+     *
+     * @param n The score.
+     */
+    public static void setBestScore(int n) {
         bestScore = n ;
     }
 
@@ -488,6 +499,10 @@ public class PuzzleGame extends Application {
 
     static boolean loss = false;
 
+    /**
+     * Shows endsreen
+     *
+     */
     public static void loss() {
         setMoveCount(0);
         pause3.setOnFinished(event -> {
@@ -500,6 +515,10 @@ public class PuzzleGame extends Application {
         pause3.play();
     }
 
+    /**
+     * Shuffles the level on arrival
+     *
+     */
     public static void firstShuffle(){
         System.out.println(canPlay);
         pause1.play() ;
@@ -515,7 +534,6 @@ public class PuzzleGame extends Application {
      *
      * @return The solve button.
      */
-
     public static Button getsolveButton() {
         return solveButton;
     }
@@ -639,6 +657,9 @@ public class PuzzleGame extends Application {
 		Platform.exit();
 	}
 
+    /**
+     * Shows message on alert
+     */
     private static void showMessage(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Message");
@@ -789,8 +810,6 @@ public class PuzzleGame extends Application {
 
     static int mousePosX; // The x-coordinate of the mouse position.
     static int mousePosY; // The y-coordinate of the mouse position.
-    static int initialTranslateX; // TODO comment
-    static int initialTranslateY; // TODO comment
     static final int TILE_SIZE = 200; // The size of the tiles.
 
     /**
@@ -836,8 +855,6 @@ public class PuzzleGame extends Application {
                                     return;}
                                 mousePosX = (int) event.getSceneX();
                                 mousePosY = (int) event.getSceneY();
-                                initialTranslateX = (int) getCurrentLevel().getTiles()[finalI4][finalJ4].getTranslateX();
-                                initialTranslateY = (int) getCurrentLevel().getTiles()[finalI4][finalJ4].getTranslateY();
 
                                 getCurrentLevel().getTiles()[finalI4][finalJ4].startDragAndDrop(TransferMode.MOVE);
 
@@ -1055,7 +1072,7 @@ public class PuzzleGame extends Application {
     }
 
     /**
-     * TODO comment
+     * Sets the difficulty layout.
      */
     public void setDifficultylayout() {
         VBox difficultyLayout = new VBox(10);
@@ -1112,6 +1129,11 @@ public class PuzzleGame extends Application {
         return leaderboardlayout;
     }
 
+    /**
+     * Sets the leaderboard layout.
+     *
+     *
+     */
     public void setLeaderboardlayout() {
         VBox leaderboardLayout = new VBox(10);
 
@@ -1360,6 +1382,12 @@ public class PuzzleGame extends Application {
 
     }
 
+
+    /**
+     * Checks if all Levels are completed
+     *
+     * @return true when all Levels are completed
+     */
     public static boolean finishGame() {
         int n = levels.size() ;
         if (getCurrentLevelNumber() == n + 1 ){
@@ -1433,25 +1461,5 @@ public class PuzzleGame extends Application {
 
     public static void main(String[] args) {
         launch(args);
-
-        currentLevel=levels.get(8).copy();
-        if(Arrays.deepEquals(currentLevel.getTiles(),levels.get(8).getTiles())){
-            System.out.println("youpi");
-        }else {
-            System.out.println("noooo");
-        }
-        currentLevel.print();
-        currentLevel.stepByStepShuffleLevel();
-        if(Arrays.deepEquals(currentLevel.getTiles(),levels.get(8).getTiles())){
-            System.out.println("youpi");
-        }else {
-            System.out.println("noooo");
-        }
-
-        /*
-        src.Node node = new src.Node(currentLevel,null,0,PuzzleSolver.calculateManhattanDistance(currentLevel));
-        PuzzleSolver.solvePuzzle(currentLevel);
-*/
-
     }
 }
