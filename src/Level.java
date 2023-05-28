@@ -249,7 +249,7 @@ public int[][] getEmptyTiles() {
         for (Tile[] row : getTiles())
             for (Tile tile : row)
                 result += tile.getValue();
-		return result * primeNumber;
+        return result * primeNumber;
 	}
 }
 
