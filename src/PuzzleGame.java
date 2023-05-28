@@ -99,7 +99,7 @@ public class PuzzleGame extends Application {
     static Stack<Tile[][]> undoStack = new Stack<>(); // The stack of previous moves that the user is able to undo.
     static Stack<Tile[][]> redoStack = new Stack<>(); // The stack of undid moves that the user is able to redo.
 
-    public static LinkedHashSet<Tile[][]> solvingMoves= new LinkedHashSet<>(); // The solving moves.
+    public static ArrayList<Tile[][]> solvingMoves= new ArrayList<>(); // The solving moves.
 
     /**
      * Returns the current level in the game.
@@ -417,7 +417,7 @@ public class PuzzleGame extends Application {
      *
      * @return The solving moves.
      */
-    public static LinkedHashSet<Tile[][]> getSolvingMoves() {
+    public static ArrayList<Tile[][]> getSolvingMoves() {
 		return solvingMoves;
 	}
 
