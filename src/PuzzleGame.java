@@ -1141,7 +1141,7 @@ public class PuzzleGame extends Application {
                             rankLabel.setStyle("-fx-text-fill: #442200;-fx-font-size: 18;-fx-font-family: 'Rockwell'");
                             rankLabel.setMinWidth(35);//to avoid the points to move when the ranking is ten
                             labelrank[count] = new Label("Point: " + integer); // to set the rank
-                            labelrank[count].setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
+                            labelrank[count].setStyle("-fx-text-fill: #442200;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
                             HBox labelRanking = new HBox(); //create horizontal box
 
 
@@ -1206,10 +1206,10 @@ public class PuzzleGame extends Application {
         }
         Label bestScoreLabel = new Label("Best Score : " + getBestScore());
         Label scoreLabel = new Label("Score : " + getMoveCount());
-        scoreLabel.setStyle("-fx-text-fill:#2f2; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
-        bestScoreLabel.setStyle("-fx-text-fill:#f8ff22; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
+        scoreLabel.setStyle("-fx-text-fill:#000000; -fx-border-color: rgba(68,34,0,0); -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
+        bestScoreLabel.setStyle("-fx-text-fill:#000000; -fx-border-color: rgba(68,34,0,0); -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
         Label levelLabel = new Label("Level: " + getCurrentLevelNumber());
-        levelLabel.setStyle("-fx-text-fill:#ddd; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
+        levelLabel.setStyle("-fx-text-fill:#000000; -fx-border-color: rgba(128,128,128,0); -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
         HBox hbox = new HBox(5);
         hbox.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(levelLabel, scoreLabel);
@@ -1239,20 +1239,28 @@ public class PuzzleGame extends Application {
         // Buttons formatting
 		List<Button> buttons = Arrays.asList(nextLevelButton, replayButton, saveScoreButton, homeButton);
 		for(Button button : buttons) {
-			button.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'");
+			button.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-background-color: rgba(0,0,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold' ; -fx-border-width: 3 ;");
 			button.setOnMousePressed(event -> {
-				button.setStyle("-fx-border-color: black; -fx-background-color: grey;"); //to make grey transparent
+				button.setStyle("-fx-border-color: rgba(102,68,0,0); -fx-background-color: rgba(128,128,128,0);"); //to make grey transparent
 	            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1));//during 0.1 second
-	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:#e19116 ;-fx-border-color: black; -fx-background-color: #25140c;-fx-font-size: 18;-fx-font-family: 'Leoscar'"));//to remove the transparent
+	            pauseTransition.setOnFinished(e -> button.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold' ; -fx-border-width: 3 ;"));//to remove the transparent
 	            pauseTransition.play();
 	        });
 		}
 
         // ----------------------------Create VBox to set label and button with space--------------------------------------
         VBox endScreenLayout = new VBox(10); // to create a vertical space 10px
+
+        Image backgroundImage = new Image("file:background2-min.jpg");
+        backgroundImage.widthProperty().add(primaryStage.widthProperty());
+        backgroundImage.heightProperty().add(primaryStage.heightProperty());
+        BackgroundSize backgroundSize = new BackgroundSize(1000, 1000, true, true, false, true);
+        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
+
+        endScreenLayout.setBackground(new Background(background));
+
         endScreenLayout.setAlignment(Pos.CENTER); // to center the buttons
         endScreenLayout.getChildren().add(hbox); // to add the hbox
-        endScreenLayout.setStyle("-fx-background-color: black;");
         if (getBestScore() != 0 ) {
             endScreenLayout.getChildren().add(bestScoreLabel);
         }
