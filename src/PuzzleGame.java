@@ -1426,6 +1426,11 @@ public class PuzzleGame extends Application {
             System.out.println("Error  : " + e.getMessage());
         }
     }
+	/**
+     * To sort the point in excluding zero
+     *
+     * @param points contains a list of point not sorted with zeros.
+     */
 
     public Integer[] sortPointsWithoutZeros(Integer[] points) {
         //To exclude zero
