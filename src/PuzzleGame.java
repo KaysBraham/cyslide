@@ -428,8 +428,6 @@ public class PuzzleGame extends Application {
         for(Tile[][] tiles : getSolvingMoves()){
         	getCurrentLevel().setTiles(tiles);
             tileGridConstuctor(getGridLayout());
-            PauseTransition pause = new PauseTransition(Duration.seconds(2));
-            pause.play();
         }
     }
 
