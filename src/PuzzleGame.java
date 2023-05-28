@@ -1221,6 +1221,14 @@ public class PuzzleGame extends Application {
             hbox.getChildren().addAll(lossLabel);
             endScreenLayout.getChildren().add(hbox);
         }
+        else {
+            Label lossLabel = new Label("YOU WON THE GAME");
+            lossLabel.setStyle("-fx-text-fill:#000000; -fx-border-color: rgba(68,34,0,0); -fx-background-color: rgba(37,20,12,0); -fx-font-size: 30; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
+            HBox hbox = new HBox(5);
+            hbox.setAlignment(Pos.CENTER);
+            hbox.getChildren().addAll(lossLabel);
+            endScreenLayout.getChildren().add(hbox);
+        }
 
         Label bestScoreLabel = new Label("Best Score : " + getBestScore());
         Label scoreLabel = new Label("Score : " + getMoveCount());
