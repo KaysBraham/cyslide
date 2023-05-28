@@ -1034,9 +1034,6 @@ public class PuzzleGame extends Application {
 
                 levelButton.setStyle("-fx-border-color: black; -fx-background-color: grey;"); // to make grey transparent
 
-                PauseTransition pauseTransition = new PauseTransition(Duration.seconds(0.1)); // during 0.1 second
-                pauseTransition.play();
-
                 File file = new File("scoreLastGame.txt"); // to retrieve point
 
                 Scanner pointlastgame;
@@ -1075,7 +1072,7 @@ public class PuzzleGame extends Application {
                             rankLabel.setMinWidth(35);//to avoid the points to move when the ranking is ten
                             labelrank[count] = new Label("Point: " + integer); // to set the rank
                             labelrank[count].setStyle("-fx-text-fill: #e19116;-fx-font-size: 18;-fx-font-family: 'Leos-car'");
-                            HBox labelRanking = new HBox(10); //create horizontal box
+                            HBox labelRanking = new HBox(); //create horizontal box
 
 
                             labelRanking.getChildren().addAll(rankLabel, labelrank[count]); //add the label containing rank and point
