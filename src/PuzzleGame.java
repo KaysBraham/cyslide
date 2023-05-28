@@ -425,8 +425,9 @@ public class PuzzleGame extends Application {
      * Solves the current level.
      */
     private static void solve(){
-        for(Tile[][] tiles : getSolvingMoves()){
-        	getCurrentLevel().setTiles(tiles);
+        int i = 0;
+        for(Tile[][] tiles : getSolvingMoves()) {
+            getCurrentLevel().setTiles(tiles);
             tileGridConstuctor(getGridLayout());
         }
     }
@@ -482,8 +483,23 @@ public class PuzzleGame extends Application {
 
     static PauseTransition pause2 = new PauseTransition(Duration.seconds(2));
 
+    static PauseTransition pause3 = new PauseTransition(Duration.seconds(3));
 
-    static void firstShuffle(){
+    static boolean loss = false;
+
+    public static void loss() {
+        setMoveCount(0);
+        pause3.setOnFinished(event -> {
+            try {
+                showEndScreen();
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        });
+        pause3.play();
+    }
+
+    public static void firstShuffle(){
         System.out.println(canPlay);
         pause1.play() ;
         pause2.setOnFinished(event -> {
@@ -703,7 +719,7 @@ public class PuzzleGame extends Application {
 
         setsolveButton(new Button("Solve Shuffle"));
         getsolveButton().setStyle("-fx-font-size:25");
-        getsolveButton().setOnAction(e -> solve());
+        getsolveButton().setOnAction(e -> {solve(); loss=true; loss();});
         getsolveButton().setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
 
         topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton(),getsolveButton());
@@ -1191,9 +1207,21 @@ public class PuzzleGame extends Application {
         collectPoints();
 
         //-------------------------------------create point label----------------------------------------------------------------
+        VBox endScreenLayout = new VBox(10); // to create a vertical space 10px
+
         if (getMoveCount() < getBestScore() || getBestScore() == 0 ){
             setBestScore(getMoveCount());
         }
+
+        if (loss==true){
+            Label lossLabel = new Label("YOU LOST THE GAME");
+            lossLabel.setStyle("-fx-text-fill:#000000; -fx-border-color: rgba(68,34,0,0); -fx-background-color: rgba(37,20,12,0); -fx-font-size: 30; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
+            HBox hbox = new HBox(5);
+            hbox.setAlignment(Pos.CENTER);
+            hbox.getChildren().addAll(lossLabel);
+            endScreenLayout.getChildren().add(hbox);
+        }
+
         Label bestScoreLabel = new Label("Best Score : " + getBestScore());
         Label scoreLabel = new Label("Score : " + getMoveCount());
         scoreLabel.setStyle("-fx-text-fill:#000000; -fx-border-color: rgba(68,34,0,0); -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
@@ -1227,7 +1255,13 @@ public class PuzzleGame extends Application {
             getPrimaryStage().setScene( new Scene(root));
         });
         // Buttons formatting
-		List<Button> buttons = Arrays.asList(nextLevelButton, replayButton, saveScoreButton, homeButton);
+
+        List<Button> buttons = Arrays.asList(nextLevelButton, replayButton, saveScoreButton, homeButton);
+        if (loss) {
+            buttons = Arrays.asList(replayButton, saveScoreButton, homeButton);
+            loss = false;
+        }
+
 		for(Button button : buttons) {
 			button.setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-background-color: rgba(0,0,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold' ; -fx-border-width: 3 ;");
 			button.setOnMousePressed(event -> {
@@ -1239,7 +1273,7 @@ public class PuzzleGame extends Application {
 		}
 
         // ----------------------------Create VBox to set label and button with space--------------------------------------
-        VBox endScreenLayout = new VBox(10); // to create a vertical space 10px
+
 
         Image backgroundImage = new Image("file:background2-min.jpg");
         backgroundImage.widthProperty().add(primaryStage.widthProperty());
