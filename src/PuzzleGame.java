@@ -1115,7 +1115,11 @@ public class PuzzleGame extends Application {
         collectPoints();
 
         //-------------------------------------create point label----------------------------------------------------------------
-        Label scoreLabel = new Label("Score: " + getMoveCountLabel()); // to print point
+        if (getMoveCount() < getScore()) {
+            setScore(getMoveCount());
+        }
+        Label bestScoreLabel = new Label("Best Score: " + getScore());
+        Label scoreLabel = new Label("Score: " + getMoveCount()); // to print point
         // FIXME
         scoreLabel.setStyle("-fx-text-fill:#2f2; -fx-border-color: #420; -fx-background-color: rgba(37,20,12,0); -fx-font-size: 22; -fx-border-width: 3; -fx-font-family: 'Rockwell'; -fx-font-weight: 'bold'");
         Label levelLabel = new Label("Level: " + getCurrentLevelNumber()); // to print level
