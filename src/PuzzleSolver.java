@@ -1,11 +1,6 @@
 package src;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents a puzzle solver for a game.
@@ -61,13 +56,13 @@ public class PuzzleSolver {
      */
     public static boolean solvePuzzle(Level initialState) {
         Node initialNode = new Node(initialState, null, 0, calculateManhattanDistance(initialState));
-        PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingInt(n -> n.getCostSoFar() + n.getEstimatedCost()));
+        TreeSet<Node> openSet = new TreeSet<>(Comparator.comparingInt(n -> n.getCostSoFar() + n.getEstimatedCost()));
         Set<Node> closedSet = new LinkedHashSet<>();
 
         openSet.add(initialNode);
 
         while (!openSet.isEmpty()) {
-            Node currentNode = openSet.poll();
+            Node currentNode = openSet.pollFirst();
             closedSet.add(currentNode);
 
             if (isGoalState(currentNode.getState())) {
