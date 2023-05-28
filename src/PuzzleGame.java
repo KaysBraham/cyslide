@@ -1407,8 +1407,6 @@ public class PuzzleGame extends Application {
         File file = new File("scoreLastGame.txt"); // to register scoreLastGame
         Scanner scoreLastGame = new Scanner(file); // collect the score
         String[] data = scoreLastGame.next().split(";");
-
-        setCurrentLevelNumber(Integer.parseInt(data[1])); // convert string to int
         scoreLastGame.close();
 
     }
