@@ -151,30 +151,32 @@ public class Level {
                 switch (randomMove) {
                     case 0 :
                         if (isMoveValid(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0]+1, emptyTiles[randomEmptyTile][1])){
-                            swapTile(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0]+1, emptyTiles[randomEmptyTile][1]);
-                            isMoveDone=true;
+                        	swapTile(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0]+1, emptyTiles[randomEmptyTile][1]);
+                            isMoveDone = true;
                         }
+                        break;
                     case 1 :
                         if (isMoveValid(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1]+1)){
-                            swapTile(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1]+1);
-                            isMoveDone=true;
+                        	swapTile(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1]+1);
+                            isMoveDone = true;
                         }
+                        break;
                     case 2 :
                         if (isMoveValid(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1]-1)){
-                            swapTile(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1]-1);
-                            isMoveDone=true;
+                        	swapTile(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1]-1);
+                            isMoveDone = true;
                         }
+                        break;
                     case 3 :
                         if (isMoveValid(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0]-1, emptyTiles[randomEmptyTile][1])){
-                            swapTile(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0]-1, emptyTiles[randomEmptyTile][1]);
-                            isMoveDone=true;
+                        	swapTile(emptyTiles[randomEmptyTile][0], emptyTiles[randomEmptyTile][1], emptyTiles[randomEmptyTile][0]-1, emptyTiles[randomEmptyTile][1]);
+                            isMoveDone = true;
                         }
-                    default:
                         break;
                 }
 
             } while (!isMoveDone);
-            if (!(n == 999 && checkShuffle())){
+            if (!(n == 999 && !checkShuffle())){
                 n++;
             }
         }

@@ -33,7 +33,6 @@ public class PuzzleSolver {
                         Node newNeighbor = new Node(newLevel, parent, parent.getCostSoFar(), calculateManhattanDistance(newLevel));
                         neighbors.add(newNeighbor);
                     }
-
                 }
             }
         }

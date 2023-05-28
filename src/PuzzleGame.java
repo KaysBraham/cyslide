@@ -841,9 +841,9 @@ public class PuzzleGame extends Application {
                                 if ((Math.abs(colOffset) + Math.abs(rowOffset) == 1) && getCurrentLevel().getTiles()[finalI1][finalJ1].getValue()==0) {
                                     int originCol = finalJ1 - colOffset;
                                     int originRow = finalI1 - rowOffset;
-                                    undoStack.push(currentLevel.copy().getTiles());
+                                    getUndoStack().push(getCurrentLevel().copy().getTiles());
                                     swapTiles(finalJ1, finalI1, originCol, originRow);
-                                    redoStack.clear();
+                                    getRedoStack().clear();
                                     getRedoButton().setDisable(true);
                                     getUndoButton().setDisable(false);
                                     setMoveCount(getMoveCount() + 1);
