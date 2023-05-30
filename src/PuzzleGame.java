@@ -90,6 +90,8 @@ public class PuzzleGame extends Application {
     private static Button stepByStepShuffleButton; // The step by step shuffle Button.
     private static Button solveButton; // The solve Button.
 
+    private static Button resolutionStepButton; // The step to solve game Button.
+
     private static boolean canPlay = false; // True if the user can play, false otherwise.
 
     private static Pair<Integer, Integer> selectedCell = null; // The coordinates of the currently selected cell.
@@ -432,18 +434,39 @@ public class PuzzleGame extends Application {
 		return solvingMoves;
 	}
 
-	/**
+
+    private static int compt = 0;
+
+    public static int getCompt() {
+        return compt;
+    }
+
+  	/**
      * Solves the current level.
      */
-    private static void solve(){
-        for(Tile[][] tiles : getSolvingMoves()){
-        	getCurrentLevel().setTiles(tiles);
-            tileGridConstuctor(getGridLayout());
-            PauseTransition pause = new PauseTransition(Duration.seconds(2));
-            pause.play();
+    public static void solve() {
+        Tile[][] tiles = getSolvingMoves().get(getCompt());
+        getCurrentLevel().setTiles(tiles);
+        tileGridConstuctor(getGridLayout());
+        compt += 1 ;
+        if (compt == getSolvingMoves().size()){
+            loss();
+            redoStack.clear();
+            undoStack.clear();
+            canPlay=false;
+            getResolutionStepButton().setDisable(true);
         }
-        loss=true;
     }
+
+    public static Button getResolutionStepButton() {
+        return resolutionStepButton;
+    }
+
+    public static void setResolutionStepButton(Button resolutionStep) {
+        PuzzleGame.resolutionStepButton = resolutionStep;
+    }
+
+
 
 	/**
      * Returns the random shuffle button.
@@ -482,6 +505,8 @@ public class PuzzleGame extends Application {
     public static void setStepByStepShuffleButton(Button stepByStepShuffleButton) {
         PuzzleGame.stepByStepShuffleButton = stepByStepShuffleButton;
     }
+
+
 
     /**
      * Returns the selected cell.
@@ -530,6 +555,7 @@ public class PuzzleGame extends Application {
         pause2.play();
         canPlay = true ;
     }
+
 
     /**
      * Returns the solve button.
@@ -746,15 +772,17 @@ public class PuzzleGame extends Application {
 
         setsolveButton(new Button("Solve Shuffle"));
         getsolveButton().setStyle("-fx-font-size:25");
-        getsolveButton().setOnAction(e -> {solve();
-            loss();
-        redoStack.clear();
-        undoStack.clear();
-        canPlay=false;
-        });
+        getsolveButton().setOnAction(e -> {getsolveButton().setDisable(true); getResolutionStepButton().setDisable(false);});
         getsolveButton().setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
 
-        topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton(),getsolveButton());
+        setResolutionStepButton(new Button("Next Step"));
+        getResolutionStepButton().setStyle("-fx-font-size:32");
+        getResolutionStepButton().setDisable(true);
+        getResolutionStepButton().setOnAction(e -> solve());
+        getResolutionStepButton().setStyle("-fx-text-fill:#442200 ;-fx-border-color: #442200; -fx-border-width: 3; -fx-background-color: rgba(68,34,0,0);-fx-font-size: 18;-fx-font-family: 'Rockwell'; -fx-font-size: 'bold'");
+
+
+        topLayout.getChildren().addAll(getUndoButton(), getRedoButton(), getRandomShuffleButton(), getStepByStepShuffleButton(),getsolveButton(),getResolutionStepButton());
 
         HBox bottomLayout = new HBox(64);
         bottomLayout.setAlignment(Pos.CENTER);
