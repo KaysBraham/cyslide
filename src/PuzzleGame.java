@@ -1300,7 +1300,7 @@ public class PuzzleGame extends Application {
 
         //---------------------------------------- Create "Replay" button------------------------------------------------------
         Button replayButton = new Button("Replay");
-        replayButton.setOnAction(event -> {canPlay=false; startGame(); firstShuffle();redoStack.clear();undoStack.clear();});
+        replayButton.setOnAction(event -> {canPlay=false; loss = false; startGame(); firstShuffle();redoStack.clear();undoStack.clear();});
 
         //--------------------------------------- Create "Save score" button--------------------------------------------------
         Button saveScoreButton = new Button("Save score");
