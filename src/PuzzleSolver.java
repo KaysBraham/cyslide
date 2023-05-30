@@ -66,7 +66,7 @@ public class PuzzleSolver {
         Set<Node> closedSet = new LinkedHashSet<>();
 
         openSet.add(initialNode);
-
+        PuzzleGame.solvingMoves.clear();
         while (!openSet.isEmpty()) {
             Node currentNode = openSet.pollFirst();
             closedSet.add(currentNode);
@@ -75,7 +75,7 @@ public class PuzzleSolver {
                 // Solution trouvée, afficher le chemin ou effectuer les actions nécessaires
                 // selon votre implémentation spécifique
                 System.out.println("Solution found!");
-                PuzzleGame.solvingMoves.clear();
+
                 for (Node node : closedSet){
                     PuzzleGame.solvingMoves.add(node.getState().getTiles());
                     System.out.println("Etape");
