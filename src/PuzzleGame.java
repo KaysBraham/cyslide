@@ -442,6 +442,7 @@ public class PuzzleGame extends Application {
             PauseTransition pause = new PauseTransition(Duration.seconds(2));
             pause.play();
         }
+        loss=true;
     }
 
 	/**
@@ -504,6 +505,7 @@ public class PuzzleGame extends Application {
      *
      */
     public static void loss() {
+        loss = true;
         setMoveCount(0);
         pause3.setOnFinished(event -> {
             try {
@@ -745,6 +747,7 @@ public class PuzzleGame extends Application {
         setsolveButton(new Button("Solve Shuffle"));
         getsolveButton().setStyle("-fx-font-size:25");
         getsolveButton().setOnAction(e -> {solve();
+            loss();
         redoStack.clear();
         undoStack.clear();
         canPlay=false;
@@ -1297,7 +1300,7 @@ public class PuzzleGame extends Application {
 
         //---------------------------------------- Create "Replay" button------------------------------------------------------
         Button replayButton = new Button("Replay");
-        replayButton.setOnAction(event -> {startGame(); firstShuffle();redoStack.clear();undoStack.clear();canPlay=false;});
+        replayButton.setOnAction(event -> {canPlay=false; startGame(); firstShuffle();redoStack.clear();undoStack.clear();});
 
         //--------------------------------------- Create "Save score" button--------------------------------------------------
         Button saveScoreButton = new Button("Save score");
@@ -1321,7 +1324,6 @@ public class PuzzleGame extends Application {
         List<Button> buttons = Arrays.asList(nextLevelButton, replayButton, saveScoreButton, homeButton);
         if (loss) {
             buttons = Arrays.asList(replayButton, saveScoreButton, homeButton);
-            loss = false;
         }
 
 		for(Button button : buttons) {
