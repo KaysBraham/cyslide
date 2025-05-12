@@ -1,0 +1,1112 @@
+#!/usr/bin/env bash
+
+# sniff.sh - A script to create a WiFi hotspot or Ethernet connection with customizable options
+#
+# Usage: ./sniff.sh [start|stop|status|restart|save-config|load-config]
+
+# Default configuration (can be modified)
+CONNECTION_TYPE="wifi"     # New variable to determine connection type (wifi or ethernet)
+HOTSPOT_INTERFACE=""
+INTERNET_INTERFACE=""
+SSID="MyHotspot"
+PASSWORD="password123"  # Static default password
+CHANNEL="2"          # Default to auto channel selection
+WIFI_MODE="g"           # Default for 2.4GHz
+SUBNET="192.168.1.0"
+IP_ADDRESS="192.168.1.1"
+DNS_SERVER="8.8.8.8"
+DNS_SERVER2="1.1.1.1"
+ENABLE_TCPDUMP=0
+TCPDUMP_FILE=""
+TCPDUMP_FILTER=""
+TCPDUMP_PID=""
+MAC_FILTER_ENABLED=0    # Disabled by default
+DEBUG_MODE=0            # Debug mode flag
+
+# Files to store created services/configs for cleanup
+SNIFF_DIR="/tmp/sniff"  # Changed from /home/$USER/sniff to avoid root issues
+DNSMASQ_CONF="$SNIFF_DIR/dnsmasq.conf"
+HOSTAPD_CONF="$SNIFF_DIR/hostapd.conf"
+TCPDUMP_FOLDER="$HOME/sniff/captures"
+CONFIG_DIR="$HOME/sniff/config.d"
+
+# Color codes for terminal output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to check if the script is run as root
+check_root() {
+    if [ "$(id -u)" -ne 0 ]; then
+        echo -e "${RED}Error: This script must be run as root${NC}"
+        exit 1
+    fi
+}
+
+# Function to check required tools
+check_dependencies() {
+    local missing_deps=()
+
+    # Required tools for both modes
+    for dep in dnsmasq ip iptables fzf; do
+        if ! command -v "$dep" &> /dev/null; then
+            missing_deps+=("$dep")
+        fi
+    done
+
+    # Check for hostapd only if we're doing WiFi mode
+    if [ "$CONNECTION_TYPE" = "wifi" ]; then
+        if ! command -v hostapd &> /dev/null; then
+            missing_deps+=("hostapd")
+        fi
+
+        if ! command -v iw &> /dev/null; then
+            missing_deps+=("iw")
+        fi
+    fi
+
+    # Check for tcpdump separately - it's optional
+    if ! command -v tcpdump &> /dev/null; then
+        echo -e "${YELLOW}Note: tcpdump is not installed. Packet capture functionality will be disabled.${NC}"
+    fi
+
+    if [ ${#missing_deps[@]} -ne 0 ]; then
+        echo -e "${RED}Error: Missing dependencies: ${missing_deps[*]}${NC}"
+        echo -e "${YELLOW}Please install them using:${NC}"
+        echo -e "${BLUE}sudo apt-get update && sudo apt-get install ${missing_deps[*]}${NC}"
+        exit 1
+    fi
+}
+
+# Function to validate IP addresses
+validate_ip() {
+    local ip=$1
+    local stat=1
+
+    if [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+        IFS='.' read -r -a ip_segments <<< "$ip"
+        [[ ${ip_segments[0]} -le 255 && ${ip_segments[1]} -le 255 \
+            && ${ip_segments[2]} -le 255 && ${ip_segments[3]} -le 255 ]]
+        stat=$?
+    fi
+    return $stat
+}
+
+# Function to list available WiFi interfaces with IP addresses if available
+list_wifi_interfaces() {
+    echo -e "${BLUE}Available wireless interfaces:${NC}"
+    for iface in $(iw dev | grep Interface | awk '{print $2}'); do
+        ip_addr=$(ip -o -4 addr show dev "$iface" 2>/dev/null | awk '{print $4}' | cut -d/ -f1)
+        if [ -n "$ip_addr" ]; then
+            echo "$iface ($ip_addr)"
+        else
+            echo "$iface (no IP)"
+        fi
+    done
+}
+
+# Function to get WiFi interfaces for selection (without the header)
+get_wifi_interfaces_for_selection() {
+    for iface in $(iw dev | grep Interface | awk '{print $2}'); do
+        ip_addr=$(ip -o -4 addr show dev "$iface" 2>/dev/null | awk '{print $4}' | cut -d/ -f1)
+        if [ -n "$ip_addr" ]; then
+            echo "$iface ($ip_addr)"
+        else
+            echo "$iface (no IP)"
+        fi
+    done
+}
+
+# Function to list ethernet interfaces with IP addresses if available
+list_ethernet_interfaces() {
+    echo -e "${BLUE}Available ethernet interfaces:${NC}"
+    ip -o link show | grep -v "LOOPBACK\|loopback\|wl" | awk -F': ' '{print $2}' | sed 's/@.*//' | while read -r iface; do
+        if [ "$iface" != "lo" ]; then
+            ip_addr=$(ip -o -4 addr show dev "$iface" 2>/dev/null | awk '{print $4}' | cut -d/ -f1)
+            if [ -n "$ip_addr" ]; then
+                echo "$iface ($ip_addr)"
+            else
+                echo "$iface (no IP)"
+            fi
+        fi
+    done
+}
+
+# Function to get ethernet interfaces for selection (without the header)
+get_ethernet_interfaces_for_selection() {
+    ip -o link show | grep -v "LOOPBACK\|loopback\|wl" | awk -F': ' '{print $2}' | sed 's/@.*//' | while read -r iface; do
+        if [ "$iface" != "lo" ]; then
+            ip_addr=$(ip -o -4 addr show dev "$iface" 2>/dev/null | awk '{print $4}' | cut -d/ -f1)
+            if [ -n "$ip_addr" ]; then
+                echo "$iface ($ip_addr)"
+            else
+                echo "$iface (no IP)"
+            fi
+        fi
+    done
+}
+
+# Function to list all network interfaces with IP addresses
+list_all_interfaces() {
+    echo -e "${BLUE}All network interfaces:${NC}"
+    ip -o link show | awk -F': ' '{print $2}' | sed 's/@.*//' | while read -r iface; do
+        if [ "$iface" != "lo" ]; then
+            ip_addr=$(ip -o -4 addr show dev "$iface" 2>/dev/null | awk '{print $4}' | cut -d/ -f1)
+            if [ -n "$ip_addr" ]; then
+                echo "$iface ($ip_addr)"
+            else
+                echo "$iface (no IP)"
+            fi
+        fi
+    done
+}
+
+# Function to get all interfaces for selection (without the header)
+get_all_interfaces_for_selection() {
+    ip -o link show | awk -F': ' '{print $2}' | sed 's/@.*//' | while read -r iface; do
+        if [ "$iface" != "lo" ]; then
+            ip_addr=$(ip -o -4 addr show dev "$iface" 2>/dev/null | awk '{print $4}' | cut -d/ -f1)
+            if [ -n "$ip_addr" ]; then
+                echo "$iface ($ip_addr)"
+            else
+                echo "$iface (no IP)"
+            fi
+        fi
+    done
+}
+
+# Function to check if interface supports AP mode
+check_ap_support() {
+    local interface=$1
+    if ! iw list | grep -A 10 "Supported interface modes" | grep -q "* AP"; then
+        echo -e "${RED}Warning: Your wireless card may not support AP mode properly.${NC}"
+        echo -e "${YELLOW}Checking specific interface capabilities...${NC}"
+
+        if iw dev "$interface" info | grep -q "type managed"; then
+            echo -e "${YELLOW}Interface $interface is currently in managed mode.${NC}"
+            echo -e "${YELLOW}Will attempt to switch to AP mode, but this may fail on some hardware.${NC}"
+        fi
+    else
+        echo -e "${GREEN}AP mode is supported by your wireless hardware.${NC}"
+    fi
+}
+
+# New function to select connection type
+select_connection_type() {
+    echo -e "${YELLOW}Select connection type:${NC}"
+    CONNECTION_TYPES=("WiFi Hotspot" "Ethernet")
+    SELECTED_TYPE=$(printf "%s\n" "${CONNECTION_TYPES[@]}" | fzf --height=10 --prompt="Connection type > " --header="Select connection type")
+
+    if [ -z "$SELECTED_TYPE" ]; then
+        echo -e "${RED}No connection type selected. Exiting.${NC}"
+        exit 1
+    fi
+
+    if [ "$SELECTED_TYPE" = "WiFi Hotspot" ]; then
+        CONNECTION_TYPE="wifi"
+        echo -e "${GREEN}Selected mode: WiFi Hotspot${NC}"
+    else
+        CONNECTION_TYPE="ethernet"
+        echo -e "${GREEN}Selected mode: Ethernet${NC}"
+    fi
+}
+
+# Function to select interfaces - modified to handle both WiFi and Ethernet
+select_interfaces() {
+    if [ "$CONNECTION_TYPE" = "wifi" ]; then
+        # Use fzf to select WiFi interface for hotspot
+        echo -e "${YELLOW}Select the wireless interface for the hotspot:${NC}"
+        WIFI_INTERFACES=$(get_wifi_interfaces_for_selection)
+        if [ -z "$WIFI_INTERFACES" ]; then
+            echo -e "${RED}Error: No wireless interfaces found${NC}"
+            exit 1
+        fi
+
+        SELECTED_INTERFACE=$(echo "$WIFI_INTERFACES" | fzf --height=10 --prompt="Hotspot interface > " --header="Select wireless interface for hotspot")
+
+        if [ -z "$SELECTED_INTERFACE" ]; then
+            echo -e "${RED}Error: No interface selected${NC}"
+            exit 1
+        fi
+
+        # Extract just the interface name (remove IP part)
+        HOTSPOT_INTERFACE=$(echo "$SELECTED_INTERFACE" | awk '{print $1}')
+        echo -e "${GREEN}Selected hotspot interface: $HOTSPOT_INTERFACE${NC}"
+
+        # Check if it's a wireless interface
+        if ! iw dev "$HOTSPOT_INTERFACE" info &> /dev/null; then
+            echo -e "${RED}Error: $HOTSPOT_INTERFACE is not a wireless interface${NC}"
+            exit 1
+        fi
+
+        # Check if AP mode is supported
+        check_ap_support "$HOTSPOT_INTERFACE"
+
+        nmcli dev set "$HOTSPOT_INTERFACE" managed no &> /dev/null
+
+    else
+        # Ethernet mode - select the ethernet interface
+        echo -e "${YELLOW}Select the ethernet interface for DHCP server:${NC}"
+        ETHERNET_INTERFACES=$(get_ethernet_interfaces_for_selection)
+        if [ -z "$ETHERNET_INTERFACES" ]; then
+            echo -e "${RED}Error: No ethernet interfaces found${NC}"
+            exit 1
+        fi
+
+        SELECTED_INTERFACE=$(echo "$ETHERNET_INTERFACES" | fzf --height=10 --prompt="Ethernet interface > " --header="Select ethernet interface for DHCP server")
+
+        if [ -z "$SELECTED_INTERFACE" ]; then
+            echo -e "${RED}Error: No interface selected${NC}"
+            exit 1
+        fi
+
+        # Extract just the interface name (remove IP part)
+        HOTSPOT_INTERFACE=$(echo "$SELECTED_INTERFACE" | awk '{print $1}')
+        echo -e "${GREEN}Selected ethernet interface: $HOTSPOT_INTERFACE${NC}"
+    fi
+
+    # Use fzf to select interface for internet sharing
+    echo -e "${YELLOW}Select the interface connected to the internet:${NC}"
+    # Get all interfaces except the already selected hotspot interface
+    ALL_INTERFACES=$(get_all_interfaces_for_selection | grep -v "$HOTSPOT_INTERFACE")
+
+    if [ -z "$ALL_INTERFACES" ]; then
+        echo -e "${RED}Error: No other interfaces found for internet sharing${NC}"
+        exit 1
+    fi
+
+    SELECTED_INTERFACE=$(echo "$ALL_INTERFACES" | fzf --height=10 --prompt="Internet interface > " --header="Select interface for internet sharing")
+
+    if [ -z "$SELECTED_INTERFACE" ]; then
+        echo -e "${RED}Error: No interface selected${NC}"
+        exit 1
+    fi
+
+    # Extract just the interface name (remove IP part)
+    INTERNET_INTERFACE=$(echo "$SELECTED_INTERFACE" | awk '{print $1}')
+    echo -e "${GREEN}Selected internet interface: $INTERNET_INTERFACE${NC}"
+
+    if [ "$HOTSPOT_INTERFACE" = "$INTERNET_INTERFACE" ]; then
+        echo -e "${RED}Error: Cannot use the same interface for both service and internet${NC}"
+        exit 1
+    fi
+}
+
+# Function to configure hotspot/ethernet
+configure_hotspot() {
+    # Common configuration for both modes
+    # Subnet selection
+    echo -e "${YELLOW}Enter subnet (e.g., 192.168.1.0) [default: $SUBNET]:${NC}"
+    read -r input
+    if [ -n "$input" ]; then
+        if validate_ip "$input"; then
+            SUBNET="$input"
+        else
+            echo -e "${RED}Invalid subnet format. Using default: $SUBNET${NC}"
+        fi
+    fi
+
+    # IP address selection
+    echo -e "${YELLOW}Enter IP address for the interface (e.g., 192.168.1.1) [default: $IP_ADDRESS]:${NC}"
+    read -r input
+    if [ -n "$input" ]; then
+        if validate_ip "$input"; then
+            IP_ADDRESS="$input"
+        else
+            echo -e "${RED}Invalid IP address format. Using default: $IP_ADDRESS${NC}"
+        fi
+    fi
+
+    # WiFi-specific configuration
+    if [ "$CONNECTION_TYPE" = "wifi" ]; then
+        # SSID selection
+        echo -e "${YELLOW}Enter SSID [default: $SSID]:${NC}"
+        read -r input
+        [ -n "$input" ] && SSID="$input"
+
+        # Password selection
+        echo -e "${YELLOW}Enter password (minimum 8 characters) [default: $PASSWORD]:${NC}"
+        read -r input
+        if [ -n "$input" ]; then
+            if [ ${#input} -lt 8 ]; then
+                echo -e "${RED}Error: Password must be at least 8 characters${NC}"
+                exit 1
+            fi
+            PASSWORD="$input"
+        fi
+    fi
+
+    # Ask about advanced options
+    echo -e "${YELLOW}Configure advanced options? (DNS, MAC filtering) (y/N):${NC}"
+    read -r advanced_options
+    if [[ "$advanced_options" =~ ^[Yy]$ ]]; then
+        configure_advanced_options
+    fi
+
+    # Debug mode option
+    echo -e "${YELLOW}Enable debug mode? (y/N):${NC}"
+    read -r debug_option
+    if [[ "$debug_option" =~ ^[Yy]$ ]]; then
+        DEBUG_MODE=1
+        echo -e "${GREEN}Debug mode enabled. Will show detailed logs.${NC}"
+    fi
+
+    # Show summary
+    echo -e "${BLUE}Configuration Summary:${NC}"
+    if [ "$CONNECTION_TYPE" = "wifi" ]; then
+        echo -e "${GREEN}Mode: WiFi Hotspot${NC}"
+        echo -e "${GREEN}SSID: $SSID${NC}"
+        echo -e "${GREEN}Password: $PASSWORD${NC}"
+        if [[ "$advanced_options" =~ ^[Yy]$ ]]; then
+            echo -e "${GREEN}WiFi Mode: $WIFI_MODE ($([ "$WIFI_MODE" == "g" ] && echo "2.4GHz" || echo "5GHz"))${NC}"
+        else
+            echo -e "${GREEN}WiFi Mode: 2.4GHz (default)${NC}"
+        fi
+        echo -e "${GREEN}Channel: $CHANNEL${NC}"
+    else
+        echo -e "${GREEN}Mode: Ethernet DHCP Server${NC}"
+    fi
+    echo -e "${GREEN}Subnet: $SUBNET${NC}"
+    echo -e "${GREEN}IP Address: $IP_ADDRESS${NC}"
+    echo -e "${GREEN}Primary DNS: $DNS_SERVER${NC}"
+    echo -e "${GREEN}Secondary DNS: $DNS_SERVER2${NC}"
+    echo -e "${GREEN}MAC Filtering: $([ "$MAC_FILTER_ENABLED" -eq 1 ] && echo "Enabled" || echo "Disabled")${NC}"
+    echo -e "${GREEN}Debug Mode: $([ "$DEBUG_MODE" -eq 1 ] && echo "Enabled" || echo "Disabled")${NC}"
+
+    # Confirm settings
+    echo -e "${YELLOW}Press Enter to continue or Ctrl+C to abort${NC}"
+    read -r
+}
+
+# Function to configure advanced options - modified to handle both modes
+configure_advanced_options() {
+    # WiFi-specific advanced options
+    if [ "$CONNECTION_TYPE" = "wifi" ]; then
+        # WiFi band and channel
+        echo -e "${YELLOW}Select WiFi band:${NC}"
+        BANDS=("2.4GHz" "5GHz")
+        SELECTED_BAND=$(printf "%s\n" "${BANDS[@]}" | fzf --height=10 --prompt="WiFi band > " --header="Select band")
+
+        if [ "$SELECTED_BAND" = "5GHz" ]; then
+            WIFI_MODE="a"
+            # 5GHz channels - commonly available channels only
+            CHANNELS=$(echo -e "auto\n36\n40\n44\n48\n52\n56\n60\n64\n100\n104\n108\n112\n116\n132\n136\n140")
+            echo -e "${YELLOW}Select 5GHz WiFi channel (or auto for automatic selection):${NC}"
+        else
+            # 2.4GHz channels
+            WIFI_MODE="g"
+            CHANNELS=$(echo -e "auto\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14")
+            echo -e "${YELLOW}Select 2.4GHz WiFi channel (or auto for automatic selection):${NC}"
+        fi
+
+        # Channel selection with fzf
+        SELECTED_CHANNEL=$(echo "$CHANNELS" | awk -v channel="$CHANNEL" '{if ($1 == channel) print $1 ">" ; else print $1}' | fzf --height=10 --prompt="WiFi channel > " --header="Select channel" --tac | tr -d '>')
+
+        if [ -n "$SELECTED_CHANNEL" ]; then
+            CHANNEL="$SELECTED_CHANNEL"
+        fi
+    fi
+
+    # DNS server configuration - for both modes
+    echo -e "${YELLOW}Configure custom DNS servers? (y/N):${NC}"
+    read -r custom_dns
+    if [[ "$custom_dns" =~ ^[Yy]$ ]]; then
+        echo -e "${YELLOW}Primary DNS server [default: $DNS_SERVER]:${NC}"
+        read -r input
+        if [ -n "$input" ]; then
+            if validate_ip "$input"; then
+                DNS_SERVER="$input"
+            else
+                echo -e "${RED}Invalid IP format. Using default: $DNS_SERVER${NC}"
+            fi
+        fi
+
+        echo -e "${YELLOW}Secondary DNS server [default: $DNS_SERVER2]:${NC}"
+        read -r input
+        if [ -n "$input" ]; then
+            if validate_ip "$input"; then
+                DNS_SERVER2="$input"
+            else
+                echo -e "${RED}Invalid IP format. Using default: $DNS_SERVER2${NC}"
+            fi
+        fi
+    fi
+
+    # MAC filtering option - for both modes
+    echo -e "${YELLOW}Enable MAC address filtering? (y/N):${NC}"
+    read -r mac_response
+    if [[ "$mac_response" =~ ^[Yy]$ ]]; then
+        echo -e "${YELLOW}Enter allowed MAC addresses (one per line, end with empty line):${NC}"
+        MAC_FILTER_FILE="$SNIFF_DIR/mac_filter"
+        > "$MAC_FILTER_FILE"
+        while true; do
+            read -r mac
+            [[ -z "$mac" ]] && break
+            echo "$mac" >> "$MAC_FILTER_FILE"
+        done
+
+        MAC_FILTER_ENABLED=1
+    fi
+}
+
+# Function to configure tcpdump - simplified
+configure_tcpdump() {
+    if ! command -v tcpdump &> /dev/null; then
+        echo -e "${RED}tcpdump is not installed. Cannot enable packet capture.${NC}"
+        ENABLE_TCPDUMP=0
+        return
+    fi
+
+    echo -e "${YELLOW}Enable packet capture with tcpdump? (y/N):${NC}"
+    read -r response
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+        ENABLE_TCPDUMP=1
+
+        # Get output file with timestamp
+        TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+        DEFAULT_TCPDUMP_FILE="$TCPDUMP_FOLDER/capture-$TIMESTAMP.pcap"
+        echo -e "${YELLOW}Enter output file for packet capture [default: $DEFAULT_TCPDUMP_FILE]:${NC}"
+        read -r input
+        TCPDUMP_FILE=${input:-"$DEFAULT_TCPDUMP_FILE"}
+
+        # Simplified filter options
+        echo -e "${YELLOW}Select a packet filter:${NC}"
+        FILTER_OPTIONS=$(cat << EOF
+All traffic
+HTTP/HTTPS (ports 80, 443)
+DNS (port 53)
+Custom filter
+EOF
+)
+        FILTER_SELECTION=$(echo "$FILTER_OPTIONS" | fzf --height=10 --prompt="Filter > " --header="Select packet capture filter")
+
+        case "$FILTER_SELECTION" in
+            "All traffic")
+                TCPDUMP_FILTER=""
+                ;;
+            "HTTP/HTTPS (ports 80, 443)")
+                TCPDUMP_FILTER="port 80 or port 443"
+                ;;
+            "DNS (port 53)")
+                TCPDUMP_FILTER="port 53"
+                ;;
+            "Custom filter")
+                echo -e "${YELLOW}Enter custom tcpdump filter expression:${NC}"
+                read -r custom_filter
+                TCPDUMP_FILTER="$custom_filter"
+                ;;
+            *)
+                TCPDUMP_FILTER=""
+                ;;
+        esac
+
+        echo -e "${GREEN}Packet capture configured:${NC}"
+        echo -e "${GREEN}Output file: $TCPDUMP_FILE${NC}"
+        if [ -n "$TCPDUMP_FILTER" ]; then
+            echo -e "${GREEN}Filter: $TCPDUMP_FILTER${NC}"
+        else
+            echo -e "${GREEN}Filter: None (capturing all traffic)${NC}"
+        fi
+    fi
+}
+
+# Function to start tcpdump
+start_tcpdump() {
+    if [ "$ENABLE_TCPDUMP" -eq 1 ]; then
+        echo -e "${BLUE}Starting packet capture with tcpdump...${NC}"
+
+        # Create directory if needed
+        mkdir -p "$(dirname "$TCPDUMP_FILE")"
+
+        # Start tcpdump in background
+        if [ -n "$TCPDUMP_FILTER" ]; then
+            tcpdump -i "$HOTSPOT_INTERFACE" -w "$TCPDUMP_FILE" "$TCPDUMP_FILTER" -U &
+        else
+            tcpdump -i "$HOTSPOT_INTERFACE" -w "$TCPDUMP_FILE" -U &
+        fi
+        TCPDUMP_PID=$!
+
+        # Save PID to temp file
+        echo "$TCPDUMP_PID" > "$SNIFF_DIR/tcpdump.pid"
+
+        echo -e "${GREEN}Packet capture started with PID $TCPDUMP_PID${NC}"
+        echo -e "${GREEN}Capture file: $TCPDUMP_FILE${NC}"
+    fi
+}
+
+# Function to stop tcpdump
+stop_tcpdump() {
+    if [ -f "$SNIFF_DIR/tcpdump.pid" ]; then
+        TCPDUMP_PID=$(cat "$SNIFF_DIR/tcpdump.pid")
+        if ps -p "$TCPDUMP_PID" > /dev/null; then
+            echo -e "${BLUE}Stopping packet capture...${NC}"
+            kill "$TCPDUMP_PID"
+            wait "$TCPDUMP_PID" 2>/dev/null || true
+            echo -e "${GREEN}Packet capture stopped${NC}"
+            echo -e "${GREEN}Capture saved to: $TCPDUMP_FILE${NC}"
+        fi
+    fi
+}
+
+# Function to save configuration
+save_configuration() {
+    echo -e "${YELLOW}Enter name for this configuration:${NC}"
+    read -r config_name
+
+    if [ -z "$config_name" ]; then
+        echo -e "${RED}Configuration name cannot be empty${NC}"
+        return 1
+    fi
+
+    # Create config directory if it doesn't exist
+    mkdir -p "$CONFIG_DIR"
+
+    # Save configuration
+    cat > "$CONFIG_DIR/$config_name.conf" << EOF
+CONNECTION_TYPE="$CONNECTION_TYPE"
+HOTSPOT_INTERFACE="$HOTSPOT_INTERFACE"
+INTERNET_INTERFACE="$INTERNET_INTERFACE"
+SSID="$SSID"
+PASSWORD="$PASSWORD"
+CHANNEL="$CHANNEL"
+WIFI_MODE="$WIFI_MODE"
+SUBNET="$SUBNET"
+IP_ADDRESS="$IP_ADDRESS"
+DNS_SERVER="$DNS_SERVER"
+DNS_SERVER2="$DNS_SERVER2"
+ENABLE_TCPDUMP="$ENABLE_TCPDUMP"
+TCPDUMP_FILTER="$TCPDUMP_FILTER"
+MAC_FILTER_ENABLED="$MAC_FILTER_ENABLED"
+EOF
+
+    echo -e "${GREEN}Configuration saved as: $config_name${NC}"
+}
+
+# Function to load configuration
+load_configuration() {
+    if [ ! -d "$CONFIG_DIR" ]; then
+        echo -e "${RED}No saved configurations found${NC}"
+        return 1
+    fi
+
+    # List available configurations
+    echo -e "${YELLOW}Select a saved configuration:${NC}"
+    configs=$(find "$CONFIG_DIR" -name "*.conf" -exec basename {} \; | sed 's/.conf$//')
+
+    if [ -z "$configs" ]; then
+        echo -e "${RED}No saved configurations found${NC}"
+        return 1
+    fi
+
+    selected_config=$(echo "$configs" | fzf --height=10 --prompt="Configuration > " --header="Select a saved configuration")
+
+    if [ -z "$selected_config" ]; then
+        echo -e "${RED}No configuration selected${NC}"
+        return 1
+    fi
+
+    # Load configuration
+    if [ -f "$CONFIG_DIR/$selected_config.conf" ]; then
+        # shellcheck disable=SC1090
+        source "$CONFIG_DIR/$selected_config.conf"
+        echo -e "${GREEN}Loaded configuration: $selected_config${NC}"
+    else
+        echo -e "${RED}Configuration file not found${NC}"
+        return 1
+    fi
+}
+
+# Function to set up the WiFi hotspot or Ethernet connection
+setup_hotspot() {
+    if [ "$CONNECTION_TYPE" = "wifi" ]; then
+        echo -e "${GREEN}Setting up WiFi hotspot...${NC}"
+    else
+        echo -e "${GREEN}Setting up Ethernet DHCP server...${NC}"
+    fi
+
+    # Create temp directory
+    mkdir -p "$SNIFF_DIR"
+
+    # Configure IP address on the selected interface
+    ip link set "$HOTSPOT_INTERFACE" up
+    ip addr flush dev "$HOTSPOT_INTERFACE"
+    ip addr add "$IP_ADDRESS/24" dev "$HOTSPOT_INTERFACE"
+
+    # Create hostapd configuration only for WiFi mode
+    if [ "$CONNECTION_TYPE" = "wifi" ]; then
+        cat > "$HOSTAPD_CONF" << EOF
+interface=$HOTSPOT_INTERFACE
+driver=nl80211
+ssid=$SSID
+hw_mode=$WIFI_MODE
+EOF
+
+        # Add channel configuration (omit for auto)
+        if [ "$CHANNEL" != "auto" ]; then
+            echo "channel=$CHANNEL" >> "$HOSTAPD_CONF"
+        fi
+
+        # Continue with the rest of the hostapd configuration
+        cat >> "$HOSTAPD_CONF" << EOF
+wmm_enabled=0
+macaddr_acl=0
+auth_algs=1
+wpa=2
+wpa_passphrase=$PASSWORD
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP
+EOF
+
+        # Add MAC filtering if enabled
+        if [ "$MAC_FILTER_ENABLED" -eq 1 ] && [ -f "$MAC_FILTER_FILE" ]; then
+            cat >> "$HOSTAPD_CONF" << EOF
+macaddr_acl=1
+accept_mac_file=$MAC_FILTER_FILE
+EOF
+        fi
+    fi
+
+    # Create dnsmasq configuration
+    SUBNET_PREFIX=$(echo "$SUBNET" | cut -d. -f1-3)
+    cat > "$DNSMASQ_CONF" << EOF
+# Specific configuration for our network
+interface=$HOTSPOT_INTERFACE
+bind-interfaces
+dhcp-range=${SUBNET_PREFIX}.2,${SUBNET_PREFIX}.200,255.255.255.0,24h
+dhcp-option=3,${IP_ADDRESS}
+dhcp-option=6,${IP_ADDRESS}
+server=${DNS_SERVER}
+server=${DNS_SERVER2}
+log-queries
+log-dhcp
+listen-address=${IP_ADDRESS}
+no-hosts
+bogus-priv
+domain-needed
+quiet-dhcp
+EOF
+
+    # Enable IP forwarding
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+
+    # Set up NAT
+    iptables -t nat -A POSTROUTING -o "$INTERNET_INTERFACE" -j MASQUERADE
+    iptables -A FORWARD -i "$HOTSPOT_INTERFACE" -o "$INTERNET_INTERFACE" -j ACCEPT
+    iptables -A FORWARD -i "$INTERNET_INTERFACE" -o "$HOTSPOT_INTERFACE" -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+    # Save iptables rules to restore later
+    iptables-save > "$SNIFF_DIR/iptables-rules"
+
+    # Check for and stop any existing dnsmasq processes
+    if pgrep dnsmasq > /dev/null; then
+        echo -e "${YELLOW}Existing dnsmasq process detected. Attempting to stop it...${NC}"
+        # Try systemd service first if it exists
+        if systemctl status dnsmasq &> /dev/null; then
+            systemctl stop dnsmasq
+            sleep 1
+        else
+            # Otherwise kill the process
+            pkill dnsmasq
+            sleep 1
+        fi
+
+        # Check if it's still running
+        if pgrep dnsmasq > /dev/null; then
+            echo -e "${RED}Warning: Could not stop existing dnsmasq. Will try to continue anyway...${NC}"
+        else
+            echo -e "${GREEN}Successfully stopped existing dnsmasq service.${NC}"
+        fi
+    fi
+
+    # Start services
+    if [ "$CONNECTION_TYPE" = "wifi" ]; then
+        echo -e "${GREEN}Starting hostapd and dnsmasq...${NC}"
+    else
+        echo -e "${GREEN}Starting dnsmasq...${NC}"
+    fi
+
+    if [ "$DEBUG_MODE" -eq 1 ]; then
+        echo -e "${BLUE}Starting dnsmasq in debug mode...${NC}"
+        dnsmasq -C "$DNSMASQ_CONF" --log-debug || {
+            echo -e "${RED}Failed to start dnsmasq${NC}"
+            debug_dnsmasq_failure
+            stop_hotspot
+            exit 1
+        }
+
+        # Only start hostapd in WiFi mode
+        if [ "$CONNECTION_TYPE" = "wifi" ]; then
+            echo -e "${BLUE}Starting hostapd in debug mode...${NC}"
+            # Run hostapd with debugging if debug mode is enabled
+            hostapd -dd "$HOSTAPD_CONF" > "$SNIFF_DIR/hostapd.log" 2>&1 &
+            HOSTAPD_PID=$!
+            echo "$HOSTAPD_PID" > "$SNIFF_DIR/hostapd.pid"
+
+            # Wait a moment for hostapd to start
+            sleep 3
+
+            # Check if hostapd is still running
+            if ! ps -p "$HOSTAPD_PID" > /dev/null; then
+                echo -e "${RED}hostapd failed to start. Check log at $SNIFF_DIR/hostapd.log${NC}"
+                cat "$SNIFF_DIR/hostapd.log"
+                stop_hotspot
+                exit 1
+            fi
+        fi
+    else
+        dnsmasq -C "$DNSMASQ_CONF" || {
+            echo -e "${RED}Failed to start dnsmasq${NC}"
+            debug_dnsmasq_failure
+            stop_hotspot
+            exit 1
+        }
+
+        # Only start hostapd in WiFi mode
+        if [ "$CONNECTION_TYPE" = "wifi" ]; then
+            hostapd -B "$HOSTAPD_CONF" || {
+                echo -e "${RED}Failed to start hostapd${NC}";
+                stop_hotspot;
+                exit 1;
+            }
+        fi
+    fi
+
+    # Start tcpdump if enabled
+    start_tcpdump
+
+    # Verify if access point is active (for WiFi mode only)
+    if [ "$CONNECTION_TYPE" = "wifi" ]; then
+        sleep 2
+        check_ap_mode
+    fi
+
+    # Print success message
+    if [ "$CONNECTION_TYPE" = "wifi" ]; then
+        echo -e "${GREEN}WiFi hotspot is now active${NC}"
+        echo -e "${GREEN}SSID: $SSID${NC}"
+        echo -e "${GREEN}Password: $PASSWORD${NC}"
+    else
+        echo -e "${GREEN}Ethernet DHCP server is now active${NC}"
+        echo -e "${GREEN}IP Address: $IP_ADDRESS${NC}"
+        echo -e "${GREEN}DHCP Range: ${SUBNET_PREFIX}.2 - ${SUBNET_PREFIX}.200${NC}"
+    fi
+    echo -e "${GREEN}To stop the service, run: $0 stop${NC}"
+
+    # Save configuration for stop command
+    cat > "$SNIFF_DIR/config" << EOF
+CONNECTION_TYPE=$CONNECTION_TYPE
+HOTSPOT_INTERFACE=$HOTSPOT_INTERFACE
+INTERNET_INTERFACE=$INTERNET_INTERFACE
+TCPDUMP_FILE=$TCPDUMP_FILE
+DEBUG_MODE=$DEBUG_MODE
+EOF
+}
+
+# Function to debug dnsmasq failure
+debug_dnsmasq_failure() {
+    echo -e "${YELLOW}Debugging information:${NC}"
+    echo -e "${BLUE}Active ports:${NC}"
+    netstat -tuln | grep -E '(:53|:67|:68)'
+    echo -e "${BLUE}Running dnsmasq processes:${NC}"
+    ps aux | grep dnsmasq
+
+    # Check if port 53 is already in use
+    if netstat -tuln | grep -q ":53 "; then
+        echo -e "${RED}Port 53 is already in use. This is preventing dnsmasq from starting.${NC}"
+        echo -e "${YELLOW}Consider using a different port or stopping the service using port 53.${NC}"
+    fi
+}
+
+# Function to check if AP mode is active
+check_ap_mode() {
+    echo -e "${BLUE}Checking if AP mode is active...${NC}"
+
+    # Check using iw
+    if iw dev "$HOTSPOT_INTERFACE" info | grep -q "type AP"; then
+        echo -e "${GREEN}AP mode successfully enabled on $HOTSPOT_INTERFACE!${NC}"
+    else
+        echo -e "${YELLOW}Warning: Interface does not show as type AP in iw.${NC}"
+        echo -e "${YELLOW}This may be normal during initialization or could indicate an issue.${NC}"
+
+        # Check if hostapd is running
+        if pgrep -f "hostapd.*$HOSTAPD_CONF" > /dev/null; then
+            echo -e "${GREEN}hostapd is running${NC}"
+
+            # Look for successful initialization in hostapd output
+            if [ -f "$SNIFF_DIR/hostapd.log" ]; then
+                if grep -q "AP-ENABLED" "$SNIFF_DIR/hostapd.log"; then
+                    echo -e "${GREEN}AP mode successfully enabled according to hostapd logs!${NC}"
+                elif grep -q "ACS-COMPLETED" "$SNIFF_DIR/hostapd.log"; then
+                    echo -e "${GREEN}ACS (channel selection) completed successfully!${NC}"
+                else
+                    echo -e "${YELLOW}AP initialization still in progress...${NC}"
+                fi
+            fi
+        else
+            echo -e "${RED}hostapd is not running. AP mode failed to initialize.${NC}"
+        fi
+    fi
+}
+
+# Add a trap for clean shutdown on script termination
+cleanup_on_exit() {
+    # Only run cleanup if hotspot is active
+    if [ -d "$SNIFF_DIR" ] && [ -f "$SNIFF_DIR/config" ]; then
+        echo -e "${YELLOW}Caught exit signal. Cleaning up...${NC}"
+        stop_hotspot
+    fi
+    trap - INT TERM
+}
+
+# Function to stop the WiFi hotspot or Ethernet DHCP server
+stop_hotspot() {
+    echo -e "${BLUE}Stopping services...${NC}"
+
+    # Stop tcpdump if running
+    stop_tcpdump
+
+    # Load saved configuration if available
+    if [ -f "$SNIFF_DIR/config" ]; then
+        # shellcheck disable=SC1090
+        source "$SNIFF_DIR/config"
+    fi
+
+    # Stop hostapd only if in WiFi mode
+    if [ "$CONNECTION_TYPE" = "wifi" ]; then
+        pkill hostapd &> /dev/null || true
+
+        # If we have a PID file, use it to kill hostapd more precisely
+        if [ -f "$SNIFF_DIR/hostapd.pid" ]; then
+            HOSTAPD_PID=$(cat "$SNIFF_DIR/hostapd.pid")
+            if ps -p "$HOSTAPD_PID" > /dev/null; then
+                kill "$HOSTAPD_PID"
+            fi
+        fi
+    fi
+
+    # Stop dnsmasq
+    if [ -f "$DNSMASQ_CONF" ]; then
+        pkill -f "dnsmasq -C $DNSMASQ_CONF" &> /dev/null || true
+    else
+        # If we can't find our config, be more cautious
+        echo -e "${YELLOW}Warning: Can't find our dnsmasq config file. Will only stop dnsmasq if it's controlled by this script.${NC}"
+        # We'll try to identify our dnsmasq by the interface
+        if [ -n "$HOTSPOT_INTERFACE" ]; then
+            pkill -f "dnsmasq.*$HOTSPOT_INTERFACE" &> /dev/null || true
+        fi
+    fi
+
+    # Restore network settings
+    if [ -n "$HOTSPOT_INTERFACE" ]; then
+        ip addr flush dev "$HOTSPOT_INTERFACE" &> /dev/null || true
+        ip link set "$HOTSPOT_INTERFACE" down &> /dev/null || true
+        ip link set "$HOTSPOT_INTERFACE" up &> /dev/null || true
+    fi
+
+    # Disable IP forwarding
+    echo 0 > /proc/sys/net/ipv4/ip_forward
+
+    # Restore iptables rules
+    if [ -f "$SNIFF_DIR/iptables-rules" ]; then
+        echo -e "${BLUE}Restoring iptables rules...${NC}"
+
+        # Remove only our rules instead of flushing everything
+        if [ -n "$INTERNET_INTERFACE" ] && [ -n "$HOTSPOT_INTERFACE" ]; then
+            iptables -t nat -D POSTROUTING -o "$INTERNET_INTERFACE" -j MASQUERADE 2>/dev/null || true
+            iptables -D FORWARD -i "$HOTSPOT_INTERFACE" -o "$INTERNET_INTERFACE" -j ACCEPT 2>/dev/null || true
+            iptables -D FORWARD -i "$INTERNET_INTERFACE" -o "$HOTSPOT_INTERFACE" -m state --state RELATED,ESTABLISHED -j ACCEPT 2>/dev/null || true
+        fi
+    fi
+
+    # Restore NetworkManager if available - WiFi mode only
+    if [ "$CONNECTION_TYPE" = "wifi" ] && command -v nmcli &> /dev/null && [ -n "$HOTSPOT_INTERFACE" ]; then
+        echo -e "${BLUE}Restoring NetworkManager control for $HOTSPOT_INTERFACE...${NC}"
+        nmcli device set "$HOTSPOT_INTERFACE" managed true &> /dev/null || true
+        nmcli radio wifi on &> /dev/null || true
+    fi
+
+    # Report tcpdump capture file location if it exists
+    if [ -n "$TCPDUMP_FILE" ] && [ -f "$TCPDUMP_FILE" ]; then
+        echo -e "${GREEN}Packet capture saved to: $TCPDUMP_FILE${NC}"
+    fi
+
+    # Clean up temporary files
+    rm -rf "$SNIFF_DIR"
+
+    echo -e "${GREEN}Service stopped successfully${NC}"
+}
+
+# Function to display comprehensive status
+show_status() {
+    if [ -d "$SNIFF_DIR" ] && [ -f "$SNIFF_DIR/config" ]; then
+        # shellcheck disable=SC1090
+        source "$SNIFF_DIR/config"
+
+        if [ "$CONNECTION_TYPE" = "wifi" ]; then
+            echo -e "${GREEN}WiFi hotspot is active${NC}"
+        else
+            echo -e "${GREEN}Ethernet DHCP server is active${NC}"
+        fi
+
+        echo -e "${BLUE}Service interface: $HOTSPOT_INTERFACE${NC}"
+        echo -e "${BLUE}Internet interface: $INTERNET_INTERFACE${NC}"
+
+        # Check if hostapd is running (WiFi mode only)
+        if [ "$CONNECTION_TYPE" = "wifi" ]; then
+            if pgrep -f "hostapd.*$HOSTAPD_CONF" > /dev/null; then
+                echo -e "${GREEN}hostapd is running${NC}"
+
+                # Check if debug log exists and print last few lines
+                if [ -f "$SNIFF_DIR/hostapd.log" ]; then
+                    echo -e "${BLUE}Last 5 lines of hostapd log:${NC}"
+                    tail -n 5 "$SNIFF_DIR/hostapd.log"
+                fi
+            else
+                echo -e "${RED}hostapd is not running${NC}"
+            fi
+        fi
+
+        # Check if dnsmasq is running
+        if pgrep -f "dnsmasq.*$HOTSPOT_INTERFACE" > /dev/null; then
+            echo -e "${GREEN}dnsmasq is running${NC}"
+        else
+            echo -e "${RED}dnsmasq is not running${NC}"
+        fi
+
+        # Check if tcpdump is running
+        if [ -f "$SNIFF_DIR/tcpdump.pid" ]; then
+            TCPDUMP_PID=$(cat "$SNIFF_DIR/tcpdump.pid")
+            if ps -p "$TCPDUMP_PID" > /dev/null; then
+                echo -e "${GREEN}tcpdump is running (PID: $TCPDUMP_PID)${NC}"
+                echo -e "${BLUE}Capture file: $TCPDUMP_FILE${NC}"
+            else
+                echo -e "${RED}tcpdump is not running${NC}"
+            fi
+        else
+            echo -e "${YELLOW}tcpdump is not configured${NC}"
+        fi
+
+        # Check interface mode (WiFi only)
+        if [ "$CONNECTION_TYPE" = "wifi" ]; then
+            echo -e "${BLUE}Interface mode:${NC}"
+            iw dev "$HOTSPOT_INTERFACE" info | grep "type" || echo -e "${RED}Could not determine interface mode${NC}"
+        fi
+
+        # Show connected clients
+        echo -e "${BLUE}Connected clients:${NC}"
+        if [ -f "/var/lib/misc/dnsmasq.leases" ]; then
+            echo -e "${GREEN}DHCP Leases:${NC}"
+            printf "%-19s %-17s %-15s %s\n" "Expires" "MAC Address" "IP Address" "Hostname"
+            echo "-----------------------------------------------------------------"
+            while read -r expires mac ip hostname _; do
+                # Convert timestamp to human-readable format
+                if [ "$expires" != "0" ]; then
+                    expiry_date=$(date -d "@$expires" "+%Y-%m-%d %H:%M")
+                else
+                    expiry_date="infinite"
+                fi
+                printf "%-19s %-17s %-15s %s\n" "$expiry_date" "$mac" "$ip" "$hostname"
+            done < "/var/lib/misc/dnsmasq.leases"
+            echo ""
+        fi
+
+        # Show current ARP table
+        echo -e "${GREEN}Current ARP Table:${NC}"
+        if [ -n "$HOTSPOT_INTERFACE" ]; then
+            printf "%-15s %-17s %s\n" "IP Address" "MAC Address" "Interface"
+            echo "-----------------------------------------------"
+            arp -n | grep "$HOTSPOT_INTERFACE" | awk '{printf "%-15s %-17s %s\n", $1, $3, $5}'
+        fi
+    else
+        echo -e "${YELLOW}Service is not active${NC}"
+    fi
+}
+
+# Main script
+check_root
+
+case "$1" in
+    start)
+        # Only set the trap when starting the service
+        trap cleanup_on_exit INT TERM
+        select_connection_type
+        check_dependencies  # Check dependencies after mode selection
+        select_interfaces
+        configure_hotspot
+        configure_tcpdump
+        setup_hotspot
+        ;;
+    stop)
+        stop_hotspot
+        ;;
+    status)
+        show_status
+        ;;
+    restart)
+        $0 stop
+        sleep 2
+        $0 start
+        ;;
+    save-config)
+        if [ -d "$SNIFF_DIR" ] && [ -f "$SNIFF_DIR/config" ]; then
+            # Load current configuration
+            # shellcheck disable=SC1090
+            source "$SNIFF_DIR/config"
+            save_configuration
+        else
+            echo -e "${RED}No active service to save configuration from${NC}"
+            echo -e "${YELLOW}Start a hotspot or ethernet service first, then save its configuration${NC}"
+        fi
+        ;;
+    load-config)
+        load_configuration
+        echo -e "${YELLOW}Configuration loaded. Start the service with:${NC}"
+        echo -e "${BLUE}$0 start${NC}"
+        ;;
+    debug)
+        # Special mode to help debug issues
+        echo -e "${BLUE}Running in debug mode...${NC}"
+        check_root
+
+        echo -e "${BLUE}WiFi Interfaces:${NC}"
+        list_wifi_interfaces
+
+        echo -e "${BLUE}Ethernet Interfaces:${NC}"
+        list_ethernet_interfaces
+
+        echo -e "${BLUE}Check if AP mode is supported:${NC}"
+        iw list | grep -A 10 "Supported interface modes" || echo "No wireless interfaces found or iw not installed"
+
+        echo -e "${BLUE}NetworkManager status:${NC}"
+        if command -v nmcli &> /dev/null; then
+            nmcli device
+        else
+            echo "NetworkManager not installed"
+        fi
+
+        echo -e "${BLUE}Active wireless connections:${NC}"
+        iw dev || echo "No wireless interfaces found or iw not installed"
+
+        echo -e "${BLUE}Active interfaces and IP addresses:${NC}"
+        ip addr
+        ;;
+    *)
+        echo -e "${BLUE}Usage: $0 [start|stop|status|restart|save-config|load-config|debug]${NC}"
+        echo -e "${YELLOW}  start: Start WiFi hotspot or Ethernet DHCP server${NC}"
+        echo -e "${YELLOW}  stop: Stop services${NC}"
+        echo -e "${YELLOW}  status: Show current status${NC}"
+        echo -e "${YELLOW}  restart: Restart services${NC}"
+        echo -e "${YELLOW}  save-config: Save current configuration${NC}"
+        echo -e "${YELLOW}  load-config: Load a saved configuration${NC}"
+        echo -e "${YELLOW}  debug: Run diagnostics to help troubleshoot issues${NC}"
+        exit 1
+        ;;
+esac
+
+# Remove the cleanup trap if the script completes normally
+trap - INT TERM
+
+exit 0
